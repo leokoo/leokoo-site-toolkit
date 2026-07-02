@@ -3,7 +3,7 @@
  * Plugin Name:  Zehoro Toolkit
  * Plugin URI:   https://leokoo.com
  * Description:  Editorial toolkit for WordPress — Article schema (E-E-A-T), Table of Contents, FAQ, author boxes, and content blocks. The free base for Zehoro Toolkit Pro.
- * Version:      1.25.6
+ * Version:      1.26.0
  * Author:       Leo Koo
  * Author URI:   https://leokoo.com
  * License:      GPLv2 or later
@@ -21,7 +21,7 @@ if ( ! defined( 'ABSPATH' ) ) exit;
 // zehoro-toolkit/). The second copy returns immediately.
 if ( defined( 'ZEHORO_VERSION' ) ) return;
 
-define( 'ZEHORO_VERSION', '1.25.6' );
+define( 'ZEHORO_VERSION', '1.26.0' );
 define( 'ZEHORO_DIR',     plugin_dir_path( __FILE__ ) );
 define( 'ZEHORO_URL',     plugin_dir_url( __FILE__ ) );
 
@@ -55,16 +55,28 @@ if ( file_exists( __DIR__ . '/vendor/yahnis-elsts/plugin-update-checker/plugin-u
     // private-repo updates). Read the CANONICAL key first — Pro reads/writes
     // `zehoro_pro_github_token`, so without this fallback a token set the canonical
     // way left Free's updater unauthenticated — then the legacy `lkst_*` key.
-    $gh_token = get_option( 'zehoro_pro_github_token', '' );
-    if ( empty( $gh_token ) ) {
-        $gh_token = get_option( 'lkst_pro_github_token', '' );
-    }
-    if ( empty( $gh_token ) && defined( 'ZEHORO_GITHUB_TOKEN' ) ) {
-        $gh_token = ZEHORO_GITHUB_TOKEN;
-    }
-    if ( ! empty( $gh_token ) ) {
-        $lkst_updater->setAuthentication( $gh_token );
-    }
+    // Authenticate on `plugins_loaded` (mirrors Pro) and NEVER forward an
+    // ENCRYPTED token. Pro stores `zehoro_pro_github_token` encrypted at rest
+    // (ciphertext prefixed `v1:`/`b64:`); Free has no decrypt path, so handing
+    // that ciphertext to GitHub as a bearer token yields a 401 and breaks Free's
+    // update check. Skip auth for a ciphertext value → fall back to anonymous
+    // (rate-limited) public-repo checks. A hand-set plaintext ZEHORO_GITHUB_TOKEN
+    // still authenticates. (See reference_wp_no_crypto_at_plugin_load doctrine.)
+    add_action( 'plugins_loaded', function () use ( $lkst_updater ) {
+        $gh_token = get_option( 'zehoro_pro_github_token', '' );
+        if ( empty( $gh_token ) ) {
+            $gh_token = get_option( 'lkst_pro_github_token', '' );
+        }
+        if ( empty( $gh_token ) && defined( 'ZEHORO_GITHUB_TOKEN' ) ) {
+            $gh_token = ZEHORO_GITHUB_TOKEN;
+        }
+        if ( str_starts_with( (string) $gh_token, 'v1:' ) || str_starts_with( (string) $gh_token, 'b64:' ) ) {
+            $gh_token = ''; // Pro's encrypted token — never send ciphertext as a credential.
+        }
+        if ( ! empty( $gh_token ) ) {
+            $lkst_updater->setAuthentication( $gh_token );
+        }
+    }, 1 );
     $lkst_updater->setBranch( 'main' );
     $lkst_updater->getVcsApi()->enableReleaseAssets();
 }

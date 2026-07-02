@@ -30,10 +30,26 @@ class CategoryPills implements \Zehoro\Core\ModuleInterface {
         // Canonical zehoro_top_category_pills + legacy lkst_top_category_pills.
         add_shortcode( 'zehoro_top_category_pills', [ $this, 'render' ] );
         add_shortcode( 'lkst_top_category_pills',   [ $this, 'render' ] );
+        // The pills render on ARCHIVE / HOME (non-singular) views, but the global
+        // stylesheet gate only loads on is_singular() + stored-content scans — so
+        // the pills' CSS never loads where they appear. Force it on those views,
+        // exactly as TableOfContents does for its auto-injected TOC.
+        add_filter( 'zehoro/load_global_styles', [ $this, 'force_styles_on_pill_views' ] );
         // Invalidate cache when taxonomy terms change
         add_action( 'created_term',         [ $this, 'clear_cache' ] );
         add_action( 'edited_term_taxonomy',  [ $this, 'clear_cache' ] );
         add_action( 'delete_term',           [ $this, 'clear_cache' ] );
+    }
+
+    /**
+     * `zehoro/load_global_styles` filter: force the shared stylesheet on the
+     * archive/home views this module renders on (the default is_singular() gate
+     * can't see it). Evaluated at wp_enqueue_scripts, where the conditional tags
+     * are available. Erring toward loading is harmless.
+     */
+    public function force_styles_on_pill_views( $load ) {
+        if ( $load ) return $load;
+        return ( is_category() || is_tag() || is_tax() || is_post_type_archive() || is_home() ) ? true : $load;
     }
 
     public function clear_cache(): void {

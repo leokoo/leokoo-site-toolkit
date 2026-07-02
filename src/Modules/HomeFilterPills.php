@@ -45,6 +45,22 @@ class HomeFilterPills implements \Zehoro\Core\ModuleInterface {
 		// Canonical zehoro_home_filter_pills + legacy lkst_home_filter_pills.
 		add_shortcode( 'zehoro_home_filter_pills', [ $this, 'render' ] );
 		add_shortcode( 'lkst_home_filter_pills',   [ $this, 'render' ] );
+		// This bar targets the homepage/front index — a non-singular view the
+		// global stylesheet gate (is_singular) skips. Force the shared sheet when
+		// pills are configured and we're on home/front, mirroring TableOfContents.
+		add_filter( 'zehoro/load_global_styles', [ $this, 'force_styles_on_home' ] );
+	}
+
+	/**
+	 * `zehoro/load_global_styles` filter: force the shared stylesheet on the
+	 * home/front index when the pills are actually configured (non-empty items).
+	 * Evaluated at wp_enqueue_scripts. Erring toward loading is harmless.
+	 */
+	public function force_styles_on_home( $load ) {
+		if ( $load ) return $load;
+		if ( ! ( is_home() || is_front_page() ) ) return $load;
+		$items = apply_filters( 'zehoro/home_filter_pills/items', [] );
+		return ( ! empty( $items ) && is_array( $items ) ) ? true : $load;
 	}
 
 	public function render( $atts ): string {

@@ -2,6 +2,15 @@
 
 All notable changes to the **Zehoro Toolkit** will be documented in this file.
 
+## [1.26.0] - 2026-07-02
+
+### Fixed — verified audit remediations (schema override · pills styling · updater token)
+Three independently-verified fixes from the platform audit pass (175 tests green):
+
+- **FAQ "Always Output Schema" now overrides SEO-plugin coexistence.** `zehoro_faq_schema_mode = 'force'` fell through the coexistence gate exactly like `'auto'`, so a user who explicitly chose "Always Output Schema" had it silently suppressed whenever an SEO plugin was active. `'force'` now emits before the `should_emit_schema()` check (dual FAQPage schema alongside an SEO plugin is the intended meaning of "always").
+- **Category / Home Filter pills now load their CSS on archives + home.** Both modules render on non-singular views, but the shared stylesheet gate only loads on `is_singular()` — so the pills rendered unstyled by default. Each module now forces the stylesheet via the `zehoro/load_global_styles` filter when it will actually render on the current view, mirroring how `TableOfContents` handles its auto-injected TOC (evaluated from the query context at enqueue time).
+- **Free updater no longer forwards Pro's encrypted token to GitHub.** Pro stores `zehoro_pro_github_token` encrypted at rest (`v1:`/`b64:` ciphertext); Free read it with a bare `get_option` and passed the ciphertext to `setAuthentication()`, yielding a GitHub `401` and a broken update check. Auth is now deferred to `plugins_loaded` and skipped when the token carries an encryption prefix (falling back to anonymous public-repo checks); a hand-set plaintext `ZEHORO_GITHUB_TOKEN` still authenticates.
+
 ## [1.25.6] - 2026-06-29
 
 ### Removed — orphaned `.zui` dead CSS (synced with Pro 1.174.3)
