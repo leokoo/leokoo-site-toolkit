@@ -101,15 +101,7 @@
 						alert( ( data.i18n && data.i18n.toggleFailed ) || 'Bulk update failed.' );
 						return;
 					}
-					( res.json.slugs || [] ).forEach( function ( slug ) {
-						var card = els.root.querySelector( '.lkst-module-card[data-module-slug="' + slug + '"]' );
-						if ( ! card ) return;
-						card.dataset.moduleActive = enable ? '1' : '0';
-						card.classList.toggle( 'active',   enable );
-						card.classList.toggle( 'inactive', ! enable );
-						var input = card.querySelector( '.lkst-switch input[type="checkbox"]' );
-						if ( input ) input.checked = enable;
-					} );
+					( res.json.slugs || [] ).forEach( function ( slug ) { applyBulkToSlug( slug, enable ); } );
 					updatePillCounts();
 					applyFilter();
 				} )
@@ -157,15 +149,7 @@
 						alert( ( data.i18n && data.i18n.toggleFailed ) || 'Could not apply the preset.' );
 						return;
 					}
-					( res.json.slugs || [] ).forEach( function ( slug ) {
-						var card = els.root.querySelector( '.lkst-module-card[data-module-slug="' + slug + '"]' );
-						if ( ! card ) return;
-						card.dataset.moduleActive = '1';
-						card.classList.add( 'active' );
-						card.classList.remove( 'inactive' );
-						var input = card.querySelector( '.lkst-switch input[type="checkbox"]' );
-						if ( input ) input.checked = true;
-					} );
+					( res.json.slugs || [] ).forEach( function ( slug ) { applyBulkToSlug( slug, true ); } );
 					updatePillCounts();
 					applyFilter();
 				} )
@@ -323,6 +307,31 @@
 	}
 
 	/** Recompute a suite card's active count + card state + master from its members. */
+	/**
+	 * Sync one module's UI after a server-side bulk/preset change. Handles BOTH a
+	 * top-level module card AND a folded suite MEMBER — a bucket-scoped bulk (e.g.
+	 * "Blocks") spans whole suites whose members live inside a suite card, not as
+	 * top-level cards, so looking them up as top-level cards silently skipped them
+	 * and left the suite toggles + pill counts stale until a reload.
+	 */
+	function applyBulkToSlug( slug, enable ) {
+		var card = els.root.querySelector( '.lkst-module-card[data-module-slug="' + slug + '"]' );
+		if ( card ) {
+			card.dataset.moduleActive = enable ? '1' : '0';
+			card.classList.toggle( 'active',   enable );
+			card.classList.toggle( 'inactive', ! enable );
+			var input = card.querySelector( '.lkst-switch input[type="checkbox"]' );
+			if ( input ) input.checked = enable;
+			return;
+		}
+		// Folded suite member: set its checkbox + resync the enclosing suite card.
+		var li = els.root.querySelector( '.zehoro-suite-member[data-module-slug="' + slug + '"]' );
+		if ( ! li ) return;
+		var mi = li.querySelector( 'input[type="checkbox"]' );
+		if ( mi ) mi.checked = enable;
+		updateSuiteCard( li.closest( '.zehoro-suite-card' ) );
+	}
+
 	function updateSuiteCard( card ) {
 		if ( ! card ) return;
 		var members = card.querySelectorAll( '.zehoro-suite-member input[type="checkbox"]' );

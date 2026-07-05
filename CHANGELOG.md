@@ -2,6 +2,19 @@
 
 All notable changes to the **Zehoro Toolkit** will be documented in this file.
 
+## [1.27.1] - 2026-07-06
+
+### Fixed — bucket bulk enable/disable now syncs folded suite cards
+From the adversarial review of the 1.27.0 buckets IA: a bucket-scoped "Enable all" /
+"Disable all" updated the server correctly but left the **suite cards** (Blocks,
+Schema, Reading & Trust) visually stale until a reload — the JS looked up the returned
+member slugs (faq, tldr, article_schema, …) as top-level cards, but folded suite
+members live *inside* a suite card, so every one was silently skipped (and the
+Active/Inactive pill counts then read the stale cards). Because a bucket spans whole
+suites, this bit every bucket bulk action. The handler now falls back to the folded
+`.zehoro-suite-member` and resyncs the enclosing suite card + counts (a shared
+`applyBulkToSlug` used by both the bulk and preset paths).
+
 ## [1.27.0] - 2026-07-06
 
 ### Changed — Modules page grouped into 4 buckets, with The Loop as the front door
