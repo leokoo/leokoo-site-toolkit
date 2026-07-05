@@ -128,6 +128,57 @@ class Plugin {
 		return $out;
 	}
 
+	// ── Buckets ─────────────────────────────────────────────────────────────────
+	//
+	// One level ABOVE the fine-grained groups: the four top-level module buckets
+	// shown on the Modules page. "The Loop" is the daily-driver front door; Blocks
+	// / Conversion / Toolkit are configure-once site furniture. Order matters — The
+	// Loop leads. Toolkit is the catch-all (unknown groups fall here — watch it for
+	// junk-drawer creep).
+
+	public const BUCKET_LOOP       = 'loop';
+	public const BUCKET_BLOCKS     = 'blocks';
+	public const BUCKET_CONVERSION = 'conversion';
+	public const BUCKET_TOOLKIT    = 'toolkit';
+
+	/** The front-door bucket — rendered first + set apart from the "set up once" trio. */
+	public const BUCKET_PRIMARY = self::BUCKET_LOOP;
+
+	/**
+	 * Bucket labels, in display order (The Loop first). Literal `__()` calls so the
+	 * strings stay i18n-extractable.
+	 *
+	 * @return array<string,string>
+	 */
+	public static function bucket_labels(): array {
+		return [
+			self::BUCKET_LOOP       => __( 'The Loop', 'zehoro-toolkit' ),
+			self::BUCKET_BLOCKS     => __( 'Blocks', 'zehoro-toolkit' ),
+			self::BUCKET_CONVERSION => __( 'Conversion', 'zehoro-toolkit' ),
+			self::BUCKET_TOOLKIT    => __( 'Toolkit', 'zehoro-toolkit' ),
+		];
+	}
+
+	/**
+	 * Map a fine-grained group to its bucket. Unknown groups fall to Toolkit (the
+	 * catch-all). Loop = the intelligence engines (SEO diagnostics + AI + the edit
+	 * log that feeds the needle-measurement); Blocks = editorial blocks + their
+	 * schema; Conversion = CTA/lead-capture; Toolkit = reader UX + plumbing + nav.
+	 */
+	public static function group_bucket( string $group ): string {
+		static $map = [
+			'seo'              => self::BUCKET_LOOP,
+			'ai'               => self::BUCKET_LOOP,
+			'workflow'         => self::BUCKET_LOOP,
+			'editorial_blocks' => self::BUCKET_BLOCKS,
+			'schema'           => self::BUCKET_BLOCKS,
+			'conversion'       => self::BUCKET_CONVERSION,
+			'reading_ux'       => self::BUCKET_TOOLKIT,
+			'admin'            => self::BUCKET_TOOLKIT,
+		];
+		return $map[ $group ] ?? self::BUCKET_TOOLKIT;
+	}
+
 	/**
 	 * Auto-detect tier from class namespace.
 	 *   Zehoro\Modules\*       → free
@@ -190,8 +241,7 @@ class Plugin {
 			'entity_index'           => 'seo',
 			'dataforseo'             => 'seo',
 			'ga4'                    => 'seo',
-			'category_pills'         => 'seo',
-			'home_filter_pills'      => 'seo',
+			'edit_log'               => 'seo', // a loop organ — records the edits the needle-measurement reads
 
 			// AI Assistance — AI-driven analysis / rewriting.
 			'ai_visibility'          => 'ai',
@@ -203,12 +253,13 @@ class Plugin {
 			'sticky_bar'        => 'conversion',
 			'cta_swap'          => 'conversion',
 
-			// Admin & Plumbing — operational.
+			// Admin & Plumbing — operational + front-end nav UX (all → Toolkit bucket).
 			'css_auditor'       => 'admin',
 			'archive_cleanup'   => 'admin',
 			'rss_support'       => 'admin',
 			'styles'            => 'admin',
-			'edit_log'          => 'admin',
+			'category_pills'    => 'admin', // front-end nav UX, not a loop diagnostic
+			'home_filter_pills' => 'admin', // front-end nav UX, not a loop diagnostic
 		];
 		return $map[ $slug ] ?? 'other';
 	}

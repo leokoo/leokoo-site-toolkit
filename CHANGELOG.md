@@ -2,6 +2,21 @@
 
 All notable changes to the **Zehoro Toolkit** will be documented in this file.
 
+## [1.27.0] - 2026-07-06
+
+### Changed — Modules page grouped into 4 buckets, with The Loop as the front door
+The Modules page left-nav listed 8 flat groups, which read as an undifferentiated
+"lab." It now groups modules into **4 buckets** one level above the fine-grained
+groups: **The Loop** (the daily-driver intelligence engine) is rendered first and
+set apart; **Blocks**, **Conversion**, and **Toolkit** fall under a "Set up once"
+heading as configure-once site furniture. Clicking a bucket filters the grid to it;
+bulk enable/disable is now bucket-scoped (still accepts a fine-group key for
+back-compat). Three reclassifications keep The Loop pure intelligence: `edit_log`
+moves **into** the Loop (it records the edits the needle-measurement reads), and
+`category_pills` + `home_filter_pills` move **out** into Toolkit (front-end nav UX,
+not diagnostics). Toolkit is the catch-all — unknown groups fall there, never into
+The Loop. New `Plugin::bucket_labels()` / `Plugin::group_bucket()` + `ModuleBucketsTest`.
+
 ## [1.26.0] - 2026-07-02
 
 ### Fixed — verified audit remediations (schema override · pills styling · updater token)

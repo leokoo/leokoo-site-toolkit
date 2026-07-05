@@ -361,6 +361,7 @@ class Dashboard {
 			data-module-active="<?php echo $active > 0 ? '1' : '0'; ?>"
 			data-module-tier="free"
 			data-module-group="<?php echo esc_attr( $s['group'] ); ?>"
+			data-module-bucket="<?php echo esc_attr( Plugin::group_bucket( (string) $s['group'] ) ); ?>"
 		>
 			<div class="lkst-module-header">
 				<h3 class="lkst-module-title">
@@ -483,15 +484,19 @@ class Dashboard {
 			}
 		}
 
-		// Left-sidebar group nav counts, off the collapsed view (a suite = 1).
-		$category_order = Plugin::group_labels(); // translated, extractable literals
-		$group_counts   = array_fill_keys( array_keys( $category_order ), 0 );
+		// Left-sidebar BUCKET nav counts, off the collapsed view (a suite = 1). The
+		// four buckets sit one level above the fine-grained groups: "The Loop" is the
+		// daily-driver front door; Blocks / Conversion / Toolkit are configure-once
+		// site furniture (grouped under a "Set up once" heading).
+		$bucket_labels = Plugin::bucket_labels(); // ordered, Loop first
+		$bucket_counts = array_fill_keys( array_keys( $bucket_labels ), 0 );
 		foreach ( $render_list as $item ) {
 			$g = ( 'suite' === $item['type'] ) ? $item['data']['group'] : ( $item['data']['group'] ?? 'other' );
-			if ( ! isset( $group_counts[ $g ] ) ) $g = 'other';
-			$group_counts[ $g ]++;
+			$b = Plugin::group_bucket( (string) $g );
+			if ( ! isset( $bucket_counts[ $b ] ) ) $b = Plugin::BUCKET_TOOLKIT;
+			$bucket_counts[ $b ]++;
 		}
-		$group_counts = array_filter( $group_counts ); // drop empty groups
+		$bucket_counts = array_filter( $bucket_counts ); // drop empty buckets
 		?>
 		<div class="wrap lkst-dashboard">
 			<div class="zui">
@@ -505,7 +510,7 @@ class Dashboard {
 			</div>
 
 			<div class="zehoro-modules-layout">
-			<aside class="zehoro-module-nav" aria-label="<?php esc_attr_e( 'Module groups', 'zehoro-toolkit' ); ?>">
+			<aside class="zehoro-module-nav" aria-label="<?php esc_attr_e( 'Module buckets', 'zehoro-toolkit' ); ?>">
 				<ul class="zehoro-module-nav__list">
 					<li>
 						<a href="#" class="zehoro-module-nav__link" data-group="all" aria-current="true">
@@ -513,14 +518,29 @@ class Dashboard {
 							<span class="zehoro-module-nav__count">(<?php echo (int) $total; ?>)</span>
 						</a>
 					</li>
-					<?php foreach ( $group_counts as $cat_slug => $count ) : ?>
+					<?php
+					// The Loop is the daily driver — rendered first + set apart. The other
+					// buckets fall under a "Set up once" heading (configure-once furniture).
+					if ( isset( $bucket_counts[ Plugin::BUCKET_PRIMARY ] ) ) : ?>
 						<li>
-							<a href="#" class="zehoro-module-nav__link" data-group="<?php echo esc_attr( $cat_slug ); ?>" aria-current="false">
-								<?php echo esc_html( $category_order[ $cat_slug ] ?? ucfirst( $cat_slug ) ); ?>
-								<span class="zehoro-module-nav__count">(<?php echo (int) $count; ?>)</span>
+							<a href="#" class="zehoro-module-nav__link zehoro-module-nav__link--primary" data-group="<?php echo esc_attr( Plugin::BUCKET_PRIMARY ); ?>" aria-current="false">
+								<?php echo esc_html( $bucket_labels[ Plugin::BUCKET_PRIMARY ] ); ?>
+								<span class="zehoro-module-nav__count">(<?php echo (int) $bucket_counts[ Plugin::BUCKET_PRIMARY ]; ?>)</span>
 							</a>
 						</li>
-					<?php endforeach; ?>
+					<?php endif; ?>
+					<?php $configure_once = array_diff_key( $bucket_counts, [ Plugin::BUCKET_PRIMARY => 0 ] ); ?>
+					<?php if ( $configure_once ) : ?>
+						<li class="zehoro-module-nav__label"><?php esc_html_e( 'Set up once', 'zehoro-toolkit' ); ?></li>
+						<?php foreach ( $configure_once as $bkey => $count ) : ?>
+							<li>
+								<a href="#" class="zehoro-module-nav__link" data-group="<?php echo esc_attr( $bkey ); ?>" aria-current="false">
+									<?php echo esc_html( $bucket_labels[ $bkey ] ?? ucfirst( $bkey ) ); ?>
+									<span class="zehoro-module-nav__count">(<?php echo (int) $count; ?>)</span>
+								</a>
+							</li>
+						<?php endforeach; ?>
+					<?php endif; ?>
 				</ul>
 			</aside>
 			<div class="zehoro-modules-main">
@@ -593,6 +613,7 @@ class Dashboard {
 						data-module-active="<?php echo $is_active ? '1' : '0'; ?>"
 						data-module-tier="<?php echo esc_attr( $tier ); ?>"
 						data-module-group="<?php echo esc_attr( $data['group'] ); ?>"
+						data-module-bucket="<?php echo esc_attr( Plugin::group_bucket( (string) $data['group'] ) ); ?>"
 					>
 						<div class="lkst-module-header">
 							<h3 class="lkst-module-title">

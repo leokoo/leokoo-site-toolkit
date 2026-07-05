@@ -127,8 +127,12 @@ class ModulesController {
 		if ( [] !== $slugs ) {
 			$targets = array_values( array_intersect( $slugs, array_keys( $registered ) ) );
 		} else {
+			// The sidebar scope is a BUCKET (Loop / Blocks / Conversion / Toolkit);
+			// match on the module's bucket, but still accept a raw fine-group key for
+			// back-compat / programmatic callers.
 			foreach ( $registered as $slug => $meta ) {
-				if ( '' === $group || ( $meta['group'] ?? 'other' ) === $group ) {
+				$g = (string) ( $meta['group'] ?? 'other' );
+				if ( '' === $group || $g === $group || Plugin::group_bucket( $g ) === $group ) {
 					$targets[] = $slug;
 				}
 			}

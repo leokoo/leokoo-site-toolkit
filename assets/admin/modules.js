@@ -415,7 +415,9 @@
 			var hay      = ( card.dataset.moduleHaystack || '' ).toLowerCase();
 			var isActive = card.dataset.moduleActive === '1';
 			var tier     = card.dataset.moduleTier || 'free';
-			var cardGroup = card.dataset.moduleGroup || 'other';
+			// The left-nav filters by BUCKET (Loop / Blocks / Conversion / Toolkit),
+			// one level above the fine-grained data-module-group.
+			var cardGroup = card.dataset.moduleBucket || card.dataset.moduleGroup || 'other';
 
 			var matchesSearch = tokens.length === 0
 				|| tokens.every( function ( t ) { return hay.indexOf( t ) !== -1; } );

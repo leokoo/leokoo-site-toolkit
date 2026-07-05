@@ -88,6 +88,23 @@
 	opacity: 0.7;
 }
 
+/* The Loop — the daily-driver front door, set apart from the "set up once" trio. */
+.zehoro-module-nav__link--primary {
+	font-weight: 600;
+	color: #1f2d1a;
+}
+
+/* "Set up once" — the sub-heading over the configure-once buckets. */
+.zehoro-module-nav__label {
+	padding: 14px 14px 4px;
+	font-size: 11px;
+	font-weight: 600;
+	text-transform: uppercase;
+	letter-spacing: 0.05em;
+	color: #8a8678;
+	pointer-events: none;
+}
+
 /* ── Filter bar ─────────────────────────────────────────────────────────── */
 
 .zehoro-module-filters {
