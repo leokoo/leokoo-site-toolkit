@@ -2,6 +2,18 @@
 
 All notable changes to the **Zehoro Toolkit** will be documented in this file.
 
+## [1.27.2] - 2026-07-06
+
+### Fixed (security) — stored-XSS hardening in JSON-LD schema
+From the Dev-Team bug audit + refuter (each verified with an adversarial probe):
+- **Steps HowTo block** — the author `taskName` reached the JSON-LD `name` unsanitized and was
+  emitted with `JSON_UNESCAPED_SLASHES`, so a literal `</script>` could break out of the
+  `<script type="application/ld+json">` block. Now `sanitize_text_field`'d **and** slash-escaped
+  (a 16-vector breakout probe came back clean).
+- **Article schema parity** — dropped `JSON_UNESCAPED_SLASHES` from `ArticleSchema`'s JSON-LD too.
+  Not exploitable via `post_title` today (WP strips tags), but it gives no safety net for any
+  free text a `zehoro_article_schema` filter injects. Defense-in-depth parity with Steps/FAQ.
+
 ## [1.27.1] - 2026-07-06
 
 ### Fixed — bucket bulk enable/disable now syncs folded suite cards

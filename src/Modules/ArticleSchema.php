@@ -183,7 +183,10 @@ class ArticleSchema implements ModuleInterface {
 
         echo "\n<!-- LKST Article Schema -->\n";
         echo '<script type="application/ld+json">';
-        echo wp_json_encode( $schema, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE );
+        // Keep slash-escaping ON so a </script> in any schema value (incl. anything a
+        // `zehoro_article_schema` filter injects) becomes <\/script> and can't close the
+        // block — defense-in-depth parity with Steps/FAQ.
+        echo wp_json_encode( $schema, JSON_UNESCAPED_UNICODE );
         echo "</script>\n";
     }
 
@@ -240,7 +243,7 @@ class ArticleSchema implements ModuleInterface {
         $word_count  = $schema['wordCount'] ?? 0;
         $headline    = $schema['headline'];
         $short_hl    = mb_strlen( $headline ) > 45 ? mb_substr( $headline, 0, 42 ) . '…' : $headline;
-        $json        = wp_json_encode( $schema, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT );
+        $json        = wp_json_encode( $schema, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT );
         ?>
         <style>
         #lkst-schema-preview{font-size:12px;}

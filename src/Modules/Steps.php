@@ -95,7 +95,10 @@ class Steps implements ModuleInterface {
         // Defer to SEO plugins
         if ( ArticleSchema::seo_plugin_active() ) return '';
 
-        $name = ! empty( $taskName ) ? $taskName : get_the_title();
+        // Sanitize the author-supplied task name before it enters JSON-LD (stored-XSS
+        // guard: an unsanitized name + unescaped slashes let a literal </script> break
+        // out of the <script type="application/ld+json"> block).
+        $name = ! empty( $taskName ) ? sanitize_text_field( $taskName ) : get_the_title();
 
         $schema = [
             '@context' => 'https://schema.org',
@@ -121,8 +124,10 @@ class Steps implements ModuleInterface {
 
         self::$schema_output = true;
 
+        // Keep slash-escaping ON (drop JSON_UNESCAPED_SLASHES): it turns any "</script>"
+        // into "<\/script>", so a stray value can't close the JSON-LD block. Matches FAQ.
         return "\n" . '<script type="application/ld+json">'
-            . wp_json_encode( $schema, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE )
+            . wp_json_encode( $schema, JSON_UNESCAPED_UNICODE )
             . "</script>\n";
     }
 }
