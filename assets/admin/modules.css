@@ -94,7 +94,7 @@
 	color: #1f2d1a;
 }
 
-/* "Set up once" — the sub-heading over the configure-once buckets. */
+/* Tier headers ("Core" / "Surface") over their buckets. */
 .zehoro-module-nav__label {
 	padding: 14px 14px 4px;
 	font-size: 11px;
@@ -103,6 +103,17 @@
 	letter-spacing: 0.05em;
 	color: #8a8678;
 	pointer-events: none;
+}
+
+/* The lower-case descriptive line under a tier header (the "engine"/"rendering" framing). */
+.zehoro-module-nav__label-sub {
+	display: block;
+	margin-top: 2px;
+	font-size: 11px;
+	font-weight: 400;
+	text-transform: none;
+	letter-spacing: 0;
+	color: #a8a496;
 }
 
 /* ── Filter bar ─────────────────────────────────────────────────────────── */

@@ -485,9 +485,9 @@ class Dashboard {
 		}
 
 		// Left-sidebar BUCKET nav counts, off the collapsed view (a suite = 1). The
-		// four buckets sit one level above the fine-grained groups: "The Loop" is the
-		// daily-driver front door; Blocks / Conversion / Toolkit are configure-once
-		// site furniture (grouped under a "Set up once" heading).
+		// buckets sit one level above the fine-grained groups and group into two tiers
+		// (Plugin::bucket_tier): Core = "The Loop" (the engine); Surface = Blocks /
+		// Conversion / Utilities (the WordPress rendering toolbox).
 		$bucket_labels = Plugin::bucket_labels(); // ordered, Loop first
 		$bucket_counts = array_fill_keys( array_keys( $bucket_labels ), 0 );
 		foreach ( $render_list as $item ) {
@@ -519,9 +519,13 @@ class Dashboard {
 						</a>
 					</li>
 					<?php
-					// The Loop is the daily driver — rendered first + set apart. The other
-					// buckets fall under a "Set up once" heading (configure-once furniture).
+					// Two tiers: Core (The Loop — the CMS-agnostic engine) leads, then
+					// Surface (the WordPress rendering toolbox). See Plugin::bucket_tier().
 					if ( isset( $bucket_counts[ Plugin::BUCKET_PRIMARY ] ) ) : ?>
+						<li class="zehoro-module-nav__label">
+							<?php esc_html_e( 'Core', 'zehoro-toolkit' ); ?>
+							<span class="zehoro-module-nav__label-sub"><?php esc_html_e( 'the content-business engine', 'zehoro-toolkit' ); ?></span>
+						</li>
 						<li>
 							<a href="#" class="zehoro-module-nav__link zehoro-module-nav__link--primary" data-group="<?php echo esc_attr( Plugin::BUCKET_PRIMARY ); ?>" aria-current="false">
 								<?php echo esc_html( $bucket_labels[ Plugin::BUCKET_PRIMARY ] ); ?>
@@ -531,7 +535,10 @@ class Dashboard {
 					<?php endif; ?>
 					<?php $configure_once = array_diff_key( $bucket_counts, [ Plugin::BUCKET_PRIMARY => 0 ] ); ?>
 					<?php if ( $configure_once ) : ?>
-						<li class="zehoro-module-nav__label"><?php esc_html_e( 'Set up once', 'zehoro-toolkit' ); ?></li>
+						<li class="zehoro-module-nav__label">
+							<?php esc_html_e( 'Surface', 'zehoro-toolkit' ); ?>
+							<span class="zehoro-module-nav__label-sub"><?php esc_html_e( 'WordPress rendering', 'zehoro-toolkit' ); ?></span>
+						</li>
 						<?php foreach ( $configure_once as $bkey => $count ) : ?>
 							<li>
 								<a href="#" class="zehoro-module-nav__link" data-group="<?php echo esc_attr( $bkey ); ?>" aria-current="false">

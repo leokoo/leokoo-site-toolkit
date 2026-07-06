@@ -1,8 +1,9 @@
 <?php
 /**
- * Buckets — the four top-level module groupings (one level above the fine-grained
- * groups) shown on the Modules page. "The Loop" is the front door; Blocks /
- * Conversion / Toolkit are configure-once furniture.
+ * Buckets — the top-level module groupings (one level above the fine-grained
+ * groups) shown on the Modules page. They split into two tiers: Core ("The Loop",
+ * the CMS-agnostic engine) and Surface (Blocks / Conversion / Utilities, the
+ * WordPress rendering toolbox).
  *
  * @package Zehoro\Tests\Integration
  */
@@ -19,7 +20,17 @@ class ModuleBucketsTest extends WP_UnitTestCase {
 			'The Loop is the front door — first in display order.'
 		);
 		$this->assertSame( 'The Loop', $labels[ Plugin::BUCKET_LOOP ] );
+		$this->assertSame( 'Utilities', $labels[ Plugin::BUCKET_TOOLKIT ], 'The Toolkit bucket now reads "Utilities".' );
 		$this->assertSame( Plugin::BUCKET_LOOP, Plugin::BUCKET_PRIMARY );
+	}
+
+	public function test_buckets_split_into_core_and_surface_tiers(): void {
+		// Core = only The Loop (the portable engine). Everything else is the
+		// WordPress rendering Surface.
+		$this->assertSame( Plugin::TIER_CORE,    Plugin::bucket_tier( Plugin::BUCKET_LOOP ) );
+		$this->assertSame( Plugin::TIER_SURFACE, Plugin::bucket_tier( Plugin::BUCKET_BLOCKS ) );
+		$this->assertSame( Plugin::TIER_SURFACE, Plugin::bucket_tier( Plugin::BUCKET_CONVERSION ) );
+		$this->assertSame( Plugin::TIER_SURFACE, Plugin::bucket_tier( Plugin::BUCKET_TOOLKIT ) );
 	}
 
 	public function test_groups_map_to_the_right_bucket(): void {

@@ -3,7 +3,7 @@
  * Plugin Name:  Zehoro Toolkit
  * Plugin URI:   https://leokoo.com
  * Description:  Editorial toolkit for WordPress — Article schema (E-E-A-T), Table of Contents, FAQ, author boxes, and content blocks. The free base for Zehoro Toolkit Pro.
- * Version:      1.27.3
+ * Version:      1.28.0
  * Author:       Leo Koo
  * Author URI:   https://leokoo.com
  * License:      GPLv2 or later
@@ -21,7 +21,7 @@ if ( ! defined( 'ABSPATH' ) ) exit;
 // zehoro-toolkit/). The second copy returns immediately.
 if ( defined( 'ZEHORO_VERSION' ) ) return;
 
-define( 'ZEHORO_VERSION', '1.27.3' );
+define( 'ZEHORO_VERSION', '1.28.0' );
 define( 'ZEHORO_DIR',     plugin_dir_path( __FILE__ ) );
 define( 'ZEHORO_URL',     plugin_dir_url( __FILE__ ) );
 

@@ -130,19 +130,26 @@ class Plugin {
 
 	// ── Buckets ─────────────────────────────────────────────────────────────────
 	//
-	// One level ABOVE the fine-grained groups: the four top-level module buckets
-	// shown on the Modules page. "The Loop" is the daily-driver front door; Blocks
-	// / Conversion / Toolkit are configure-once site furniture. Order matters — The
-	// Loop leads. Toolkit is the catch-all (unknown groups fall here — watch it for
-	// junk-drawer creep).
+	// One level ABOVE the fine-grained groups. The Modules page splits the buckets
+	// into two TIERS (see bucket_tier()):
+	//   Core    — "The Loop": the CMS-agnostic content-business engine (what becomes
+	//             the Laravel core). The daily driver.
+	//   Surface — Blocks / Conversion / Utilities: the WordPress-specific rendering
+	//             (a per-connector toolbox you'd strip for a Shopify/Ghost surface).
+	// Order matters — The Loop leads. Utilities (key still 'toolkit') is the catch-all;
+	// unknown groups fall here — watch it for junk-drawer creep.
 
 	public const BUCKET_LOOP       = 'loop';
 	public const BUCKET_BLOCKS     = 'blocks';
 	public const BUCKET_CONVERSION = 'conversion';
-	public const BUCKET_TOOLKIT    = 'toolkit';
+	public const BUCKET_TOOLKIT    = 'toolkit'; // label: "Utilities"
 
-	/** The front-door bucket — rendered first + set apart from the "set up once" trio. */
+	/** The Core tier — one bucket, rendered first + set apart from the Surface trio. */
 	public const BUCKET_PRIMARY = self::BUCKET_LOOP;
+
+	/** Tier keys — the two sections the buckets group under on the Modules page. */
+	public const TIER_CORE    = 'core';
+	public const TIER_SURFACE = 'surface';
 
 	/**
 	 * Bucket labels, in display order (The Loop first). Literal `__()` calls so the
@@ -155,8 +162,16 @@ class Plugin {
 			self::BUCKET_LOOP       => __( 'The Loop', 'zehoro-toolkit' ),
 			self::BUCKET_BLOCKS     => __( 'Blocks', 'zehoro-toolkit' ),
 			self::BUCKET_CONVERSION => __( 'Conversion', 'zehoro-toolkit' ),
-			self::BUCKET_TOOLKIT    => __( 'Toolkit', 'zehoro-toolkit' ),
+			self::BUCKET_TOOLKIT    => __( 'Utilities', 'zehoro-toolkit' ),
 		];
+	}
+
+	/**
+	 * Which tier a bucket sits under. The Loop is the Core (portable engine);
+	 * everything else is the WordPress rendering Surface.
+	 */
+	public static function bucket_tier( string $bucket ): string {
+		return $bucket === self::BUCKET_LOOP ? self::TIER_CORE : self::TIER_SURFACE;
 	}
 
 	/**

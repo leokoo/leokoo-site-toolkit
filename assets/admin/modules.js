@@ -50,11 +50,9 @@
 		bindSuiteEvents();
 		bindBulkEvents();
 		bindPresetEvents();
+		// applyFilter() recomputes the (bucket-scoped) pill counts from live
+		// card state, so the server-rendered pills can never sit stale.
 		applyFilter( /* skipAnimation = */ true );
-
-		// Pills are server-rendered; recompute from live card state so they
-		// can never sit stale (and stay correct after every toggle below).
-		updatePillCounts();
 	}
 
 	/**
@@ -161,18 +159,43 @@
 		} );
 	}
 
-	/** Recompute the Active / Inactive pill counts from current card state. */
+	/**
+	 * Recompute every status-pill count from live card state, SCOPED to the
+	 * active bucket + search. Each pill shows how many cards you'd see if that
+	 * pill were the selected status (group + search held fixed) — so "All (n)"
+	 * always equals the visible count for the current bucket, never the whole
+	 * plugin. (The old version counted every card and only touched Active /
+	 * Inactive, so the top pills read 34/32 while the Loop bucket held 14.)
+	 */
 	function updatePillCounts() {
+		var group  = state.group || 'all';
+		var q      = state.search || '';
+		var tokens = q ? q.split( /\s+/ ).filter( Boolean ) : [];
 		var cards  = els.root.querySelectorAll( '.lkst-module-card' );
-		var active = 0;
-		cards.forEach( function ( c ) { if ( c.dataset.moduleActive === '1' ) active++; } );
+
+		var all = 0, active = 0, free = 0, pro = 0;
+		cards.forEach( function ( c ) {
+			var hay       = ( c.dataset.moduleHaystack || '' ).toLowerCase();
+			var cardGroup = c.dataset.moduleBucket || c.dataset.moduleGroup || 'other';
+			var matchesGroup  = group === 'all' || cardGroup === group;
+			var matchesSearch = tokens.length === 0
+				|| tokens.every( function ( t ) { return hay.indexOf( t ) !== -1; } );
+			if ( ! matchesGroup || ! matchesSearch ) return;
+
+			all++;
+			if ( c.dataset.moduleActive === '1' ) active++;
+			if ( ( c.dataset.moduleTier || 'free' ) === 'pro' ) pro++; else free++;
+		} );
 
 		var set = function ( status, n ) {
 			var count = document.querySelector( '.zehoro-status-pill[data-status="' + status + '"] .zehoro-status-pill__count' );
 			if ( count ) count.textContent = '(' + n + ')';
 		};
-		set( 'active', active );
-		set( 'inactive', cards.length - active );
+		set( 'all',      all );
+		set( 'active',   active );
+		set( 'inactive', all - active );
+		set( 'free',     free );
+		set( 'pro',      pro );
 	}
 
 	function bindToggleEvents() {
@@ -460,6 +483,9 @@
 		if ( els.empty ) els.empty.style.display = visible === 0 ? 'block' : 'none';
 		if ( els.root  ) els.root.style.display  = visible === 0 ? 'none'  : '';
 
+		// Pills are scoped to the current bucket + search, so refresh them
+		// whenever the filter changes (switching buckets, typing a search).
+		updatePillCounts();
 		announce( visible );
 	}
 

@@ -2,6 +2,23 @@
 
 All notable changes to the **Zehoro Toolkit** will be documented in this file.
 
+## [1.28.0] - 2026-07-07
+
+### Changed — Modules page re-cut along Core vs Surface (the loop is one engine, not 34 toggles)
+The flat four-bucket nav now groups into two tiers that match the product's real architecture:
+- **Core · the content-business engine** — holds **The Loop** (the CMS-agnostic diagnostics + measurement;
+  what becomes the Laravel core).
+- **Surface · WordPress rendering** — **Blocks / Conversion / Utilities** (the per-connector toolbox you'd
+  strip for a Shopify/Ghost surface). The **Toolkit** bucket is now labelled **Utilities**.
+New `Plugin::bucket_tier()` + `TIER_CORE`/`TIER_SURFACE` constants encode the split; the bucket keys are
+unchanged (`toolkit` stays the internal key). No modules move on the Free side — this is IA only.
+
+### Fixed — Modules-page status-pill counts ignored the active bucket
+The top **All / Active / Inactive / Free / Pro** pills counted *every* card and only ever refreshed the
+Active/Inactive two, and never re-ran when you switched buckets — so selecting **The Loop** still read
+`All (34)` while the bucket held 14. `updatePillCounts()` now scopes every pill to the selected bucket +
+search and recomputes on each filter change (`All (20)` under The Loop, etc.).
+
 ## [1.27.3] - 2026-07-06
 
 ### Fixed — author sameAs dropped from JSON-LD after the brand rename (Dev-Team re-audit, RENAME-DRIFT-1)
