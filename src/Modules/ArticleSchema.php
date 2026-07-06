@@ -94,8 +94,13 @@ class ArticleSchema implements ModuleInterface {
             $author_schema['url'] = esc_url( $custom_url );
         }
 
-        $linkedin = get_the_author_meta( 'lkst_author_linkedin', $author_id );
-        $twitter  = get_the_author_meta( 'lkst_author_twitter', $author_id );
+        // Read the canonical post-rename key first, falling back to the legacy one for installs
+        // that haven't run ZehoroRenameMigrator yet. Before this, ArticleSchema read only the
+        // legacy `lkst_author_*` key while the migrator had moved the value to `zehoro_author_*`,
+        // so a migrated site silently dropped the author's sameAs from the JSON-LD (audit round-2
+        // RENAME-DRIFT-1 — an E-E-A-T signal loss).
+        $linkedin = get_the_author_meta( 'zehoro_author_linkedin', $author_id ) ?: get_the_author_meta( 'lkst_author_linkedin', $author_id );
+        $twitter  = get_the_author_meta( 'zehoro_author_twitter', $author_id ) ?: get_the_author_meta( 'lkst_author_twitter', $author_id );
         $same_as  = array_values( array_filter( [ $linkedin, $twitter ] ) );
         if ( ! empty( $same_as ) ) {
             $author_schema['sameAs'] = array_map( 'esc_url', $same_as );

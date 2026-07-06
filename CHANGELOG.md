@@ -2,6 +2,15 @@
 
 All notable changes to the **Zehoro Toolkit** will be documented in this file.
 
+## [1.27.3] - 2026-07-06
+
+### Fixed — author sameAs dropped from JSON-LD after the brand rename (Dev-Team re-audit, RENAME-DRIFT-1)
+`ArticleSchema` read the author's LinkedIn/Twitter from the legacy `lkst_author_*` user-meta key,
+but `ZehoroRenameMigrator` moves that value to `zehoro_author_*` on upgrade — so on any migrated
+site the author's `sameAs` (an E-E-A-T authorship signal) silently vanished from the article schema.
+It now reads the canonical `zehoro_author_*` key with a fallback to the legacy one for un-migrated
+installs. Refuter-verified (the `?:` fallback is safe; the canonical key matches the migrator + DataEraser).
+
 ## [1.27.2] - 2026-07-06
 
 ### Fixed (security) — stored-XSS hardening in JSON-LD schema
