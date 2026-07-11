@@ -214,7 +214,7 @@ class Plugin {
 	private static function detect_group( string $slug ): string {
 		static $map = [
 			// Editorial Blocks — content the author drops into posts.
-			'tldr'              => 'editorial_blocks',
+			'key_takeaways'     => 'editorial_blocks',
 			'faq'               => 'editorial_blocks',
 			'steps'             => 'editorial_blocks',
 			'pros_cons'         => 'editorial_blocks',
@@ -289,7 +289,7 @@ class Plugin {
 	private static function detect_type( string $slug ): string {
 		static $blocks = [
 			'callout', 'faq', 'pros_cons', 'stat_callout', 'steps', 'testimonial',
-			'tldr', 'inline_product', 'comparison_table', 'coupon_box', 'product_box',
+			'key_takeaways', 'inline_product', 'comparison_table', 'coupon_box', 'product_box',
 			'product_roundup', 'product_verdict', 'review_box', 'versus_box',
 		];
 		static $tools = [

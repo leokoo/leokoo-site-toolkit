@@ -2,6 +2,27 @@
 
 All notable changes to the **Zehoro Toolkit** will be documented in this file.
 
+## [1.29.0] - 2026-07-12
+
+### Added — Key Takeaways block (first launch block; supersedes `lkst/tldr`)
+A dynamic, server-rendered **Key Takeaways** block (`zehoro/key-takeaways`) for the answer-first summary at
+the top of a post — scannable bullets *or* a short TL;DR paragraph, a quote-ready passage readers and AI
+answer engines can lift verbatim. WYSIWYG editor (heading + list/paragraph via a block-toolbar toggle),
+configurable heading level (H2–H4), theme-neutral in light + dark, semantic `<section>`/`<h*>`/`<ul>`, fully
+translatable, zero outbound HTTP, and **no schema markup** (there is no valid type — the value is the visible
+passage). Empty blocks render nothing rather than an empty box. All output flows through **one** server-side
+render seam (`Zehoro\Modules\KeyTakeaways::render_html()`) — the single interception point the future
+connected/smart version hooks without a block deprecation.
+
+### Changed — retired the legacy `lkst/tldr` block; renamed to `zehoro/key-takeaways`
+The brand-correct name + reframe. Existing content is preserved two ways: (1) a `render_block` **safety net**
+re-renders any un-migrated `lkst/tldr` through the new seam so it is never unstyled or shown as an editor
+error, and (2) a new **`wp zehoro migrate-blocks`** WP-CLI command permanently rewrites
+`lkst/tldr` → `zehoro/key-takeaways` in `post_content`, carrying the heading + content across (a **dry run by
+default**; pass `--execute` to write). The module slug `tldr` is now `key_takeaways` (group/curation
+references updated); the old pre-built `build/tldr` assets are removed. Block-name stability otherwise remains
+sacred — this is the sanctioned, non-breaking rename pattern for the wider `lkst-*` → `zehoro-*` cleanup.
+
 ## [1.28.0] - 2026-07-07
 
 ### Changed — Modules page re-cut along Core vs Surface (the loop is one engine, not 34 toggles)

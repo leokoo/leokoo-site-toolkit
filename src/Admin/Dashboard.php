@@ -186,7 +186,7 @@ class Dashboard {
 				'title' => __( 'Content publisher / blogger', 'zehoro-toolkit' ),
 				'desc'  => __( 'E-E-A-T signals (author box, freshness, FAQ, schema), editorial blocks, the rewrite workflow and the full GSC loop — which post to fix next, and proof the fix worked.', 'zehoro-toolkit' ),
 				'slugs' => [
-					'author_box', 'table_of_contents', 'tldr', 'faq', 'callout', 'stat_callout',
+					'author_box', 'table_of_contents', 'key_takeaways', 'faq', 'callout', 'stat_callout',
 					'steps', 'testimonial', 'last_updated', 'freshness_log', 'article_schema',
 					'entity_map', 'rewrite_context', 'ai_visibility', 'inline_subscribe',
 					'category_pills', 'google_search_console', 'ctr_rescue',

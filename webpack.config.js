@@ -3,7 +3,7 @@
  *
  * Extends the default @wordpress/scripts config with one change:
  * `output.clean` is disabled so that pre-built legacy block assets
- * (callout, pros, cons, pros-cons, tldr) committed to build/ are
+ * (callout, pros, cons, pros-cons) committed to build/ are
  * not deleted on each `npm run build`.
  *
  * If those legacy blocks are ever migrated to src/blocks/ source files
