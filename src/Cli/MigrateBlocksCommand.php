@@ -77,28 +77,18 @@ class MigrateBlocksCommand {
 
 		foreach ( $ids as $id ) {
 			$scanned++;
-			$content = (string) get_post_field( 'post_content', $id );
-			if ( strpos( $content, 'wp:' . self::LEGACY ) === false ) {
+
+			$outcome = self::migrate_post( (int) $id, $execute );
+			if ( $outcome === 'unchanged' ) {
 				continue;
 			}
 			$found++;
 
-			$changed = false;
-			$mapped  = self::map_blocks( parse_blocks( $content ), $changed );
-			if ( ! $changed ) {
+			if ( $outcome === 'error' ) {
+				\WP_CLI::warning( sprintf( '#%d failed to update', $id ) );
 				continue;
 			}
-
 			if ( $execute ) {
-				$result = wp_update_post( [
-					'ID'           => $id,
-					'post_content' => serialize_blocks( $mapped ),
-				], true );
-
-				if ( is_wp_error( $result ) ) {
-					\WP_CLI::warning( sprintf( '#%d failed: %s', $id, $result->get_error_message() ) );
-					continue;
-				}
 				$migrated++;
 				\WP_CLI::log( sprintf( 'Migrated #%d', $id ) );
 			} else {
@@ -117,6 +107,44 @@ class MigrateBlocksCommand {
 				$scanned, $found, self::LEGACY
 			) );
 		}
+	}
+
+	/**
+	 * Migrate a single post in place.
+	 *
+	 * @return string 'unchanged' (nothing to do), 'changed' (a legacy block was
+	 *                rewritten — written only when $execute is true), or 'error'
+	 *                (the write failed).
+	 *
+	 * CRITICAL: wp_update_post() internally wp_unslash()es its input, so the
+	 * serialized content MUST be wp_slash()ed first. Without it, the JSON
+	 * \uXXXX escapes that block serialization uses for HTML in attributes (e.g.
+	 * a list's `<li>` markup → `<li>`) lose their backslash and the
+	 * attribute is corrupted (`<li>` renders as literal text, breaking the list).
+	 */
+	public static function migrate_post( int $post_id, bool $execute = false ): string {
+		$content = (string) get_post_field( 'post_content', $post_id );
+		if ( $content === '' || strpos( $content, 'wp:' . self::LEGACY ) === false ) {
+			return 'unchanged';
+		}
+
+		$changed = false;
+		$mapped  = self::map_blocks( parse_blocks( $content ), $changed );
+		if ( ! $changed ) {
+			return 'unchanged';
+		}
+
+		if ( $execute ) {
+			$result = wp_update_post( [
+				'ID'           => $post_id,
+				'post_content' => wp_slash( serialize_blocks( $mapped ) ),
+			], true );
+			if ( is_wp_error( $result ) ) {
+				return 'error';
+			}
+		}
+
+		return 'changed';
 	}
 
 	/**

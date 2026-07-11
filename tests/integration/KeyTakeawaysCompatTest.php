@@ -151,4 +151,43 @@ class KeyTakeawaysCompatTest extends WP_UnitTestCase {
 		$this->assertStringContainsString( 'Hello', $rendered );
 		$this->assertStringNotContainsString( 'lkst-tldr', $rendered );
 	}
+
+	/**
+	 * Regression: the migrator writes through wp_update_post(), which
+	 * wp_unslash()es its input. HTML in a block attribute (a list's <li>) is
+	 * serialized as JSON < escapes; without wp_slash() the backslash is
+	 * stripped and the attribute corrupts to literal `u003cli` text — the list
+	 * renders as a single text node, failing the a11y `list` rule. This test
+	 * crosses the real wp_update_post boundary (the earlier round-trip test used
+	 * serialize_blocks()/do_blocks() directly and could not catch it).
+	 */
+	public function test_migrator_write_preserves_html_in_attributes() {
+		$content =
+			'<!-- wp:zehoro/key-takeaways {"mode":"list","heading":"KT","items":"<li>Alpha</li><li>Beta</li>"} /-->' .
+			'<!-- wp:lkst/tldr {"heading":"Old"} -->' . self::LEGACY_MARKUP . '<!-- /wp:lkst/tldr -->';
+
+		$id = self::factory()->post->create( [ 'post_content' => $content ] );
+
+		$this->assertSame( 'changed', MigrateBlocksCommand::migrate_post( $id, true ) );
+
+		$stored   = (string) get_post_field( 'post_content', $id );
+		$rendered = do_blocks( $stored );
+
+		// Legacy block converted.
+		$this->assertStringNotContainsString( 'wp:lkst/tldr', $stored );
+		// The list block's markup survived the write — real <li>, not corrupted text.
+		$this->assertStringContainsString( '<li>Alpha</li>', $rendered );
+		$this->assertStringContainsString( '<li>Beta</li>', $rendered );
+		$this->assertStringNotContainsString( 'u003c', $rendered );
+	}
+
+	public function test_migrate_post_dry_run_writes_nothing() {
+		$content = '<!-- wp:lkst/tldr {"heading":"Old"} -->' . self::LEGACY_MARKUP . '<!-- /wp:lkst/tldr -->';
+		$id      = self::factory()->post->create( [ 'post_content' => $content ] );
+
+		$this->assertSame( 'changed', MigrateBlocksCommand::migrate_post( $id, false ) );
+
+		// Nothing written on a dry run — the legacy block is still there.
+		$this->assertStringContainsString( 'wp:lkst/tldr', (string) get_post_field( 'post_content', $id ) );
+	}
 }

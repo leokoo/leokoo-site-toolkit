@@ -6,7 +6,7 @@ branch-scoped note — delete it before merging to `main`.*
 ## TL;DR
 
 Built launch block #1 — **Key Takeaways** (`zehoro/key-takeaways`) — to the "perfected" bar you asked for,
-and did the `lkst/tldr → zehoro/key-takeaways` rename **bulletproof**. Free suite green (**210 tests, 618
+and did the `lkst/tldr → zehoro/key-takeaways` rename **bulletproof**. Free suite green (**212 tests, 625
 assertions**), and verified end-to-end on a real local WordPress 6.9.4 install (front-end render, the legacy
 safety net on a live page, the migrator moving real data, and the block working in the Gutenberg editor with
 no console errors). Version bumped **1.28.0 → 1.29.0** with the CHANGELOG in the same commit.
@@ -20,7 +20,7 @@ no console errors). Version bumped **1.28.0 → 1.29.0** with the CHANGELOG in t
   `KeyTakeaways::render_html()`, the legacy `render_block` safety net, and the DOM-based legacy-content
   extractor.
 - `src/Cli/MigrateBlocksCommand.php` — `wp zehoro migrate-blocks` (dry-run by default; `--execute` to write).
-- `tests/integration/KeyTakeawaysRenderTest.php` (16 tests) + `KeyTakeawaysCompatTest.php` (11 tests).
+- `tests/integration/KeyTakeawaysRenderTest.php` (16 tests) + `KeyTakeawaysCompatTest.php` (13 tests).
 - `specs/blocks/key-takeaways.md` — the STEP-0 design doc.
 
 **Changed / removed**
@@ -58,7 +58,7 @@ run `wp zehoro migrate-blocks` (preview) then `--execute` on the dev site with m
 
 ## Verification done
 
-- **Tests:** `composer test` → 210 passed / 618 assertions. My 27 new tests cover both render modes, the
+- **Tests:** `composer test` → 212 passed / 625 assertions. My 29 new tests cover both render modes, the
   empty contract, heading clamping, XSS, wrapper passthrough, the legacy extractor, the safety net, the
   migrator, and a `do_blocks()` round-trip.
 - **Real WordPress 6.9.4** (throwaway install at `/tmp/zehoro-dev`, served on `http://localhost:8899`):
@@ -69,6 +69,18 @@ run `wp zehoro migrate-blocks` (preview) then `--execute` on the dev site with m
   - Block CSS confirmed loading (WP 6.9 inlines it) and the file resolves HTTP 200.
   - Gutenberg editor: block registers, inserts, renders WYSIWYG, toolbar + Inspector controls all work,
     **no console errors**.
+  - **axe-core (WCAG 2 A + AA): 0 violations** on the rendered blocks (after the fix below).
+
+## 🐛 Bug caught + fixed during verification (the axe scan earned its keep)
+
+The a11y scan flagged a `serious` `list` violation: a migrated `<ul>` held **literal `u003cli…` text**
+instead of real `<li>` elements. Root cause: `wp_update_post()` internally `wp_unslash()`es its input, so the
+migrator's `serialize_blocks()` output (which JSON-escapes HTML as `<`) lost its backslashes on write,
+corrupting any HTML-bearing attribute (`items`, `text`, links). **Fixed** by `wp_slash()`ing the serialized
+content before `wp_update_post()`, extracted into a testable `MigrateBlocksCommand::migrate_post()`, and locked
+with a regression test that crosses the real write boundary (the earlier round-trip test used
+`serialize_blocks()`/`do_blocks()` directly and couldn't catch it). Re-verified live: 0 axe violations, real
+`<li>` elements. **Editor-created blocks were never affected** — only the CLI migrator's write path.
 
 ## ⚠️ Known follow-ups (flagged, not blockers)
 
