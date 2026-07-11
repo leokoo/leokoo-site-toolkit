@@ -15,13 +15,26 @@ render seam (`Zehoro\Modules\KeyTakeaways::render_html()`) — the single interc
 connected/smart version hooks without a block deprecation.
 
 ### Changed — retired the legacy `lkst/tldr` block; renamed to `zehoro/key-takeaways`
-The brand-correct name + reframe. Existing content is preserved two ways: (1) a `render_block` **safety net**
-re-renders any un-migrated `lkst/tldr` through the new seam so it is never unstyled or shown as an editor
-error, and (2) a new **`wp zehoro migrate-blocks`** WP-CLI command permanently rewrites
-`lkst/tldr` → `zehoro/key-takeaways` in `post_content`, carrying the heading + content across (a **dry run by
-default**; pass `--execute` to write). The module slug `tldr` is now `key_takeaways` (group/curation
-references updated); the old pre-built `build/tldr` assets are removed. Block-name stability otherwise remains
-sacred — this is the sanctioned, non-breaking rename pattern for the wider `lkst-*` → `zehoro-*` cleanup.
+The brand-correct name + reframe. Existing content is preserved several ways:
+- The module slug `tldr` → `key_takeaways`. Because the active-module allowlist stores slugs **by value**, the
+  rename migrator now rewrites `tldr` → `key_takeaways` inside the stored `zehoro_active_modules` (own
+  idempotency flag, runs before module bootstrap) — without it the module would ship **dark** on every
+  upgrading site (block unregistered, safety net + CLI never hooked). Group/curation references updated.
+- A `render_block` **safety net** re-renders any un-migrated `lkst/tldr` through the seam **losslessly** —
+  multiple paragraphs and lists keep their structure instead of collapsing to a run-on line.
+- **`wp zehoro migrate-blocks`** (dry run by default; `--execute` to write) permanently rewrites clean inline
+  `lkst/tldr` into `zehoro/key-takeaways`. Block-structured legacy content (multi-paragraph / lists) is **left
+  as-is and reported**, never silently flattened — the safety net displays it; hand-convert if desired.
+
+The old pre-built `build/tldr` assets are removed. Block-name stability otherwise remains sacred — this is the
+sanctioned, non-breaking rename pattern for the wider `lkst-*` → `zehoro-*` cleanup.
+
+### Known limitations (deliberate, documented trade-offs)
+- The Key Takeaways editor uses `RichText multiline="li"` for the bullet list — soft-deprecated by WordPress
+  but fully functional through 6.9; a future migration to InnerBlocks would break the single attribute-driven
+  render seam, so it is a deliberate deferral (tracked for a pre-wp.org decision).
+- The block's dark styling keys off `prefers-color-scheme` (the OS setting, not the theme's); the
+  `currentColor` border keeps the box visible on a dark theme under a light OS regardless.
 
 ## [1.28.0] - 2026-07-07
 

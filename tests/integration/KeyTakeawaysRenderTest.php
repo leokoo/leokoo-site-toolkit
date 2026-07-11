@@ -139,6 +139,51 @@ class KeyTakeawaysRenderTest extends WP_UnitTestCase {
 		$this->assertStringNotContainsString( 'onclick', $html );
 	}
 
+	public function test_target_attribute_is_dropped_to_prevent_reverse_tabnabbing() {
+		$html = KeyTakeaways::render_html( [
+			'mode' => 'paragraph',
+			'text' => '<a href="https://x.test" target="_blank">x</a>',
+		] );
+
+		$this->assertStringNotContainsString( 'target', $html );
+		$this->assertStringContainsString( 'href="https://x.test"', $html );
+	}
+
+	// -------------------------------------------------------------------------
+	// Rich mode — the lossless legacy path (safety net only)
+	// -------------------------------------------------------------------------
+
+	public function test_rich_mode_preserves_block_structure() {
+		$html = KeyTakeaways::render_html( [
+			'mode' => 'rich',
+			'text' => '<p>First.</p><p>Second.</p>',
+		] );
+
+		$this->assertStringContainsString( '<div class="zehoro-key-takeaways__summary">', $html );
+		$this->assertSame( 2, substr_count( $html, '<p' ), 'both paragraphs preserved' );
+		$this->assertStringNotContainsString( 'First.Second.', $html );
+	}
+
+	public function test_rich_mode_preserves_a_list() {
+		$html = KeyTakeaways::render_html( [
+			'mode' => 'rich',
+			'text' => '<ul><li>a</li><li>b</li></ul>',
+		] );
+
+		$this->assertStringContainsString( '<li>a</li>', $html );
+		$this->assertStringContainsString( '<li>b</li>', $html );
+	}
+
+	public function test_rich_mode_still_strips_scripts() {
+		$html = KeyTakeaways::render_html( [
+			'mode' => 'rich',
+			'text' => '<p>ok<script>alert(1)</script></p>',
+		] );
+
+		$this->assertStringNotContainsString( '<script', $html );
+		$this->assertStringContainsString( 'ok', $html );
+	}
+
 	// -------------------------------------------------------------------------
 	// Wrapper attributes
 	// -------------------------------------------------------------------------

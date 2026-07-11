@@ -25,8 +25,30 @@ if ( ! defined( 'ABSPATH' ) ) exit;
  */
 class ZehoroRenameMigrator {
 
-	/** Per-site flag that this migrator has already run successfully. */
+	/** Per-site flag that the key-rename migration has already run successfully. */
 	public const MIGRATION_FLAG = 'zehoro_rename_migration_v1';
+
+	/**
+	 * Independent flag for the module-slug VALUE migration (below).
+	 *
+	 * Deliberately separate from MIGRATION_FLAG: sites that already ran the
+	 * lkst_*→zehoro_* key rename (e.g. leokoo.com, Simlecco in June) have
+	 * MIGRATION_FLAG set, so a slug fix folded into the flag-gated path would
+	 * never run on exactly the installs that need it.
+	 */
+	public const SLUG_MIGRATION_FLAG = 'zehoro_slug_migration_v1';
+
+	/**
+	 * Renamed module slugs. The active-module allowlist stores slugs BY VALUE
+	 * (`zehoro_active_modules` is a positive list, not a default-merge), so a
+	 * module rename must rewrite the stored value or the module ships dark on
+	 * every upgrading site. tldr→key_takeaways landed in v1.29.0.
+	 *
+	 * @var array<string,string>
+	 */
+	public const SLUG_RENAME_MAP = [
+		'tldr' => 'key_takeaways',
+	];
 
 	/** Sentinel returned by get_option() when a key is unset (distinguishes from a stored empty string / null / false). */
 	private const UNSET_SENTINEL = '__zehoro_unset__';
@@ -133,9 +155,53 @@ class ZehoroRenameMigrator {
 	// ── public surface ───────────────────────────────────────────────────────
 
 	/**
-	 * Run all migrations. Idempotent — second run is a no-op via MIGRATION_FLAG.
+	 * Run all migrations. Each step is independently idempotent via its own flag.
 	 */
 	public static function run(): void {
+		self::migrate_keys();
+		self::migrate_module_slugs();
+	}
+
+	/**
+	 * Rewrite renamed module slugs inside the stored active-module allowlists.
+	 *
+	 * Runs on plugins_loaded @1 (before Plugin::init reads the list) and on
+	 * activation. Idempotent via SLUG_MIGRATION_FLAG.
+	 *
+	 * Touches ONLY the canonical `zehoro_active_modules` — the sole key the
+	 * module bootstrap reads. The legacy `lkst_active_modules` is left untouched
+	 * as one-release rollback safety (a downgrade must still find the old slug),
+	 * and it does not need fixing anyway: migrate_keys() (run first) copies it
+	 * into the canonical key before this step runs.
+	 */
+	public static function migrate_module_slugs(): void {
+		if ( get_option( self::SLUG_MIGRATION_FLAG ) === '1' ) {
+			return;
+		}
+
+		$list = get_option( 'zehoro_active_modules', self::UNSET_SENTINEL );
+		if ( is_array( $list ) ) {
+			$changed = false;
+			foreach ( $list as $i => $slug ) {
+				if ( is_string( $slug ) && isset( self::SLUG_RENAME_MAP[ $slug ] ) ) {
+					$list[ $i ] = self::SLUG_RENAME_MAP[ $slug ];
+					$changed    = true;
+				}
+			}
+
+			if ( $changed ) {
+				update_option( 'zehoro_active_modules', array_values( array_unique( $list ) ), true );
+			}
+		}
+
+		update_option( self::SLUG_MIGRATION_FLAG, '1', false );
+	}
+
+	/**
+	 * Copy legacy lkst_* option/meta keys to canonical zehoro_* names.
+	 * Idempotent — second run is a no-op via MIGRATION_FLAG.
+	 */
+	private static function migrate_keys(): void {
 		if ( get_option( self::MIGRATION_FLAG ) === '1' ) {
 			return;
 		}
@@ -228,5 +294,6 @@ class ZehoroRenameMigrator {
 	 */
 	public static function reset_flag(): void {
 		delete_option( self::MIGRATION_FLAG );
+		delete_option( self::SLUG_MIGRATION_FLAG );
 	}
 }

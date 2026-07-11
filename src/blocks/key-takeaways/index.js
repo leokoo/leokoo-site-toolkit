@@ -136,6 +136,10 @@ function Edit( { attributes, setAttributes } ) {
 						) }
 					/>
 				) : (
+					// DEBT: `multiline` is soft-deprecated by WordPress but fully
+					// functional through 6.9; it keeps the render seam attribute-
+					// driven. Migrating to InnerBlocks would break the single seam,
+					// so this is a deliberate deferral (see CHANGELOG known limits).
 					<RichText
 						identifier="items"
 						tagName="ul"

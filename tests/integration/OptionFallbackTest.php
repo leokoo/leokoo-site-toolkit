@@ -88,16 +88,17 @@ class OptionFallbackTest extends WP_UnitTestCase {
 		update_option( 'lkst_active_modules', [ 'tldr', 'faq', 'author_box' ] );
 		$this->assertSame( [ 'tldr', 'faq', 'author_box' ], Option::get( 'zehoro_active_modules', [] ), 'pre-migration: fallback path returns legacy data' );
 
-		// Migrator runs (mimics plugins_loaded@1).
+		// Migrator runs (mimics plugins_loaded@1): copies legacy→canonical, then
+		// the module-slug migration rewrites the renamed slug in the canonical key.
 		ZehoroRenameMigrator::run();
 
-		// Now zehoro_active_modules holds the copy. Option::get returns it directly.
-		$this->assertSame( [ 'tldr', 'faq', 'author_box' ], Option::get( 'zehoro_active_modules', [] ), 'post-migration: canonical path' );
+		// Canonical now holds the copy WITH the renamed slug (tldr→key_takeaways).
+		$this->assertSame( [ 'key_takeaways', 'faq', 'author_box' ], Option::get( 'zehoro_active_modules', [] ), 'post-migration: canonical path, slug renamed' );
 
 		// Subsequent writes land on the canonical key only. Legacy unchanged
-		// (rollback safety until v1.8.0 cleanup migrator).
-		update_option( 'zehoro_active_modules', [ 'tldr', 'faq', 'author_box', 'entitymap' ] );
-		$this->assertSame( [ 'tldr', 'faq', 'author_box', 'entitymap' ], Option::get( 'zehoro_active_modules', [] ) );
-		$this->assertSame( [ 'tldr', 'faq', 'author_box' ], get_option( 'lkst_active_modules' ), 'legacy preserved as rollback safety' );
+		// (rollback safety until v1.8.0 cleanup migrator) — including its old slug.
+		update_option( 'zehoro_active_modules', [ 'key_takeaways', 'faq', 'author_box', 'entitymap' ] );
+		$this->assertSame( [ 'key_takeaways', 'faq', 'author_box', 'entitymap' ], Option::get( 'zehoro_active_modules', [] ) );
+		$this->assertSame( [ 'tldr', 'faq', 'author_box' ], get_option( 'lkst_active_modules' ), 'legacy preserved untouched as rollback safety' );
 	}
 }

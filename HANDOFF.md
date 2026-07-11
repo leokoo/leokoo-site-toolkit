@@ -82,6 +82,28 @@ with a regression test that crosses the real write boundary (the earlier round-t
 `serialize_blocks()`/`do_blocks()` directly and couldn't catch it). Re-verified live: 0 axe violations, real
 `<li>` elements. **Editor-created blocks were never affected** — only the CLI migrator's write path.
 
+## 🔍 Formal Refuter audit (the process you asked about) — BLOCK → fixed
+
+After you asked whether I used the dev-team, I ran the real thing: a 5-lens read-only Refuter panel + a
+synthesis pass on the KT diff. Verdict **BLOCK, 6 confirmed** — and two were serious enough that my "212 green
++ verified" was self-consistency, not correctness (the tests encoded the same proxy the bugs did):
+
+- **CRITICAL — module shipped dark on every upgrading site.** The slug rename wasn't migrated inside the
+  stored `zehoro_active_modules` allowlist, so `Plugin::init`'s `in_array('key_takeaways',$active)` gate was
+  false: block unregistered, safety net never hooked, CLI never registered. Fresh installs (my whole
+  verification) were fine — which is why it stayed green. **Fixed** + proven live (seed `['tldr']` → next
+  request → block **registers**).
+- **HIGH — permanent data loss.** Legacy content was force-mapped to paragraph mode + an inline-only
+  `wp_kses`, collapsing multi-paragraph/list TL;DRs to a run-on line, and `--execute` wrote it. **Fixed:**
+  lossless `rich` render path (safety net) + the migrator now *skips + reports* block-structured content
+  instead of flattening it. Proven live (multi-paragraph legacy → 2 separate `<p>`).
+- **MEDIUM — self-confirming tests** (bypassed the activation gate; asserted a bare `'Hello'`). Replaced with
+  real-path tests: a seeded-allowlist migration test, multi-paragraph/list fixtures, sibling byte-integrity.
+
+Plus should-fix items (dropped `target=_blank` reverse-tabnabbing; moved these trade-offs into the CHANGELOG so
+they aren't silent debt when this file is deleted). Suite now **222 green**. Full run:
+`~/.claude/.../workflows/wf_5c42800d-ad0`.
+
 ## ⚠️ Known follow-ups (flagged, not blockers)
 
 1. **`RichText multiline="li"` deprecation warning** (editor console). It still works fully in WP 6.9 (the
@@ -91,8 +113,9 @@ with a regression test that crosses the real write boundary (the earlier round-t
    wp.org, not a rushed change. **This is the one thing I'd want your call on.**
 2. **`readme.txt` Stable tag is 1.25.3** — already 3 minors behind before I started; it isn't kept in sync
    pre-launch. Needs a full readme sync pass before wp.org submission (out of scope tonight).
-3. **Module-slug rename** `tldr`→`key_takeaways`: a site that had *explicitly disabled* the old module would
-   reset to the default (on). Default was on + dev-only, so near-zero impact.
+3. ~~Module-slug rename impact~~ — **RESOLVED.** The formal audit (below) found this was a CRITICAL
+   ship-dark regression, not the "near-zero" reset I'd written. Fixed by migrating the slug inside
+   `zehoro_active_modules`; recorded durably in the CHANGELOG, not just here.
 4. **Dark mode** uses `prefers-color-scheme` (the OS setting, not the theme's). A light-OS user on a dark
    theme gets the light box; the `currentColor` border keeps it visible regardless. Acceptable for a
    theme-neutral default; noting it.

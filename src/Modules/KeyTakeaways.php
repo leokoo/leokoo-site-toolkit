@@ -63,12 +63,23 @@ class KeyTakeaways implements ModuleInterface {
 	 *                                   plain class is used instead.
 	 */
 	public static function render_html( array $attributes, string $wrapper_attributes = '' ): string {
-		$mode = ( isset( $attributes['mode'] ) && $attributes['mode'] === 'paragraph' ) ? 'paragraph' : 'list';
+		$mode = isset( $attributes['mode'] ) ? (string) $attributes['mode'] : 'list';
+		if ( ! in_array( $mode, [ 'list', 'paragraph', 'rich' ], true ) ) {
+			$mode = 'list';
+		}
 
 		// Build the body first — an empty block renders nothing at all rather
 		// than an empty box (better for a11y and the document outline).
 		$body = '';
-		if ( $mode === 'paragraph' ) {
+		if ( $mode === 'rich' ) {
+			// Legacy/lossless path (safety net only — never persisted by the
+			// editor or migrator): preserve block-level structure from a retired
+			// lkst/tldr box rather than flatten it into one inline paragraph.
+			$rich = self::sanitize_rich( isset( $attributes['text'] ) ? (string) $attributes['text'] : '' );
+			if ( self::has_visible_text( $rich ) ) {
+				$body = '<div class="zehoro-key-takeaways__summary">' . $rich . '</div>';
+			}
+		} elseif ( $mode === 'paragraph' ) {
 			$text = self::sanitize_inline( isset( $attributes['text'] ) ? (string) $attributes['text'] : '' );
 			if ( self::has_visible_text( $text ) ) {
 				$body = '<p class="zehoro-key-takeaways__summary">' . $text . '</p>';
@@ -134,7 +145,10 @@ class KeyTakeaways implements ModuleInterface {
 		$html = self::render_html( [
 			'heading'      => $heading,
 			'headingLevel' => 2,
-			'mode'         => 'paragraph',
+			// 'rich' preserves the legacy box's block-level structure (multiple
+			// paragraphs / lists) losslessly — the inline-only paragraph path
+			// would collapse them into one run-on line.
+			'mode'         => 'rich',
 			'text'         => $content,
 		] );
 
@@ -215,9 +229,28 @@ class KeyTakeaways implements ModuleInterface {
 		return wp_kses( $html, $allowed );
 	}
 
+	/** Block-level allowlist for the lossless legacy ('rich') path only. */
+	private static function sanitize_rich( string $html ): string {
+		$allowed               = self::allowed_inline();
+		$allowed['p']          = [];
+		$allowed['ul']         = [ 'class' => true ];
+		$allowed['ol']         = [ 'class' => true ];
+		$allowed['li']         = [ 'class' => true ];
+		$allowed['h3']         = [];
+		$allowed['h4']         = [];
+		$allowed['h5']         = [];
+		$allowed['h6']         = [];
+		$allowed['blockquote'] = [];
+		return wp_kses( $html, $allowed );
+	}
+
 	private static function allowed_inline(): array {
+		// No `target` — a dynamic block's output never passes through
+		// wp_targeted_link_rel, so target="_blank" would render without
+		// rel="noopener" (reverse-tabnabbing). An answer-first summary does
+		// not need new-tab links; keep the surface closed.
 		return [
-			'a'      => [ 'href' => true, 'title' => true, 'rel' => true, 'target' => true ],
+			'a'      => [ 'href' => true, 'title' => true, 'rel' => true ],
 			'strong' => [],
 			'b'      => [],
 			'em'     => [],

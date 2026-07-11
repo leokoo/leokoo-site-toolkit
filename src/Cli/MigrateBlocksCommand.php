@@ -71,42 +71,46 @@ class MigrateBlocksCommand {
 			'suppress_filters' => true,
 		] );
 
-		$scanned  = 0;
-		$found    = 0;
-		$migrated = 0;
+		$scanned        = 0;
+		$migrated       = 0;
+		$skipped_blocks = 0;
 
 		foreach ( $ids as $id ) {
 			$scanned++;
 
-			$outcome = self::migrate_post( (int) $id, $execute );
+			$stats   = [];
+			$outcome = self::migrate_post( (int) $id, $execute, $stats );
 			if ( $outcome === 'unchanged' ) {
 				continue;
 			}
-			$found++;
-
 			if ( $outcome === 'error' ) {
 				\WP_CLI::warning( sprintf( '#%d failed to update', $id ) );
 				continue;
 			}
-			if ( $execute ) {
+
+			// Block-structured legacy blocks are left in place (the render safety
+			// net displays them losslessly) rather than flattened — never a silent
+			// lossy rewrite.
+			if ( ! empty( $stats['skipped'] ) ) {
+				$skipped_blocks += (int) $stats['skipped'];
+				\WP_CLI::warning( sprintf(
+					'#%d: left %d block-structured %s block(s) as-is (multi-paragraph/list — the render safety net displays them; hand-convert if you want them as native blocks).',
+					$id, (int) $stats['skipped'], self::LEGACY
+				) );
+			}
+
+			if ( $outcome === 'changed' ) {
 				$migrated++;
-				\WP_CLI::log( sprintf( 'Migrated #%d', $id ) );
-			} else {
-				\WP_CLI::log( sprintf( '[dry-run] Would migrate #%d', $id ) );
+				\WP_CLI::log( $execute ? sprintf( 'Migrated #%d', $id ) : sprintf( '[dry-run] Would migrate #%d', $id ) );
 			}
 		}
 
-		if ( $execute ) {
-			\WP_CLI::success( sprintf(
-				'Scanned %d, found %d with %s, migrated %d.',
-				$scanned, $found, self::LEGACY, $migrated
-			) );
-		} else {
-			\WP_CLI::success( sprintf(
-				'Scanned %d, found %d with %s. Dry run — nothing written. Re-run with --execute to apply.',
-				$scanned, $found, self::LEGACY
-			) );
-		}
+		$verb = $execute ? 'migrated' : 'would migrate';
+		\WP_CLI::success( sprintf(
+			'Scanned %d. %s %d post(s); left %d block-structured %s block(s) as-is.%s',
+			$scanned, ucfirst( $verb ), $migrated, $skipped_blocks, self::LEGACY,
+			$execute ? '' : ' Dry run — nothing written; re-run with --execute to apply.'
+		) );
 	}
 
 	/**
@@ -122,16 +126,21 @@ class MigrateBlocksCommand {
 	 * a list's `<li>` markup → `<li>`) lose their backslash and the
 	 * attribute is corrupted (`<li>` renders as literal text, breaking the list).
 	 */
-	public static function migrate_post( int $post_id, bool $execute = false ): string {
+	public static function migrate_post( int $post_id, bool $execute = false, array &$stats = [] ): string {
+		$stats   = [ 'converted' => 0, 'skipped' => 0 ];
 		$content = (string) get_post_field( 'post_content', $post_id );
 		if ( $content === '' || strpos( $content, 'wp:' . self::LEGACY ) === false ) {
 			return 'unchanged';
 		}
 
-		$changed = false;
-		$mapped  = self::map_blocks( parse_blocks( $content ), $changed );
-		if ( ! $changed ) {
-			return 'unchanged';
+		$converted = 0;
+		$skipped   = 0;
+		$mapped    = self::map_blocks( parse_blocks( $content ), $converted, $skipped );
+		$stats     = [ 'converted' => $converted, 'skipped' => $skipped ];
+
+		if ( $converted === 0 ) {
+			// Legacy blocks present but none convertible (all block-structured).
+			return $skipped > 0 ? 'skipped' : 'unchanged';
 		}
 
 		if ( $execute ) {
@@ -148,18 +157,24 @@ class MigrateBlocksCommand {
 	}
 
 	/**
-	 * Recursively replace legacy blocks. Sets $changed = true if anything was
-	 * rewritten at any depth.
+	 * Recursively replace legacy blocks at any depth. $converted counts blocks
+	 * rewritten; $skipped counts legacy blocks left in place because their
+	 * content has block-level structure the constrained block would flatten.
 	 */
-	private static function map_blocks( array $blocks, bool &$changed ): array {
+	private static function map_blocks( array $blocks, int &$converted, int &$skipped ): array {
 		foreach ( $blocks as &$block ) {
 			if ( ( $block['blockName'] ?? '' ) === self::LEGACY ) {
-				$block   = self::rewrite_tldr( $block );
-				$changed = true;
+				$new = self::rewrite_tldr( $block );
+				if ( $new === null ) {
+					$skipped++; // leave the original lkst/tldr block untouched
+				} else {
+					$block = $new;
+					$converted++;
+				}
 				continue;
 			}
 			if ( ! empty( $block['innerBlocks'] ) && is_array( $block['innerBlocks'] ) ) {
-				$block['innerBlocks'] = self::map_blocks( $block['innerBlocks'], $changed );
+				$block['innerBlocks'] = self::map_blocks( $block['innerBlocks'], $converted, $skipped );
 			}
 		}
 		unset( $block );
@@ -167,30 +182,64 @@ class MigrateBlocksCommand {
 		return $blocks;
 	}
 
-	/** Build the replacement zehoro/key-takeaways block from a legacy lkst/tldr block. */
-	private static function rewrite_tldr( array $block ): array {
+	/**
+	 * Build the replacement zehoro/key-takeaways block from a legacy lkst/tldr
+	 * block, or return null when the content has block-level structure the
+	 * constrained block would flatten (multi-paragraph / list / headings). Those
+	 * are left as lkst/tldr and rendered losslessly by the safety net — the
+	 * migrator NEVER performs a silent lossy rewrite.
+	 */
+	private static function rewrite_tldr( array $block ): ?array {
 		$attrs   = ( isset( $block['attrs'] ) && is_array( $block['attrs'] ) ) ? $block['attrs'] : [];
 		$heading = isset( $attrs['heading'] ) ? (string) $attrs['heading'] : '';
-		$text    = KeyTakeaways::extract_legacy_content( (string) ( $block['innerHTML'] ?? '' ) );
-		if ( $text === '' && isset( $attrs['content'] ) ) {
-			$text = (string) $attrs['content'];
+		$content = KeyTakeaways::extract_legacy_content( (string) ( $block['innerHTML'] ?? '' ) );
+		if ( $content === '' && isset( $attrs['content'] ) ) {
+			$content = (string) $attrs['content'];
 		}
 
-		$new_attrs = [ 'mode' => 'paragraph' ];
-		if ( $heading !== '' ) {
-			$new_attrs['heading'] = $heading;
+		$plan = self::plan_conversion( $content );
+		if ( $plan === null ) {
+			return null;
 		}
-		if ( $text !== '' ) {
-			$new_attrs['text'] = $text;
+		if ( $heading !== '' ) {
+			$plan['heading'] = $heading;
 		}
 
 		return [
 			'blockName'    => 'zehoro/key-takeaways',
-			'attrs'        => $new_attrs,
+			'attrs'        => $plan,
 			'innerBlocks'  => [],
 			'innerHTML'    => '',
 			'innerContent' => [],
 		];
+	}
+
+	/**
+	 * Decide how to carry legacy content into the new block WITHOUT losing
+	 * structure. Returns new-block attrs (mode + text) for clean inline content;
+	 * null when the content has block-level structure (caller skips it).
+	 */
+	private static function plan_conversion( string $content ): ?array {
+		$content = trim( $content );
+		if ( $content === '' ) {
+			return [ 'mode' => 'paragraph' ]; // empty legacy box → clean removal
+		}
+
+		// A single <p> wrapping the whole thing is just an inline paragraph.
+		if ( preg_match( '#^<p\b[^>]*>(.*)</p>$#is', $content, $m ) ) {
+			$inner = $m[1];
+			return self::has_block_tags( $inner ) ? null : [ 'mode' => 'paragraph', 'text' => $inner ];
+		}
+
+		if ( self::has_block_tags( $content ) ) {
+			return null; // multiple paragraphs / list / headings → leave as-is
+		}
+
+		return [ 'mode' => 'paragraph', 'text' => $content ];
+	}
+
+	private static function has_block_tags( string $html ): bool {
+		return (bool) preg_match( '#<\s*(p|div|ul|ol|li|h[1-6]|blockquote|table|figure|section|article|pre|hr)\b#i', $html );
 	}
 
 	/** @return string[] */
