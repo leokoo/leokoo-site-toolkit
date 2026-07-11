@@ -31,6 +31,15 @@ class KeyTakeaways implements ModuleInterface {
 	/** Legacy block name this module replaces. */
 	private const LEGACY_BLOCK = 'lkst/tldr';
 
+	/**
+	 * The retired lkst/tldr block defaulted its heading to "Key Takeaways"
+	 * (title case). Gutenberg omits default-valued attributes, so a legacy block
+	 * that used the default has no stored heading — the legacy paths fall back to
+	 * this old default rather than the new sentence-case one, so upgraded content
+	 * does not silently change casing.
+	 */
+	public const LEGACY_DEFAULT_HEADING = 'Key Takeaways';
+
 	public static function register(): void {
 		Plugin::register_module( 'key_takeaways', self::class, [
 			'title'   => 'Key Takeaways',
@@ -135,7 +144,9 @@ class KeyTakeaways implements ModuleInterface {
 		}
 
 		$attrs   = ( isset( $block['attrs'] ) && is_array( $block['attrs'] ) ) ? $block['attrs'] : [];
-		$heading = isset( $attrs['heading'] ) ? (string) $attrs['heading'] : '';
+		$heading = ( isset( $attrs['heading'] ) && $attrs['heading'] !== '' )
+			? (string) $attrs['heading']
+			: self::LEGACY_DEFAULT_HEADING;
 
 		$content = self::extract_legacy_content( is_string( $block_content ) ? $block_content : '' );
 		if ( $content === '' && isset( $attrs['content'] ) ) {
@@ -241,6 +252,9 @@ class KeyTakeaways implements ModuleInterface {
 		$allowed['h5']         = [];
 		$allowed['h6']         = [];
 		$allowed['blockquote'] = [];
+		// Preserve inline media/markup a legacy box may carry (truly lossless).
+		$allowed['img']        = [ 'src' => true, 'alt' => true, 'width' => true, 'height' => true, 'loading' => true, 'class' => true ];
+		$allowed['span']       = [ 'class' => true ];
 		return wp_kses( $html, $allowed );
 	}
 
@@ -263,6 +277,7 @@ class KeyTakeaways implements ModuleInterface {
 			'del'    => [],
 			'ins'    => [],
 			'br'     => [],
+			'span'   => [ 'class' => true ],
 		];
 	}
 }

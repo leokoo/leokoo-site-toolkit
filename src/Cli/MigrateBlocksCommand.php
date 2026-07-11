@@ -201,9 +201,9 @@ class MigrateBlocksCommand {
 		if ( $plan === null ) {
 			return null;
 		}
-		if ( $heading !== '' ) {
-			$plan['heading'] = $heading;
-		}
+		// Preserve the legacy default heading casing ("Key Takeaways") when the
+		// old block used the default (attribute omitted).
+		$plan['heading'] = ( $heading !== '' ) ? $heading : KeyTakeaways::LEGACY_DEFAULT_HEADING;
 
 		return [
 			'blockName'    => 'zehoro/key-takeaways',
@@ -222,7 +222,7 @@ class MigrateBlocksCommand {
 	private static function plan_conversion( string $content ): ?array {
 		$content = trim( $content );
 		if ( $content === '' ) {
-			return [ 'mode' => 'paragraph' ]; // empty legacy box → clean removal
+			return null; // empty legacy box → leave as-is (no gratuitous post rewrite)
 		}
 
 		// A single <p> wrapping the whole thing is just an inline paragraph.
@@ -239,7 +239,9 @@ class MigrateBlocksCommand {
 	}
 
 	private static function has_block_tags( string $html ): bool {
-		return (bool) preg_match( '#<\s*(p|div|ul|ol|li|h[1-6]|blockquote|table|figure|section|article|pre|hr)\b#i', $html );
+		// `img` is included so an image-bearing box is left as-is (the paragraph
+		// path's inline allowlist would drop it); the safety net renders it.
+		return (bool) preg_match( '#<\s*(p|div|ul|ol|li|h[1-6]|blockquote|table|figure|section|article|pre|hr|img)\b#i', $html );
 	}
 
 	/** @return string[] */

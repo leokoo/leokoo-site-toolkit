@@ -8,7 +8,7 @@
  * markup and classes the front end emits.
  */
 import { __ } from '@wordpress/i18n';
-import { registerBlockType } from '@wordpress/blocks';
+import { registerBlockType, createBlock } from '@wordpress/blocks';
 import {
 	useBlockProps,
 	RichText,
@@ -163,4 +163,97 @@ function Edit( { attributes, setAttributes } ) {
 registerBlockType( metadata, {
 	edit: Edit,
 	save: () => null,
+} );
+
+/**
+ * Legacy editor bridge for the retired `lkst/tldr` block.
+ *
+ * The server-side render_block safety net fixes the FRONT END, but the editor
+ * still needs a registered block type for `lkst/tldr` or an un-migrated post
+ * shows Gutenberg's "unexpected/invalid content" warning (and Block Recovery
+ * degrades the stored content). This registration keeps old content valid in
+ * the editor and offers a one-click transform to Key Takeaways. It reproduces
+ * the retired block's exact saved markup (verified against git main) so
+ * validation passes, and it is hidden from the inserter — legacy-only.
+ */
+const LEGACY_CLASS = 'lkst-tldr lkst-editorial-block';
+
+function LegacyEdit( { attributes, setAttributes } ) {
+	const blockProps = useBlockProps( { className: LEGACY_CLASS } );
+	return (
+		<div { ...blockProps }>
+			<RichText
+				tagName="strong"
+				className="lkst-tldr-heading"
+				value={ attributes.heading }
+				onChange={ ( heading ) => setAttributes( { heading } ) }
+				placeholder={ __( 'Key Takeaways', 'zehoro-toolkit' ) }
+			/>
+			<div className="lkst-tldr-content-wrapper">
+				<RichText
+					tagName="div"
+					className="lkst-tldr-content"
+					value={ attributes.content }
+					onChange={ ( content ) => setAttributes( { content } ) }
+					placeholder={ __( 'Summary…', 'zehoro-toolkit' ) }
+				/>
+			</div>
+		</div>
+	);
+}
+
+function LegacySave( { attributes } ) {
+	const blockProps = useBlockProps.save( { className: LEGACY_CLASS } );
+	return (
+		<div { ...blockProps }>
+			<RichText.Content
+				tagName="strong"
+				className="lkst-tldr-heading"
+				value={ attributes.heading }
+			/>
+			<div className="lkst-tldr-content-wrapper">
+				<RichText.Content
+					tagName="div"
+					className="lkst-tldr-content"
+					value={ attributes.content }
+				/>
+			</div>
+		</div>
+	);
+}
+
+registerBlockType( 'lkst/tldr', {
+	apiVersion: 3,
+	title: __( 'TL;DR (legacy)', 'zehoro-toolkit' ),
+	category: 'zehoro-toolkit',
+	icon: 'list-view',
+	description: __(
+		'Retired block — transform to Key Takeaways.',
+		'zehoro-toolkit'
+	),
+	supports: { inserter: false, html: false },
+	attributes: {
+		heading: { type: 'string', default: 'Key Takeaways' },
+		content: {
+			type: 'string',
+			source: 'html',
+			selector: '.lkst-tldr-content',
+		},
+	},
+	transforms: {
+		to: [
+			{
+				type: 'block',
+				blocks: [ 'zehoro/key-takeaways' ],
+				transform: ( { heading, content } ) =>
+					createBlock( 'zehoro/key-takeaways', {
+						heading: heading || 'Key Takeaways',
+						mode: 'paragraph',
+						text: content || '',
+					} ),
+			},
+		],
+	},
+	edit: LegacyEdit,
+	save: LegacySave,
 } );

@@ -21,7 +21,10 @@ The brand-correct name + reframe. Existing content is preserved several ways:
   idempotency flag, runs before module bootstrap) — without it the module would ship **dark** on every
   upgrading site (block unregistered, safety net + CLI never hooked). Group/curation references updated.
 - A `render_block` **safety net** re-renders any un-migrated `lkst/tldr` through the seam **losslessly** —
-  multiple paragraphs and lists keep their structure instead of collapsing to a run-on line.
+  multiple paragraphs, lists and inline images keep their structure instead of collapsing to a run-on line.
+- An **editor bridge** keeps un-migrated `lkst/tldr` blocks valid in Gutenberg (no "invalid content" warning,
+  no Block-Recovery data loss) and offers a one-click **transform to Key Takeaways**. Legacy content that used
+  the old default heading keeps its "Key Takeaways" title-case (no silent casing change on upgrade).
 - **`wp zehoro migrate-blocks`** (dry run by default; `--execute` to write) permanently rewrites clean inline
   `lkst/tldr` into `zehoro/key-takeaways`. Block-structured legacy content (multi-paragraph / lists) is **left
   as-is and reported**, never silently flattened — the safety net displays it; hand-convert if desired.

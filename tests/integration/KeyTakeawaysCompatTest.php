@@ -250,4 +250,77 @@ class KeyTakeawaysCompatTest extends WP_UnitTestCase {
 		$id = self::factory()->post->create( [ 'post_content' => '<!-- wp:paragraph --><p>hi</p><!-- /wp:paragraph -->' ] );
 		$this->assertSame( 'unchanged', MigrateBlocksCommand::migrate_post( $id, true ) );
 	}
+
+	// =========================================================================
+	// The safety-net FILTER WIRING (must be red-able — not a direct handler call)
+	// =========================================================================
+
+	public function test_safety_net_is_actually_hooked_on_render_block() {
+		// Render an un-migrated legacy block through the REAL pipeline. A direct
+		// handler call can't catch a broken/removed add_filter — this can.
+		$rendered = do_blocks( self::legacy_post_content( '<p>Legacy body here.</p>', 'Legacy H' ) );
+
+		$this->assertStringContainsString( 'zehoro-key-takeaways', $rendered );
+		$this->assertStringContainsString( 'Legacy body here.', $rendered );
+		$this->assertStringNotContainsString( 'lkst-tldr', $rendered );
+	}
+
+	// =========================================================================
+	// Mixed post — converted + skipped written together (real serialize path)
+	// =========================================================================
+
+	public function test_migrator_writes_mixed_post_faithfully() {
+		$convertible = self::legacy_post_content( '<p>Convert me.</p>', 'C' );
+		$skipped     = self::legacy_post_content( '<p>One.</p><p>Two.</p>', 'S' );
+		$id          = self::factory()->post->create( [ 'post_content' => $convertible . "\n\n" . $skipped ] );
+
+		$stats = [];
+		$this->assertSame( 'changed', MigrateBlocksCommand::migrate_post( $id, true, $stats ) );
+		$this->assertSame( 1, $stats['converted'] );
+		$this->assertSame( 1, $stats['skipped'] );
+
+		$stored = (string) get_post_field( 'post_content', $id );
+		$this->assertStringContainsString( 'wp:zehoro/key-takeaways', $stored, 'convertible block migrated' );
+		$this->assertStringContainsString( 'wp:lkst/tldr', $stored, 'block-structured block left as-is' );
+		$this->assertStringContainsString( '<p>One.</p><p>Two.</p>', $stored, 'skipped block survives re-serialization intact' );
+	}
+
+	// =========================================================================
+	// Should-fix coverage: heading casing, empty box, inline media
+	// =========================================================================
+
+	public function test_legacy_default_heading_casing_is_preserved() {
+		// The old block defaulted to 'Key Takeaways' (title case); a legacy block
+		// using the default (no stored heading) must not silently become 'Key takeaways'.
+		$module = new KeyTakeaways();
+		$block  = self::legacy_block( '<p>x</p>' );
+		unset( $block['attrs']['heading'] );
+
+		$out = $module->legacy_render_safety_net( $block['innerHTML'], $block );
+		$this->assertStringContainsString( 'Key Takeaways', $out );
+		$this->assertStringNotContainsString( 'Key takeaways</h2>', $out );
+	}
+
+	public function test_migrator_skips_empty_box_without_rewrite() {
+		$id    = self::factory()->post->create( [ 'post_content' => self::legacy_post_content( '', 'E' ) ] );
+		$stats = [];
+		$this->assertSame( 'skipped', MigrateBlocksCommand::migrate_post( $id, true, $stats ) );
+		$this->assertSame( 0, $stats['converted'] );
+	}
+
+	public function test_image_bearing_content_is_skipped_and_rendered_losslessly() {
+		$inner = '<p>See <img src="https://x.test/a.png" alt="a" /> here.</p>';
+
+		// Migrator leaves it (the inline path would drop the img).
+		$id    = self::factory()->post->create( [ 'post_content' => self::legacy_post_content( $inner ) ] );
+		$stats = [];
+		$this->assertSame( 'skipped', MigrateBlocksCommand::migrate_post( $id, true, $stats ) );
+
+		// Safety net renders the image losslessly.
+		$module = new KeyTakeaways();
+		$block  = self::legacy_block( $inner );
+		$out    = $module->legacy_render_safety_net( $block['innerHTML'], $block );
+		$this->assertStringContainsString( '<img', $out );
+		$this->assertStringContainsString( 'a.png', $out );
+	}
 }
