@@ -206,11 +206,16 @@ function LegacySave( { attributes } ) {
 	const blockProps = useBlockProps.save( { className: LEGACY_CLASS } );
 	return (
 		<div { ...blockProps }>
-			<RichText.Content
-				tagName="strong"
-				className="lkst-tldr-heading"
-				value={ attributes.heading }
-			/>
+			{ /* Mirror the retired block's save: it emitted <strong> only when
+			     heading was non-empty, so an explicitly-emptied heading stored no
+			     node. Reproduce that exactly or validation mismatches. */ }
+			{ attributes.heading && (
+				<RichText.Content
+					tagName="strong"
+					className="lkst-tldr-heading"
+					value={ attributes.heading }
+				/>
+			) }
 			<div className="lkst-tldr-content-wrapper">
 				<RichText.Content
 					tagName="div"

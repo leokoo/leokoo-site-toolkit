@@ -84,8 +84,10 @@ class KeyTakeaways implements ModuleInterface {
 			// Legacy/lossless path (safety net only — never persisted by the
 			// editor or migrator): preserve block-level structure from a retired
 			// lkst/tldr box rather than flatten it into one inline paragraph.
+			// Media-only content counts as visible so it renders through the seam
+			// instead of falling back to the raw (unstyled) legacy markup.
 			$rich = self::sanitize_rich( isset( $attributes['text'] ) ? (string) $attributes['text'] : '' );
-			if ( self::has_visible_text( $rich ) ) {
+			if ( self::has_rich_content( $rich ) ) {
 				$body = '<div class="zehoro-key-takeaways__summary">' . $rich . '</div>';
 			}
 		} elseif ( $mode === 'paragraph' ) {
@@ -228,6 +230,12 @@ class KeyTakeaways implements ModuleInterface {
 
 	private static function has_visible_text( string $html ): bool {
 		return trim( wp_strip_all_tags( $html ) ) !== '';
+	}
+
+	/** Visible text OR embedded media — used by the rich (legacy) branch. */
+	private static function has_rich_content( string $html ): bool {
+		return self::has_visible_text( $html )
+			|| (bool) preg_match( '#<(img|figure|iframe|video|audio)\b#i', $html );
 	}
 
 	private static function sanitize_inline( string $html ): string {

@@ -323,4 +323,40 @@ class KeyTakeawaysCompatTest extends WP_UnitTestCase {
 		$this->assertStringContainsString( '<img', $out );
 		$this->assertStringContainsString( 'a.png', $out );
 	}
+
+	public function test_image_only_content_renders_without_leaking_legacy_markup() {
+		// No visible text — only an image. Must render through the seam, not fall
+		// back to the raw (now-unstyled) lkst-* markup.
+		$module = new KeyTakeaways();
+		$block  = self::legacy_block( '<p><img src="https://x.test/a.png" alt="" /></p>' );
+
+		$out = $module->legacy_render_safety_net( $block['innerHTML'], $block );
+		$this->assertStringContainsString( '<img', $out );
+		$this->assertStringContainsString( 'zehoro-key-takeaways', $out );
+		$this->assertStringNotContainsString( 'lkst-tldr', $out );
+	}
+
+	// =========================================================================
+	// End-to-end seam guard: migration → active module → block registered
+	// =========================================================================
+
+	public function test_migration_reactivates_the_module_that_registers_the_block() {
+		$registry = WP_Block_Type_Registry::get_instance();
+
+		update_option( 'zehoro_active_modules', [ 'tldr' ] );
+		ZehoroRenameMigrator::reset_flag();
+		ZehoroRenameMigrator::migrate_module_slugs();
+		$active = get_option( 'zehoro_active_modules' );
+
+		// Prove the now-active module actually registers the block from a clean
+		// registry state (register_block re-registers, restoring it for other tests).
+		if ( $registry->is_registered( 'zehoro/key-takeaways' ) ) {
+			unregister_block_type( 'zehoro/key-takeaways' );
+		}
+		( new KeyTakeaways() )->register_block();
+		$registered = $registry->is_registered( 'zehoro/key-takeaways' );
+
+		$this->assertContains( 'key_takeaways', $active, 'migration flips the gate predicate Plugin::init reads' );
+		$this->assertTrue( $registered, 'the reactivated module registers the block' );
+	}
 }
