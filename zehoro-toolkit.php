@@ -70,7 +70,7 @@ if ( file_exists( __DIR__ . '/vendor/yahnis-elsts/plugin-update-checker/plugin-u
         if ( empty( $gh_token ) && defined( 'ZEHORO_GITHUB_TOKEN' ) ) {
             $gh_token = ZEHORO_GITHUB_TOKEN;
         }
-        if ( str_starts_with( (string) $gh_token, 'v1:' ) || str_starts_with( (string) $gh_token, 'b64:' ) ) {
+        if ( strncmp( (string) $gh_token, 'v1:', 3 ) === 0 || strncmp( (string) $gh_token, 'b64:', 4 ) === 0 ) {
             $gh_token = ''; // Pro's encrypted token — never send ciphertext as a credential.
         }
         if ( ! empty( $gh_token ) ) {
