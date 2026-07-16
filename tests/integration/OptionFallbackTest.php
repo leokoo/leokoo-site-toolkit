@@ -92,8 +92,10 @@ class OptionFallbackTest extends WP_UnitTestCase {
 		// the module-slug migration rewrites the renamed slug in the canonical key.
 		ZehoroRenameMigrator::run();
 
-		// Canonical now holds the copy WITH the renamed slug (tldr→key_takeaways).
-		$this->assertSame( [ 'key_takeaways', 'faq', 'author_box' ], Option::get( 'zehoro_active_modules', [] ), 'post-migration: canonical path, slug renamed' );
+		// Canonical now holds the copy WITH the renamed slug (tldr→key_takeaways)
+		// AND the newly-introduced default module (evaluation), which run() adds
+		// once so a new default doesn't ship dark on an existing site.
+		$this->assertSame( [ 'key_takeaways', 'faq', 'author_box', 'evaluation' ], Option::get( 'zehoro_active_modules', [] ), 'post-migration: renamed slug + new default module' );
 
 		// Subsequent writes land on the canonical key only. Legacy unchanged
 		// (rollback safety until v1.8.0 cleanup migrator) — including its old slug.

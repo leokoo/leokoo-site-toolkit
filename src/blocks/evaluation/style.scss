@@ -1,0 +1,196 @@
+/**
+ * "We Tested" evaluation card — theme-neutral (front-end + editor).
+ */
+.zehoro-eval {
+	margin-block: 1.5em;
+	padding: 1.25em 1.5em;
+	border: 1px solid rgba( 0, 0, 0, 0.12 );
+	border-radius: 8px;
+	background: rgba( 0, 0, 0, 0.02 );
+
+	&__header {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 1em;
+		flex-wrap: wrap;
+	}
+
+	&__subject {
+		margin: 0;
+		font-size: 1.25em;
+		line-height: 1.2;
+	}
+
+	&__subject-link {
+		text-decoration: none;
+		border-bottom: 1px solid currentColor;
+	}
+
+	&__score {
+		flex-shrink: 0;
+		display: inline-flex;
+		align-items: baseline;
+		gap: 0.1em;
+		padding: 0.2em 0.55em;
+		border-radius: 6px;
+		background: rgba( 0, 0, 0, 0.06 );
+		font-weight: 700;
+	}
+
+	&__score-num {
+		font-size: 1.4em;
+	}
+
+	&__score-max {
+		font-size: 0.85em;
+		opacity: 0.6;
+	}
+
+	&__methodology {
+		margin: 0.85em 0 0;
+		font-size: 0.95em;
+		line-height: 1.55;
+	}
+
+	&__methodology-label {
+		font-weight: 700;
+		text-transform: uppercase;
+		letter-spacing: 0.03em;
+		font-size: 0.78em;
+		opacity: 0.7;
+		margin-right: 0.4em;
+	}
+
+	&__criteria {
+		margin-top: 1em;
+		display: flex;
+		flex-direction: column;
+		gap: 0.7em;
+	}
+
+	&__criterion-head {
+		display: flex;
+		justify-content: space-between;
+		align-items: baseline;
+		gap: 1em;
+		font-size: 0.92em;
+	}
+
+	&__criterion-name {
+		font-weight: 600;
+	}
+
+	&__criterion-score {
+		font-variant-numeric: tabular-nums;
+		font-weight: 700;
+	}
+
+	&__bar {
+		margin-top: 0.3em;
+		height: 7px;
+		border-radius: 999px;
+		background: rgba( 0, 0, 0, 0.1 );
+		overflow: hidden;
+	}
+
+	&__bar-fill {
+		display: block;
+		height: 100%;
+		border-radius: 999px;
+		background: currentColor;
+		opacity: 0.75;
+	}
+
+	&__proscons {
+		margin-top: 1.1em;
+		display: flex;
+		flex-wrap: wrap;
+		gap: 1.25em;
+	}
+
+	&__pros,
+	&__cons {
+		flex: 1 1 220px;
+
+		ul {
+			margin: 0.35em 0 0;
+			padding: 0;
+			list-style: none;
+		}
+
+		li {
+			position: relative;
+			padding-left: 1.4em;
+			margin-bottom: 0.3em;
+			line-height: 1.45;
+		}
+
+		li::before {
+			position: absolute;
+			left: 0;
+			font-weight: 700;
+		}
+	}
+
+	&__pros li::before {
+		content: "\2713"; // ✓
+		color: #1a7f37;
+	}
+
+	&__cons li::before {
+		content: "\2715"; // ✕
+		color: #b42318;
+	}
+
+	&__proscons-heading {
+		margin: 0;
+		font-size: 0.82em;
+		text-transform: uppercase;
+		letter-spacing: 0.04em;
+		opacity: 0.75;
+	}
+
+	&__verdict {
+		margin-top: 1.1em;
+		padding-top: 0.9em;
+		border-top: 1px solid rgba( 0, 0, 0, 0.1 );
+		line-height: 1.5;
+	}
+
+	&__verdict-label {
+		font-weight: 700;
+		text-transform: uppercase;
+		letter-spacing: 0.03em;
+		font-size: 0.78em;
+		opacity: 0.7;
+		margin-right: 0.4em;
+	}
+}
+
+@media ( prefers-color-scheme: dark ) {
+	.zehoro-eval {
+		border-color: rgba( 255, 255, 255, 0.16 );
+		background: rgba( 255, 255, 255, 0.04 );
+	}
+
+	.zehoro-eval__score {
+		background: rgba( 255, 255, 255, 0.1 );
+	}
+
+	.zehoro-eval__bar {
+		background: rgba( 255, 255, 255, 0.15 );
+	}
+
+	.zehoro-eval__verdict {
+		border-top-color: rgba( 255, 255, 255, 0.15 );
+	}
+
+	.zehoro-eval__pros li::before {
+		color: #4ac26b;
+	}
+
+	.zehoro-eval__cons li::before {
+		color: #f97066;
+	}
+}

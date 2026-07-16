@@ -2,6 +2,27 @@
 
 All notable changes to the **Zehoro Toolkit** will be documented in this file.
 
+## [1.33.0] - 2026-07-16
+
+### Added — "We Tested" evaluation block (launch block #5)
+`zehoro/evaluation`: an editorial evaluation scorecard — a "how we tested" methodology note, per-criteria
+scores (auto-averaged into an overall score), pros/cons, and a verdict. Theme-neutral, server-rendered through
+one seam. It's the trust-signal counterpart to Pro's affiliate Review Box — no price, no buy-buttons (those
+stay in Pro).
+
+Unlike the other launch blocks (which emit no schema), this one **can** emit `Review` JSON-LD — but behind a
+hard, code-level **self-serving guardrail**: a "review" of your own site/brand is exactly what Google's spam
+policy penalises, so schema is suppressed automatically when the reviewed subject is this site (a same-domain
+link, or a name matching the site name). Only genuine third-party subjects get structured data — one Review per
+URL, `itemReviewed` restricted to an allowlist of schema.org types, `</script>` breakout neutralised, and WP
+Review Pro wins if active. The editor shows a live warning when a subject looks self-serving.
+
+### Fixed — a new default module no longer ships dark on existing sites
+`zehoro_active_modules` is a stored positive allowlist with no default-merge (so a deactivated module stays
+off). The side-effect: a brand-new default module was absent from every existing site's stored list and would
+never activate. The rename migrator now introduces each new default module **once** (opt-out model — it lights
+up on upgrade, but a later user deactivation sticks), tracked in `zehoro_seen_new_modules`.
+
 ## [1.32.0] - 2026-07-16
 
 ### Added — Author Box block (E-E-A-T trust card; launch block #4)

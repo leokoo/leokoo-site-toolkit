@@ -50,6 +50,28 @@ class ZehoroRenameMigrator {
 		'tldr' => 'key_takeaways',
 	];
 
+	/** Per-site record of NEW default modules already introduced (array of slugs). */
+	public const SEEN_NEW_MODULES_FLAG = 'zehoro_seen_new_modules';
+
+	/**
+	 * NEW default modules shipped AFTER a site's initial install/baseline.
+	 *
+	 * `zehoro_active_modules` is a stored positive allowlist with NO default-merge
+	 * on read — deliberately, so a module a user deactivated stays off. The
+	 * side-effect: a brand-new default module is absent from every existing site's
+	 * stored list and would ship DARK. This list re-activates each new default
+	 * ONCE (opt-out model: it lights up on upgrade, but a later user deactivation
+	 * sticks — tracked in SEEN_NEW_MODULES_FLAG so re-runs never resurrect it).
+	 *
+	 * Add a slug here in the same release that introduces the module; never remove
+	 * one (the "seen" record makes re-runs harmless).
+	 *
+	 * @var string[]
+	 */
+	public const NEW_DEFAULT_MODULES = [
+		'evaluation', // v1.33.0 — the "We Tested" evaluation block
+	];
+
 	/** Sentinel returned by get_option() when a key is unset (distinguishes from a stored empty string / null / false). */
 	private const UNSET_SENTINEL = '__zehoro_unset__';
 
@@ -160,6 +182,49 @@ class ZehoroRenameMigrator {
 	public static function run(): void {
 		self::migrate_keys();
 		self::migrate_module_slugs();
+		self::activate_new_default_modules();
+	}
+
+	/**
+	 * Add each not-yet-seen NEW_DEFAULT_MODULES slug to the stored active-module
+	 * allowlist ONCE, so a new default module lights up on existing sites instead
+	 * of shipping dark — while a later user deactivation persists (the slug is
+	 * recorded in SEEN_NEW_MODULES_FLAG and never re-added).
+	 *
+	 * Runs on plugins_loaded @1 (before Plugin::init reads the list) and on
+	 * activation. On a fresh install the option is already seeded with every
+	 * default (Plugin::activate), so this only marks them seen — a no-op on the
+	 * active list.
+	 */
+	public static function activate_new_default_modules(): void {
+		$active = get_option( 'zehoro_active_modules', self::UNSET_SENTINEL );
+		if ( ! is_array( $active ) ) {
+			// No stored allowlist yet (pre-activation). Fresh installs seed it
+			// with all defaults via Plugin::activate — nothing to reconcile.
+			return;
+		}
+
+		$seen = get_option( self::SEEN_NEW_MODULES_FLAG, [] );
+		if ( ! is_array( $seen ) ) {
+			$seen = [];
+		}
+
+		$changed = false;
+		foreach ( self::NEW_DEFAULT_MODULES as $slug ) {
+			if ( in_array( $slug, $seen, true ) ) {
+				continue; // introduced once already — respect any later opt-out
+			}
+			if ( ! in_array( $slug, $active, true ) ) {
+				$active[] = $slug;
+			}
+			$seen[]  = $slug;
+			$changed = true;
+		}
+
+		if ( $changed ) {
+			update_option( 'zehoro_active_modules', array_values( array_unique( $active ) ), true );
+			update_option( self::SEEN_NEW_MODULES_FLAG, array_values( array_unique( $seen ) ), false );
+		}
 	}
 
 	/**
@@ -295,5 +360,6 @@ class ZehoroRenameMigrator {
 	public static function reset_flag(): void {
 		delete_option( self::MIGRATION_FLAG );
 		delete_option( self::SLUG_MIGRATION_FLAG );
+		delete_option( self::SEEN_NEW_MODULES_FLAG );
 	}
 }
