@@ -33,14 +33,8 @@ class Dashboard {
 		register_setting( 'zehoro_author_box_group', 'zehoro_cta_primary_url',     [ 'default' => '/blog/',              'sanitize_callback' => 'esc_url_raw' ] );
 		register_setting( 'zehoro_author_box_group', 'zehoro_cta_secondary_label', [ 'default' => 'Get the newsletter',  'sanitize_callback' => 'sanitize_text_field' ] );
 		register_setting( 'zehoro_author_box_group', 'zehoro_cta_secondary_url',   [ 'default' => '#newsletter',         'sanitize_callback' => 'esc_url_raw' ] );
-		register_setting( 'zehoro_rss_group', 'zehoro_rss_post_types', [
-			'default'           => [ 'post' ],
-			'sanitize_callback' => function ( $input ) {
-				if ( ! is_array( $input ) ) return [ 'post' ];
-				$valid = array_keys( get_post_types( [ 'public' => true ] ) );
-				return array_values( array_filter( array_map( 'sanitize_key', $input ), fn( $pt ) => in_array( $pt, $valid, true ) ) );
-			},
-		] );
+		// (The zehoro_rss_group setting moved to Pro's RSSSupport module with
+		// the rss_support module in the lean-Free reorg, stage C.)
 
 		$sanitize_hex = fn( $value, $default ) => preg_match( '/^#[0-9a-fA-F]{3,8}$/', sanitize_text_field( $value ) ) ? sanitize_text_field( $value ) : $default;
 		register_setting( 'zehoro_styles_group', 'zehoro_color_primary',          [ 'default' => '#E8A020', 'sanitize_callback' => fn( $v ) => $sanitize_hex( $v, '#E8A020' ) ] );
@@ -103,9 +97,8 @@ class Dashboard {
 			);
 		}
 
-		if ( in_array( 'rss_support', $this->active, true ) ) {
-			add_submenu_page( null, __( 'RSS Feed Settings', 'zehoro-toolkit' ), __( 'RSS Feed', 'zehoro-toolkit' ), 'manage_options', 'zehoro-rss-feed', [ $this, 'render_rss_feed_settings_page' ] );
-		}
+		// (The RSS Feed settings page moved to Pro's RSSSupport module, which
+		// registers zehoro-rss-feed itself — lean-Free reorg, stage C.)
 
 		if ( in_array( 'styles', $this->active, true ) ) {
 			add_submenu_page( null, __( 'Visual Styles', 'zehoro-toolkit' ), __( 'Visual Styles', 'zehoro-toolkit' ), 'manage_options', 'zehoro-styles', [ $this, 'render_styles_settings_page' ] );
@@ -777,51 +770,6 @@ class Dashboard {
 										<input type="text" id="<?php echo esc_attr( $key ); ?>" name="<?php echo esc_attr( $key ); ?>" value="<?php echo esc_attr( \Zehoro\Utils\Option::get( $key, $default ) ); ?>" class="lkst-color-picker">
 									</div>
 								<?php endforeach; ?>
-								<button type="submit" class="zui-btn zui-btn--primary"><?php esc_html_e( 'Save Changes', 'zehoro-toolkit' ); ?></button>
-							</form>
-						</div>
-					</div>
-				</div>
-			</div>
-		</div>
-		<?php
-	}
-
-	public function render_rss_feed_settings_page(): void {
-		$post_types = get_post_types( [ 'public' => true ], 'objects' );
-		$exclude    = [ 'attachment', 'page', 'bricks_template', 'etch_template', 'elementor_library', 'ifso_triggers' ];
-		$selected   = \Zehoro\Utils\Option::get( 'zehoro_rss_post_types', [ 'post' ] );
-		?>
-		<div class="wrap">
-			<div class="zui">
-				<header class="zui-pagehead">
-					<div>
-						<div class="zui-pagehead__eyebrow"><?php esc_html_e( 'Zehoro Toolkit', 'zehoro-toolkit' ); ?></div>
-						<h1 class="zui-pagehead__title"><?php esc_html_e( 'RSS Feed Support', 'zehoro-toolkit' ); ?></h1>
-						<div class="zui-pagehead__sub"><?php esc_html_e( 'Choose which content types appear in your site feeds.', 'zehoro-toolkit' ); ?></div>
-					</div>
-					<div class="zui-pagehead__actions">
-						<a class="zui-btn zui-btn--secondary zui-btn--sm" href="<?php echo esc_url( admin_url( 'admin.php?page=zehoro-dashboard' ) ); ?>">&larr; <?php esc_html_e( 'Back to Modules', 'zehoro-toolkit' ); ?></a>
-					</div>
-				</header>
-				<div class="zui-body" style="padding:18px 0 0;">
-					<div class="zui-card zui-card--raised" style="max-width:560px;">
-						<div class="zui-card__head"><span><?php esc_html_e( 'Feed content types', 'zehoro-toolkit' ); ?></span></div>
-						<div class="zui-card__body">
-							<form method="post" action="options.php">
-								<?php settings_fields( 'zehoro_rss_group' ); ?>
-								<div class="zui-field">
-									<span class="zui-field__label"><?php esc_html_e( 'Include Post Types', 'zehoro-toolkit' ); ?></span>
-									<?php
-									foreach ( $post_types as $slug => $pt ) :
-										if ( in_array( $slug, $exclude, true ) ) continue;
-										?>
-										<label class="zui-inline" style="margin-bottom:2px;">
-											<input type="checkbox" name="zehoro_rss_post_types[]" value="<?php echo esc_attr( $slug ); ?>" <?php checked( in_array( $slug, $selected, true ) ); ?>>
-											<span><?php echo esc_html( $pt->label ); ?> <span class="zui-slug"><?php echo esc_html( $slug ); ?></span></span>
-										</label>
-									<?php endforeach; ?>
-								</div>
 								<button type="submit" class="zui-btn zui-btn--primary"><?php esc_html_e( 'Save Changes', 'zehoro-toolkit' ); ?></button>
 							</form>
 						</div>

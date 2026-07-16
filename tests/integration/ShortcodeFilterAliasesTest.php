@@ -18,9 +18,9 @@ class ShortcodeFilterAliasesTest extends WP_UnitTestCase {
 	// ── Shortcode aliases ───────────────────────────────────────────────────
 
 	/**
-	 * The pills pairs (home_filter_pills / top_category_pills) moved to Pro's
-	 * MovedShortcodeFilterAliasesTest in the 1.219.0 lean-Free reorg (stage B);
-	 * the ContentBox + LastUpdated pairs follow in stage C.
+	 * The pills pairs moved to Pro in the lean-Free reorg stage B; the
+	 * ContentBox (lkst_box) + LastUpdated pairs moved in stage C — all now
+	 * covered by Pro's MovedStageBModulesTest / MovedStageCModulesTest.
 	 *
 	 * @return array<int, array{0: string, 1: string}>
 	 */
@@ -28,9 +28,7 @@ class ShortcodeFilterAliasesTest extends WP_UnitTestCase {
 		return [
 			[ 'lkst_author_box',         'zehoro_author_box' ],
 			[ 'lkst_author_socials',     'zehoro_author_socials' ],
-			[ 'lkst_box',                'zehoro_box' ],
 			[ 'lkst_faq',                'zehoro_faq' ],
-			[ 'lkst_last_updated',       'zehoro_last_updated' ],
 			[ 'lkst_toc',                'zehoro_toc' ],
 		];
 	}
@@ -108,12 +106,10 @@ class ShortcodeFilterAliasesTest extends WP_UnitTestCase {
 		static $booted = [];
 
 		$map = [
-			'lkst_author_box'         => \Zehoro\Modules\AuthorBox::class,
-			'lkst_author_socials'     => \Zehoro\Modules\AuthorBox::class,
-			'lkst_box'                => \Zehoro\Modules\ContentBox::class,
-			'lkst_faq'                => \Zehoro\Modules\FAQ::class,
-			'lkst_last_updated'       => \Zehoro\Modules\LastUpdated::class,
-			'lkst_toc'                => \Zehoro\Modules\TableOfContents::class,
+			'lkst_author_box'     => \Zehoro\Modules\AuthorBox::class,
+			'lkst_author_socials' => \Zehoro\Modules\AuthorBox::class,
+			'lkst_faq'            => \Zehoro\Modules\FAQ::class,
+			'lkst_toc'            => \Zehoro\Modules\TableOfContents::class,
 		];
 		$class = $map[ $legacy_name ] ?? null;
 		if ( $class === null || isset( $booted[ $class ] ) ) return;

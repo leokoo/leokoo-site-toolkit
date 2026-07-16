@@ -76,55 +76,6 @@
 
 
 /* =============================================================================
-   Mid-post newsletter CTA  (.zehoro-midpost-cta)
-   ============================================================================= */
-
-.zehoro-midpost-cta {
-	margin-bottom: 20px;
-	min-height: 180px;
-	background: var(--lkst-bg-dark);
-	border-left: 4px solid var(--lkst-primary-color);
-	border-radius: 12px;
-	padding: 36px 28px 28px;
-	
-	display: grid;
-	grid-template-columns: 1fr 1fr;
-	gap: 28px;
-	align-items: start;
-}
-
-@media (max-width: 640px) {
-	.zehoro-midpost-cta { min-height: 180px; grid-template-columns: 1fr; }
-}
-
-/* Sidebar variant — single-column stacked layout */
-.zehoro-midpost-cta.zehoro-sidebar-cta {
-	grid-template-columns: 1fr;
-	min-height: auto;
-	gap: 16px;
-	padding: 20px;
-	margin: 0;
-	border-radius: 8px;
-}
-
-.zehoro-midpost-cta__heading {
-	display: block;
-	color: #F5F0E8;
-	font-size: var(--text-m, 1.1rem);
-	font-weight: 700;
-	margin-bottom: 8px;
-	line-height: 1.35;
-}
-
-.zehoro-midpost-cta__desc {
-	display: block;
-	color: rgba(245, 240, 232, 0.72);
-	font-size: var(--text-s, 0.95rem);
-	line-height: 1.6;
-}
-
-
-/* =============================================================================
    Author social links row  (.lkst-author-socials)
    ============================================================================= */
 
@@ -400,80 +351,6 @@
     
 }
 
-.zehoro-midpost-cta__eyebrow {
-	display: block;
-	font-size: var(--text-xs, 0.75rem);
-	font-weight: 800;
-	text-transform: uppercase;
-	letter-spacing: 0.1em;
-	color: var(--lkst-primary-color, #E8A020);
-	margin-bottom: 6px;
-}
-/* =============================================================================
-   Content CTA Layouts
-   ============================================================================= */
-
-/* Image layout variants */
-.zehoro-midpost-cta.has-image.image-left,
-.zehoro-midpost-cta.has-image.image-right {
-  grid-template-columns: 200px 1fr 1fr;
-}
-.zehoro-midpost-cta.has-image.image-left .zehoro-cta-image-wrapper,
-.zehoro-midpost-cta.has-image.image-right .zehoro-cta-image-wrapper {
-  width: 200px;
-  min-width: 200px;
-  max-width: 200px;
-}
-
-.zehoro-midpost-cta.has-image.image-left .zehoro-cta-image-wrapper  { order: 1; }
-.zehoro-midpost-cta.has-image.image-left .zehoro-midpost-cta__text   { order: 2; }
-.zehoro-midpost-cta.has-image.image-left .zehoro-midpost-cta__form   { order: 3; }
-
-.zehoro-midpost-cta.has-image.image-right .zehoro-midpost-cta__text  { order: 1; }
-.zehoro-midpost-cta.has-image.image-right .zehoro-midpost-cta__form  { order: 2; }
-.zehoro-midpost-cta.has-image.image-right .zehoro-cta-image-wrapper  { order: 3; }
-
-.zehoro-midpost-cta.has-image.image-top {
-  grid-template-columns: 1fr 1fr; /* text | form — image spans full width above */
-  grid-template-rows: auto 1fr;
-}
-.zehoro-midpost-cta.has-image.image-top .zehoro-cta-image-wrapper {
-  grid-column: 1 / -1; /* full width */
-}
-
-.zehoro-cta-image-wrapper img {
-  width: 100%;
-  height: auto;
-  border-radius: 8px;
-  object-fit: cover;
-}
-
-/* Cap image-top height to prevent 16:9 images from dominating */
-.zehoro-midpost-cta.has-image.image-top .zehoro-cta-image-wrapper img {
-  max-height: 200px;
-}
-
-/* Stack form elements (input on top, button below) inside any CTA.
-   Fluent Forms adds gap:15px to .ff-t-container at >=768px — override it
-   with a tighter value so the stacked pair doesn't look too spread out. */
-.zehoro-midpost-cta__form .ff-t-container {
-  flex-direction: column;
-  gap: 8px;
-}
-.zehoro-midpost-cta__form .ff-t-cell {
-  width: 100% !important;
-}
-
-/* Mobile: always hide CTA images */
-@media (max-width: 768px) {
-  .zehoro-midpost-cta.hide-image-mobile .zehoro-cta-image-wrapper {
-    display: none;
-  }
-  /* Collapse to single column when image is hidden */
-  .zehoro-midpost-cta.hide-image-mobile {
-    grid-template-columns: 1fr;
-  }
-}
 
 /* =============================================================================
    Table of Contents (Wirecutter Style)
@@ -631,31 +508,6 @@
 
 
 
-/* FluentForm Gap Override */
-@media (min-width: 768px) {
-    .zehoro-midpost-cta .frm-fluent-form .ff-t-container,
-    .zehoro-sidebar-cta .frm-fluent-form .ff-t-container {
-        gap: 0 !important;
-    }
-}
-/* Tablet and Mobile Stacking Rules */
-@media (max-width: 900px) {
-    .zehoro-midpost-cta {
-        grid-template-columns: 1fr !important;
-        padding: 20px !important;
-        gap: 20px !important;
-    }
-    
-    .zehoro-midpost-cta.has-image .zehoro-cta-image-wrapper {
-        display: none !important;
-    }
-    
-    .zehoro-midpost-cta .zehoro-midpost-cta__text,
-    .zehoro-midpost-cta .zehoro-midpost-cta__form {
-        order: initial !important;
-        grid-column: 1 / -1 !important;
-    }
-}
 /* Fix for container gap on mobile */
 @media (max-width: 768px) {
     #brxe-dlyscy {
@@ -731,33 +583,6 @@
 	padding: 0 20px 20px;
 	line-height: 1.6;
 	color: var(--lkst-text-main, #3D3730);
-}
-
-
-/* =============================================================================
-   Last Updated Badge  (.lkst-last-updated)
-   ----------------------------------------------------------------------------
-   Default (`.lkst-last-updated`) is intentionally unstyled — it inherits the
-   surrounding typography so it composes cleanly inside article bodies, page
-   hero metadata rows, sidebars, etc.
-
-   The legacy "editorial pill" look is now opt-in via the modifier class
-   `.lkst-last-updated--pill`, applied either by:
-     • passing variant="pill" to the shortcode: [lkst_last_updated variant="pill"]
-     • or by hand: <span class="lkst-last-updated lkst-last-updated--pill">…</span>
-   ============================================================================= */
-
-.lkst-last-updated--pill {
-	display: inline-block;
-	font-size: 12px;
-	font-weight: 600;
-	text-transform: uppercase;
-	letter-spacing: 0.05em;
-	padding: 4px 10px;
-	background: var(--lkst-bg-light, #F5F0E8);
-	color: var(--lkst-primary-contrast, #0F1A2E);
-	border-radius: 3px;
-	margin-bottom: 1em;
 }
 
 

@@ -2,6 +2,17 @@
 
 All notable changes to the **Zehoro Toolkit** will be documented in this file.
 
+## [1.36.0] - 2026-07-17
+
+### Changed — lean Free reorg stage C (final): the last four modules relocate to Pro
+**Moves `content_box`, `cta_swap`, `rss_support`, `last_updated`** to Zehoro Toolkit Pro 1.220.0, completing
+the reorg: Free now ships exactly its wordpress.org funnel — the 5 launch blocks + Table of Contents + Article
+schema + Visual Styles. The mid-post CTA styles (shared with Pro's ContentStream), the last-updated pill
+styles, and the CTA-swap assets all travel to Pro; the RSS Feed settings page (previously rendered by Free's
+Dashboard) moves into the Pro module itself — same option keys and page slug, so existing sites keep their
+settings. Shortcode aliases (`[lkst_box]`, `[lkst_last_updated]`) and the AJAX email-capture contract are
+unchanged.
+
 ## [1.35.0] - 2026-07-17
 
 ### Changed — lean Free reorg stage B: five more modules relocate to Pro
