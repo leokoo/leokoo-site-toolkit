@@ -2,6 +2,16 @@
 
 All notable changes to the **Zehoro Toolkit** will be documented in this file.
 
+## [1.35.0] - 2026-07-17
+
+### Changed — lean Free reorg stage B: five more modules relocate to Pro
+**Moves `callout`, `steps`, `disclosure` (Disclaimer), `category_pills`, `home_filter_pills`** to Zehoro
+Toolkit Pro 1.219.0. Block names stay `lkst/*` (existing content renders identically on Free+Pro sites); the
+steps + callout CSS travels with the blocks, and the pill styles ship as Pro's own `assets/pills.css` (loaded
+on the archive/home views the pills render on — the modules no longer force Free's global stylesheet). On
+sites running Pro everything keeps working via the shared module registry + `ModuleSeeder`; Free-only sites no
+longer ship these (a static callout's saved content still renders, unstyled).
+
 ## [1.34.0] - 2026-07-17
 
 ### Changed — lean Free: editorial/utility modules moving to Pro (reorg stage A)
