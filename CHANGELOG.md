@@ -19,6 +19,13 @@ author's structured identity lives — the card renders, the schema attests, wit
 Non-duplication with a dedicated SEO plugin's schema is preserved (Article schema stays opt-in / off when a
 schema plugin owns it).
 
+### Fixed — JSON-LD URL escaping + safer author resolution (Refuter audit)
+Article schema URLs (`sameAs`, author `url`, publisher `logo`, `image`) now use `esc_url_raw` instead of
+`esc_url` — the display-context escaper turned `&` into `&#038;`, corrupting any query-string profile URL for
+the crawler; a rejected scheme is dropped rather than leaving a blank `sameAs` entry. The Author Box author
+resolver now falls back to the queried object **only when it is a post**, so a Person card placed on a
+category/author archive can no longer misread a term/user id as a post id and render an unrelated author.
+
 ## [1.31.0] - 2026-07-12
 
 ### Added — FAQ block (accessible accordion, no schema; launch block #3)

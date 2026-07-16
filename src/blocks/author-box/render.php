@@ -15,7 +15,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-$zehoro_ab_mode    = ( ( $attributes['mode'] ?? 'person' ) === 'organization' ) ? 'organization' : 'person';
+$zehoro_ab_mode    = \Zehoro\Modules\AuthorBox::resolve_mode( $attributes );
 $zehoro_ab_wrapper = get_block_wrapper_attributes(
 	[ 'class' => 'zehoro-author-box zehoro-author-box--' . $zehoro_ab_mode ]
 );

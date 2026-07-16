@@ -60,7 +60,7 @@ class AuthorBox implements \Zehoro\Core\ModuleInterface {
      * visual E-E-A-T card only.
      */
     public static function render_block( array $attributes, string $wrapper = '' ): string {
-        $mode = ( ( $attributes['mode'] ?? 'person' ) === 'organization' ) ? 'organization' : 'person';
+        $mode = self::resolve_mode( $attributes );
         $body = ( $mode === 'organization' )
             ? self::render_org_body( $attributes )
             : self::render_person_body( $attributes );
@@ -177,6 +177,15 @@ class AuthorBox implements \Zehoro\Core\ModuleInterface {
         return ! isset( $attributes[ $key ] ) || ! empty( $attributes[ $key ] );
     }
 
+    /**
+     * The card mode ('person' | 'organization') — the single source of truth for
+     * both the render seam (body) and the block wrapper's modifier class, so the
+     * two can never desync.
+     */
+    public static function resolve_mode( array $attributes ): string {
+        return ( ( $attributes['mode'] ?? 'person' ) === 'organization' ) ? 'organization' : 'person';
+    }
+
     /** Static author resolver for the block seam (mirrors resolve_author_id). */
     public static function resolve_author( int $override ): int {
         if ( $override > 0 ) {
@@ -186,12 +195,12 @@ class AuthorBox implements \Zehoro\Core\ModuleInterface {
         if ( $id ) {
             return $id;
         }
-        $queried = get_queried_object_id();
-        if ( $queried ) {
-            $author = (int) get_post_field( 'post_author', $queried );
-            if ( $author ) {
-                return $author;
-            }
+        // Fall back to the queried object ONLY when it is a post — never a term
+        // (category/tag/date archive) or user (author archive), whose numeric id
+        // would otherwise be misread as a post id and resolve an unrelated author.
+        $queried = get_queried_object();
+        if ( $queried instanceof \WP_Post && (int) $queried->post_author ) {
+            return (int) $queried->post_author;
         }
         return 0;
     }
@@ -235,12 +244,12 @@ class AuthorBox implements \Zehoro\Core\ModuleInterface {
         if ( $id ) {
             return $id;
         }
-        // 3. Outside the loop (e.g. Bricks sidebar element): fall back to
-        //    the post\'s post_author field via the queried object.
-        $queried = get_queried_object_id();
-        if ( $queried ) {
-            $author = (int) get_post_field( 'post_author', $queried );
-            if ( $author ) return $author;
+        // 3. Outside the loop (e.g. Bricks sidebar element): fall back to the
+        //    post\'s post_author — but ONLY when the queried object is actually a
+        //    post, not a term/user archive whose id would misresolve an author.
+        $queried = get_queried_object();
+        if ( $queried instanceof \WP_Post && (int) $queried->post_author ) {
+            return (int) $queried->post_author;
         }
         return 0;
     }

@@ -66,7 +66,10 @@ class AuthorBoxBlockTest extends WP_UnitTestCase {
 		$id = self::factory()->user->create( [ 'role' => 'author', 'display_name' => 'X' ] );
 		update_user_meta( $id, 'zehoro_chip_1', '<script>alert(1)</script>' );
 		$html = AuthorBox::render_block( [ 'mode' => 'person', 'authorId' => $id ] );
-		$this->assertStringNotContainsString( '<script', $html );
+		// Positive AND negative: the chip must actually RENDER (escaped), so this
+		// can't pass by the chip silently vanishing.
+		$this->assertStringContainsString( '&lt;script&gt;', $html, 'escaped chip is present' );
+		$this->assertStringNotContainsString( '<script', $html, 'no live script tag' );
 	}
 
 	public function test_social_links_carry_noopener() {
@@ -118,5 +121,82 @@ class AuthorBoxBlockTest extends WP_UnitTestCase {
 
 		$this->assertContains( 'https://linkedin.com/in/jane', $schema['author']['sameAs'] );
 		$this->assertContains( 'https://x.com/jane', $schema['author']['sameAs'] );
+	}
+
+	// -------------------------------------------------------------------------
+	// Legacy lkst_* fallback — the ONLY path real (un-migrated) author data
+	// travels: nothing writes zehoro_* user meta, so this is the load-bearing
+	// read. (Refuter audit should_fix: the canonical-key tests above never
+	// exercised the fallback.)
+	// -------------------------------------------------------------------------
+
+	private function author_with_legacy_meta(): int {
+		$id = self::factory()->user->create( [
+			'role'         => 'author',
+			'display_name' => 'Legacy Larry',
+			'description'  => 'Wrote posts before the rename.',
+		] );
+		update_user_meta( $id, 'lkst_author_tagline', 'Old-school byline' );
+		update_user_meta( $id, 'lkst_chip_1', 'Veteran' );
+		update_user_meta( $id, 'lkst_social_linkedin', 'https://linkedin.com/in/larry' );
+		return $id;
+	}
+
+	public function test_person_card_renders_from_legacy_lkst_meta() {
+		$id   = $this->author_with_legacy_meta();
+		$html = AuthorBox::render_block( [ 'mode' => 'person', 'authorId' => $id ] );
+
+		$this->assertStringContainsString( 'Old-school byline', $html, 'tagline via lkst_ fallback' );
+		$this->assertStringContainsString( 'Veteran', $html, 'credential via lkst_ fallback' );
+		$this->assertStringContainsString( 'linkedin.com/in/larry', $html, 'social via lkst_ fallback' );
+	}
+
+	public function test_article_schema_sameAs_from_legacy_lkst_social() {
+		$id     = $this->author_with_legacy_meta();
+		$post   = self::factory()->post->create_and_get( [ 'post_type' => 'post', 'post_author' => $id ] );
+		$schema = ArticleSchema::build_schema( $post );
+
+		$this->assertContains( 'https://linkedin.com/in/larry', $schema['author']['sameAs'] );
+	}
+
+	// -------------------------------------------------------------------------
+	// Fix proofs (Refuter audit should_fix items)
+	// -------------------------------------------------------------------------
+
+	/** esc_url_raw (not esc_url) keeps a query-string profile URL valid in JSON-LD. */
+	public function test_sameAs_query_string_url_is_not_html_entity_encoded() {
+		$id = self::factory()->user->create( [ 'role' => 'author', 'display_name' => 'Q' ] );
+		update_user_meta( $id, 'zehoro_social_youtube', 'https://youtube.com/channel/UCabc?view=videos&flow=grid' );
+		$post   = self::factory()->post->create_and_get( [ 'post_type' => 'post', 'post_author' => $id ] );
+		$schema = ArticleSchema::build_schema( $post );
+
+		$this->assertContains( 'https://youtube.com/channel/UCabc?view=videos&flow=grid', $schema['author']['sameAs'] );
+		$this->assertStringNotContainsString( '&#038;', wp_json_encode( $schema['author']['sameAs'] ), 'ampersand not HTML-entity-encoded in the data URL' );
+	}
+
+	/** A rejected scheme sanitizes to '' and must NOT leave a blank sameAs entry. */
+	public function test_sameAs_drops_rejected_scheme_url() {
+		$id = self::factory()->user->create( [ 'role' => 'author', 'display_name' => 'J' ] );
+		update_user_meta( $id, 'zehoro_social_facebook', 'javascript:alert(1)' );
+		update_user_meta( $id, 'zehoro_social_linkedin', 'https://linkedin.com/in/j' );
+		$post   = self::factory()->post->create_and_get( [ 'post_type' => 'post', 'post_author' => $id ] );
+		$schema = ArticleSchema::build_schema( $post );
+
+		$this->assertNotContains( '', $schema['author']['sameAs'], 'no empty entry from a stripped scheme' );
+		$this->assertContains( 'https://linkedin.com/in/j', $schema['author']['sameAs'] );
+	}
+
+	/** resolve_author() must not misread a term/user archive id as a post id. */
+	public function test_resolve_author_ignores_non_post_queried_object() {
+		$cat  = self::factory()->category->create();
+		$post = self::factory()->post->create();
+		wp_set_post_categories( $post, [ $cat ] );
+		$this->go_to( get_term_link( $cat, 'category' ) );
+
+		$this->assertInstanceOf( \WP_Term::class, get_queried_object(), 'sanity: on a category archive' );
+		$this->assertSame( 0, AuthorBox::resolve_author( 0 ), 'no author resolved from a term archive' );
+		$this->assertSame( '', AuthorBox::render_block( [ 'mode' => 'person', 'authorId' => 0 ] ), 'card renders nothing rather than a wrong author' );
+
+		$this->go_to( '/' ); // reset the query for following tests
 	}
 }
