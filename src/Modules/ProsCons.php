@@ -97,7 +97,7 @@ class ProsCons implements ModuleInterface {
 			return ''; // empty column renders nothing
 		}
 
-		$title = trim( wp_strip_all_tags( (string) $title ) );
+		$title = \Zehoro\Utils\BlockSanitize::plain_text( (string) $title );
 		if ( $title === '' ) {
 			$title = ( $variant === 'pros' )
 				? __( 'Pros', 'zehoro-toolkit' )

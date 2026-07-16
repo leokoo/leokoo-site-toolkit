@@ -75,34 +75,77 @@ class FaqBlockTest extends WP_UnitTestCase {
 		$this->assertTrue( $registry->is_registered( 'zehoro/faq-item' ) );
 	}
 
-	public function test_end_to_end_via_do_blocks() {
-		$content =
-			'<!-- wp:zehoro/faq -->' .
-			'<!-- wp:zehoro/faq-item {"question":"What is it?"} -->' .
-			'<!-- wp:paragraph --><p>It is a thing.</p><!-- /wp:paragraph -->' .
-			'<!-- /wp:zehoro/faq-item -->' .
+	private static function faq_block( string $inner, string $item_attrs = '{"question":"What is it?"}' ): string {
+		return '<!-- wp:zehoro/faq -->' .
+			'<!-- wp:zehoro/faq-item ' . $item_attrs . ' -->' . $inner . '<!-- /wp:zehoro/faq-item -->' .
 			'<!-- /wp:zehoro/faq -->';
+	}
 
-		$out = do_blocks( $content );
+	public function test_end_to_end_via_do_blocks() {
+		$out = do_blocks( self::faq_block( '<!-- wp:paragraph --><p>It is a thing.</p><!-- /wp:paragraph -->' ) );
 
-		$this->assertStringContainsString( 'wp-block-zehoro-faq', $out );
+		// Container wrapper must be present distinctly (not just the child's
+		// wp-block-zehoro-faq-item, which contains 'wp-block-zehoro-faq' as a substring).
+		$this->assertMatchesRegularExpression( '/<div class="[^"]*\bzehoro-faq\b[^"]*">\s*<details/', $out );
 		$this->assertStringContainsString( '<summary class="zehoro-faq__question">What is it?</summary>', $out );
 		$this->assertStringContainsString( 'zehoro-faq__answer', $out );
 		$this->assertStringContainsString( 'It is a thing.', $out );
-		$this->assertStringContainsString( '<details', $out );
 	}
 
-	public function test_block_emits_no_schema() {
-		// Per the 2026 decision: the FAQ block emits NO FAQPage JSON-LD (dead
-		// rich results); the value is the accessible accordion.
-		$content =
-			'<!-- wp:zehoro/faq --><!-- wp:zehoro/faq-item {"question":"Q?"} -->' .
-			'<!-- wp:paragraph --><p>A.</p><!-- /wp:paragraph -->' .
-			'<!-- /wp:zehoro/faq-item --><!-- /wp:zehoro/faq -->';
+	public function test_start_open_round_trips_through_do_blocks() {
+		$out = do_blocks( self::faq_block(
+			'<!-- wp:paragraph --><p>A</p><!-- /wp:paragraph -->',
+			'{"question":"Q?","startOpen":true}'
+		) );
+		$this->assertMatchesRegularExpression( '/<details[^>]*\sopen>/', $out );
+	}
 
-		$out = do_blocks( $content );
+	public function test_question_empty_item_collapses() {
+		// A filled answer with no question must NOT render an unlabeled <summary>.
+		$out = do_blocks( self::faq_block(
+			'<!-- wp:paragraph --><p>Orphan answer</p><!-- /wp:paragraph -->',
+			'{"question":""}'
+		) );
+		$this->assertStringNotContainsString( '<details', $out );
+		$this->assertStringNotContainsString( 'Orphan answer', $out );
+	}
 
-		$this->assertStringNotContainsString( 'application/ld+json', $out );
-		$this->assertStringNotContainsString( 'FAQPage', $out );
+	public function test_question_ampersand_is_encoded_exactly_once() {
+		// RichText stores '&' entity-encoded; the seam must not double-encode.
+		$out = do_blocks( self::faq_block(
+			'<!-- wp:paragraph --><p>A</p><!-- /wp:paragraph -->',
+			'{"question":"Terms &amp; Conditions"}'
+		) );
+		$this->assertStringContainsString( 'Terms &amp; Conditions</summary>', $out );
+		$this->assertStringNotContainsString( '&amp;amp;', $out );
+	}
+
+	public function test_block_render_does_not_feed_faqpage_schema() {
+		// FAQPage JSON-LD is emitted only by output_schema() (the real emitter).
+		// Rendering the FAQ blocks must not feed it — the block seams are static
+		// and never populate the schema collector.
+		$faq = new FAQ();
+		do_blocks( self::faq_block( '<!-- wp:paragraph --><p>A.</p><!-- /wp:paragraph -->' ) );
+
+		ob_start();
+		$faq->output_schema();
+		$emitted = (string) ob_get_clean();
+
+		$this->assertStringNotContainsString( 'FAQPage', $emitted, 'the block path must emit no FAQ schema' );
+	}
+
+	public function test_shortcode_still_emits_faqpage_schema() {
+		// Pin the block-vs-shortcode boundary: the legacy shortcode path DOES
+		// still populate + emit FAQPage (back-compat). 'force' mode bypasses the
+		// SEO-plugin coexistence gate.
+		update_option( 'zehoro_faq_schema_mode', 'force' );
+		$faq = new FAQ();
+		$faq->render_shortcode( [ 'question' => 'Q?' ], 'Answer.' );
+
+		ob_start();
+		$faq->output_schema();
+		$emitted = (string) ob_get_clean();
+
+		$this->assertStringContainsString( 'FAQPage', $emitted );
 	}
 }

@@ -94,6 +94,12 @@ class ProsConsRenderTest extends WP_UnitTestCase {
 		$this->assertStringNotContainsString( '</h3><script>', $html );
 	}
 
+	public function test_title_ampersand_is_encoded_exactly_once() {
+		$html = ProsCons::render_html( [ 'show' => 'pros', 'prosTitle' => 'Wins &amp; Perks', 'pros' => '<li>x</li>' ] );
+		$this->assertStringContainsString( 'Wins &amp; Perks</h3>', $html );
+		$this->assertStringNotContainsString( '&amp;amp;', $html );
+	}
+
 	public function test_blank_title_falls_back_to_i18n_default() {
 		// block.json no longer hardcodes 'Pros'/'Cons', so the __() fallback must fire.
 		$html = ProsCons::render_html( [ 'show' => 'both', 'pros' => '<li>x</li>', 'cons' => '<li>y</li>' ] );

@@ -46,8 +46,10 @@ class FAQ implements ModuleInterface {
 
     /**
      * Render seam — the FAQ container. Wraps the rendered faq-item inner blocks.
-     * The block emits NO schema (FAQ rich results were retired 2026-05-07; the
-     * value is the accessible, quotable accordion).
+     * The BLOCK emits NO FAQPage JSON-LD (Google retired FAQ rich results
+     * 2026-05-07; the value is the accessible, quotable accordion). The legacy
+     * [zehoro_faq] SHORTCODE keeps its optional, SEO-plugin-gated schema for
+     * backward-compat — see output_schema() below.
      */
     public static function render_container( array $attributes, string $content, string $wrapper = '' ): string {
         $content = trim( $content );
@@ -66,9 +68,11 @@ class FAQ implements ModuleInterface {
      * output). The question is plain text (the editor disallows inline formats).
      */
     public static function render_item( array $attributes, string $content, string $wrapper = '' ): string {
-        $question = trim( wp_strip_all_tags( isset( $attributes['question'] ) ? (string) $attributes['question'] : '' ) );
+        $question = \Zehoro\Utils\BlockSanitize::plain_text( isset( $attributes['question'] ) ? (string) $attributes['question'] : '' );
         $answer   = trim( $content );
-        if ( $question === '' && $answer === '' ) {
+        // An FAQ item needs a question — a labelless <summary> is a broken,
+        // inaccessible disclosure control, so render nothing until one is set.
+        if ( $question === '' ) {
             return '';
         }
         if ( $wrapper === '' ) {

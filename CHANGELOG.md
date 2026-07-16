@@ -11,6 +11,12 @@ All notable changes to the **Zehoro Toolkit** will be documented in this file.
 Google retired FAQ rich results on 7 May 2026, so the block leads on the visible, quotable accordion rather
 than penalty-adjacent markup. The existing `[zehoro_faq]` shortcode is unchanged for backward-compat.
 
+### Fixed — heading/title/question no longer double-HTML-encoded
+RichText serializes its value entity-encoded, so a naive `wp_strip_all_tags()` + `esc_html()` double-encoded
+the Key Takeaways heading, the Pros/Cons titles, and the FAQ question — `Terms & Conditions` rendered as
+literal `Terms &amp; Conditions`. A shared `BlockSanitize::plain_text()` now decodes entities before the single
+`esc_html()` at the output site (caught by the FAQ audit's cross-block lens).
+
 ## [1.30.0] - 2026-07-12
 
 ### Added — Pros & Cons block (consolidated, launch block #2)

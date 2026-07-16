@@ -175,7 +175,7 @@ class KeyTakeaways implements ModuleInterface {
 		if ( $level < 2 || $level > 4 ) {
 			$level = 2;
 		}
-		$heading = trim( wp_strip_all_tags( isset( $attributes['heading'] ) ? (string) $attributes['heading'] : '' ) );
+		$heading = \Zehoro\Utils\BlockSanitize::plain_text( isset( $attributes['heading'] ) ? (string) $attributes['heading'] : '' );
 		if ( $heading === '' ) {
 			$heading = __( 'Key takeaways', 'zehoro-toolkit' );
 		}

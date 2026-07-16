@@ -17,6 +17,18 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 final class BlockSanitize {
 
+	/**
+	 * Plain text from a RichText/HTML value, ready to be esc_html()'d for output.
+	 *
+	 * RichText serializes its value entity-encoded (`&` → `&amp;`), so a naive
+	 * wp_strip_all_tags() + esc_html() double-encodes ("Terms & Conditions" →
+	 * "Terms &amp;amp; Conditions" → renders literally). Strip tags, THEN decode
+	 * entities, so the single esc_html() at the output site encodes exactly once.
+	 */
+	public static function plain_text( string $html ): string {
+		return trim( html_entity_decode( wp_strip_all_tags( $html ), ENT_QUOTES ) );
+	}
+
 	/** Inline author formatting. wp_kses on the inline allowlist. */
 	public static function inline( string $html ): string {
 		return wp_kses( $html, self::allowed_inline() );

@@ -92,6 +92,13 @@ class KeyTakeawaysRenderTest extends WP_UnitTestCase {
 		$this->assertStringContainsString( 'Key takeaways</h2>', $html );
 	}
 
+	public function test_heading_ampersand_is_encoded_exactly_once() {
+		// RichText stores '&' entity-encoded; the seam must not double-encode.
+		$html = KeyTakeaways::render_html( [ 'mode' => 'paragraph', 'heading' => 'Terms &amp; Conditions', 'text' => 'x' ] );
+		$this->assertStringContainsString( 'Terms &amp; Conditions</h2>', $html );
+		$this->assertStringNotContainsString( '&amp;amp;', $html );
+	}
+
 	// -------------------------------------------------------------------------
 	// Security — the seam is the only escaping boundary
 	// -------------------------------------------------------------------------
