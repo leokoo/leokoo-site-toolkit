@@ -25,7 +25,8 @@ It is **plug-and-play**: no API keys, no external accounts, no heavy configurati
 * **"We Tested" evaluation** — a hands-on scorecard (per-criteria scores, methodology, verdict) with penalty-safe Review schema for genuine third-party subjects.
 * **Author boxes** — surface the human behind the post (an E-E-A-T signal that AI answer engines increasingly weigh).
 * **Article schema (E-E-A-T)** — Article / author / publisher JSON-LD that reflects real authorship and freshness signals.
-* **More editorial blocks** — Callout, Stat Callout, Steps, Testimonial and more, for review- and guide-style content.
+
+(More editorial and conversion blocks — Callout, Stat Callout, Steps, Testimonial, product boxes and more — live in Zehoro Toolkit Pro.)
 
 = Works *alongside* your SEO plugin =
 
