@@ -1,0 +1,50 @@
+{
+  "$schema": "https://schemas.wp.org/trunk/block.json",
+  "apiVersion": 3,
+  "name": "zehoro/author-box",
+  "title": "Author Box",
+  "category": "zehoro-toolkit",
+  "icon": "id",
+  "description": "An E-E-A-T trust card — the post author (or your organization) with bio, credentials and links. Auto-fills from the author profile.",
+  "keywords": [
+    "author",
+    "bio",
+    "byline",
+    "e-e-a-t",
+    "about"
+  ],
+  "textdomain": "zehoro-toolkit",
+  "supports": {
+    "html": false,
+    "anchor": true,
+    "align": [
+      "wide"
+    ]
+  },
+  "attributes": {
+    "mode": {
+      "type": "string",
+      "default": "person"
+    },
+    "authorId": {
+      "type": "number",
+      "default": 0
+    },
+    "showBio": {
+      "type": "boolean",
+      "default": true
+    },
+    "showCredentials": {
+      "type": "boolean",
+      "default": true
+    },
+    "showSocials": {
+      "type": "boolean",
+      "default": true
+    }
+  },
+  "editorScript": "file:./index.js",
+  "editorStyle": "file:./index.css",
+  "style": "file:./style-index.css",
+  "render": "file:./render.php"
+}

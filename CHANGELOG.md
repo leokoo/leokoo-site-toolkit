@@ -2,6 +2,23 @@
 
 All notable changes to the **Zehoro Toolkit** will be documented in this file.
 
+## [1.32.0] - 2026-07-16
+
+### Added — Author Box block (E-E-A-T trust card; launch block #4)
+`zehoro/author-box`: a theme-neutral author trust card that **auto-fills from the post author** — avatar,
+name, tagline, bio, credential chips, and social links — with a one-click **Organization mode** (site name,
+logo, description) for company-authored posts. Per-section toggles (bio / credentials / socials). Server-rendered
+through one seam; the editor preview is a real `ServerSideRender` of that seam, so what you see is what ships.
+The block emits **no schema of its own** — it is the visible card only.
+
+### Changed — richer author E-E-A-T in Article schema (no duplicate nodes)
+`ArticleSchema` now models the author as a real person *inside your organization*: the author `Person` gains
+`worksFor` referencing the publisher `Organization` **by the same `@id`** (one canonical Org node, never a
+duplicate), and the author's `sameAs` is enriched with their configured social profiles. This is where the
+author's structured identity lives — the card renders, the schema attests, with no overlap between them.
+Non-duplication with a dedicated SEO plugin's schema is preserved (Article schema stays opt-in / off when a
+schema plugin owns it).
+
 ## [1.31.0] - 2026-07-12
 
 ### Added — FAQ block (accessible accordion, no schema; launch block #3)

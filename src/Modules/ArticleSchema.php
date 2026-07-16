@@ -101,10 +101,27 @@ class ArticleSchema implements ModuleInterface {
         // RENAME-DRIFT-1 — an E-E-A-T signal loss).
         $linkedin = get_the_author_meta( 'zehoro_author_linkedin', $author_id ) ?: get_the_author_meta( 'lkst_author_linkedin', $author_id );
         $twitter  = get_the_author_meta( 'zehoro_author_twitter', $author_id ) ?: get_the_author_meta( 'lkst_author_twitter', $author_id );
-        $same_as  = array_values( array_filter( [ $linkedin, $twitter ] ) );
+        $same_as  = [ $linkedin, $twitter ];
+        // Enrich sameAs with the Author Box social profiles — the SAME links the
+        // visual card renders, so schema + card agree (a stronger E-E-A-T
+        // identity signal). Author Box: block #4.
+        foreach ( [ 'facebook', 'linkedin', 'x', 'youtube' ] as $net ) {
+            $url = get_the_author_meta( 'zehoro_social_' . $net, $author_id ) ?: get_the_author_meta( 'lkst_social_' . $net, $author_id );
+            if ( $url ) {
+                $same_as[] = $url;
+            }
+        }
+        $same_as = array_values( array_unique( array_filter( $same_as ) ) );
         if ( ! empty( $same_as ) ) {
             $author_schema['sameAs'] = array_map( 'esc_url', $same_as );
         }
+
+        // The author works for the publisher Organization. Reference it by @id
+        // (set on the publisher node below) instead of inlining a second
+        // Organization — one canonical Org node, penalty-safe (the Author Box
+        // block's dual-mode differentiator, done in schema not a duplicate box).
+        $org_id = home_url() . '#organization';
+        $author_schema['worksFor'] = [ '@id' => $org_id ];
 
         // Core schema. @type already resolved above via get_schema_type() — the filterable
         // post-type → schema-type map (zehoro_article_schema_type_map). A stray hardcoded
@@ -123,6 +140,7 @@ class ArticleSchema implements ModuleInterface {
             'author'        => $author_schema,
             'publisher'     => [
                 '@type' => 'Organization',
+                '@id'   => $org_id,
                 'name'  => get_bloginfo( 'name' ),
                 'url'   => home_url(),
             ],
