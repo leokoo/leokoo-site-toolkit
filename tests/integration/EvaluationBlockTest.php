@@ -73,9 +73,21 @@ class EvaluationBlockTest extends WP_UnitTestCase {
 		$html = Evaluation::render_block( $this->third_party_attrs( [
 			'subjectName' => 'Widget</script><script>alert(1)</script>',
 		] ) );
-		// Card: escaped. Schema: JSON_HEX_TAG escapes < / > so no breakout.
+
+		// No live breakout anywhere in the output.
 		$this->assertStringNotContainsString( '<script>alert(1)', $html );
-		$this->assertStringContainsString( '<', $html, 'schema hex-escapes the angle brackets' );
+
+		// Isolate the JSON-LD block. Its raw text must carry NO literal <script /
+		// </script — yet the full payload must still round-trip through the
+		// decoded JSON. Both true at once is only possible via hex-escaping.
+		preg_match( '#<script type="application/ld\+json">(.*?)</script>#s', $html, $m );
+		$this->assertNotEmpty( $m, 'a Review schema block is present' );
+		$raw = $m[1];
+		$this->assertStringNotContainsString( '<script', $raw, 'no literal opening tag inside the JSON-LD' );
+		$this->assertStringNotContainsString( '</script', $raw, 'no literal breakout inside the JSON-LD' );
+		$decoded = json_decode( $raw, true );
+		$this->assertIsArray( $decoded, 'JSON-LD is still valid JSON' );
+		$this->assertStringContainsString( 'alert(1)', $decoded['itemReviewed']['name'], 'payload preserved, escaped' );
 	}
 
 	// -------------------------------------------------------------------------
@@ -107,6 +119,64 @@ class EvaluationBlockTest extends WP_UnitTestCase {
 			'subjectUrl' => home_url( '/our-own-product' ),
 		] ) );
 		$this->assertNull( $this->schema_from( $html ), 'self-serving: subject on our own domain' );
+	}
+
+	public function test_schema_suppressed_for_www_host_variant() {
+		// home is example.org; www.example.org is the SAME site.
+		$html = Evaluation::render_block( $this->third_party_attrs( [
+			'subjectUrl' => str_replace( '://', '://www.', home_url( '/product' ) ),
+		] ) );
+		$this->assertNull( $this->schema_from( $html ), 'www variant is the same host' );
+	}
+
+	public function test_schema_suppressed_for_subdomain() {
+		$html = Evaluation::render_block( $this->third_party_attrs( [
+			'subjectUrl' => str_replace( '://', '://shop.', home_url( '/product' ) ),
+		] ) );
+		$this->assertNull( $this->schema_from( $html ), 'a subdomain of the site is still us' );
+	}
+
+	public function test_schema_emitted_for_similar_but_different_domain() {
+		// home is example.org; "not<site>" and same-TLD siblings must NOT over-match.
+		$host = wp_parse_url( home_url(), PHP_URL_HOST ); // e.g. example.org
+		foreach ( [ 'not' . $host, 'my' . $host ] as $other ) {
+			Evaluation::reset_schema_latch(); // each is a fresh "page"
+			$html = Evaluation::render_block( $this->third_party_attrs( [
+				'subjectUrl' => 'https://' . $other . '/product',
+			] ) );
+			$this->assertNotNull( $this->schema_from( $html ), "$other is a genuine third party — must emit" );
+		}
+	}
+
+	public function test_schema_suppressed_for_relative_subject_url() {
+		$html = Evaluation::render_block( $this->third_party_attrs( [
+			'subjectUrl' => '/our-own-product',
+		] ) );
+		$this->assertNull( $this->schema_from( $html ), 'a host-less/relative URL resolves to this site' );
+	}
+
+	public function test_defer_review_schema_filter_suppresses() {
+		add_filter( 'zehoro/evaluation/defer_review_schema', '__return_true' );
+		$html = Evaluation::render_block( $this->third_party_attrs() );
+		remove_filter( 'zehoro/evaluation/defer_review_schema', '__return_true' );
+		$this->assertNull( $this->schema_from( $html ), 'another plugin owns the Review schema' );
+	}
+
+	public function test_self_serving_filter_ignores_non_boolean_return() {
+		// A buggy callback returning null must NOT un-suppress a detected self-review.
+		add_filter( 'zehoro/evaluation/is_self_serving', static function () {
+			return null;
+		} );
+		$detected = Evaluation::is_self_serving( [ 'subjectName' => get_bloginfo( 'name' ) ] );
+		remove_all_filters( 'zehoro/evaluation/is_self_serving' );
+		$this->assertTrue( $detected, 'null filter return falls back to the detected verdict' );
+	}
+
+	public function test_proscons_heading_nests_under_subject_level() {
+		$html = Evaluation::render_block( $this->third_party_attrs( [ 'headingLevel' => 2 ] ) );
+		$this->assertStringContainsString( '<h2 class="zehoro-eval__subject"', $html );
+		$this->assertStringContainsString( '<h3 class="zehoro-eval__proscons-heading">', $html, 'proscons nests one level below H2' );
+		$this->assertStringNotContainsString( '<h4 class="zehoro-eval__proscons-heading">', $html );
 	}
 
 	public function test_schema_suppressed_when_toggle_off() {

@@ -5,7 +5,7 @@
  * from the PHP render seam. Reuses the star-picker + list-editor UX from Pro's
  * Review Box, minus the affiliate machinery.
  */
-import { __ } from '@wordpress/i18n';
+import { __, _n, sprintf } from '@wordpress/i18n';
 import { useBlockProps, InspectorControls } from '@wordpress/block-editor';
 import {
 	PanelBody,
@@ -28,7 +28,7 @@ const StarPicker = ( { value, onChange } ) => (
 				type="button"
 				className={ `zehoro-eval-editor__star ${ n <= value ? 'is-filled' : '' }` }
 				onClick={ () => onChange( n === value ? 0 : n ) }
-				aria-label={ `${ n } ${ n !== 1 ? __( 'stars', 'zehoro-toolkit' ) : __( 'star', 'zehoro-toolkit' ) }` }
+				aria-label={ sprintf( _n( '%d star', '%d stars', n, 'zehoro-toolkit' ), n ) }
 			>
 				★
 			</button>
@@ -84,21 +84,33 @@ function computeAverage( criteria ) {
 }
 
 // Client-side mirror of Evaluation::is_self_serving() — a courtesy warning only;
-// the PHP seam is the authoritative guard.
+// the PHP seam is the authoritative guard. Kept in lockstep with the PHP host
+// canonicalization (strip www, subdomain either way, resolve relative URLs) so
+// the editor Notice never disagrees with what the server actually emits.
+function normalizeHost( host ) {
+	return ( host || '' ).toLowerCase().replace( /\.$/, '' ).replace( /^www\./, '' );
+}
+function hostsSameSite( a, b ) {
+	if ( ! a || ! b ) {
+		return false;
+	}
+	return a === b || a.endsWith( '.' + b ) || b.endsWith( '.' + a );
+}
 function looksSelfServing( subjectName, subjectUrl, site ) {
 	if ( ! site ) {
 		return false;
 	}
-	try {
-		if ( subjectUrl && site.url ) {
-			const subjHost = new URL( subjectUrl, site.url ).host.toLowerCase();
-			const siteHost = new URL( site.url ).host.toLowerCase();
-			if ( subjHost && subjHost === siteHost ) {
+	if ( subjectUrl && site.url ) {
+		try {
+			// new URL(relative, base) resolves "/x" against the site → same host.
+			const subjHost = normalizeHost( new URL( subjectUrl, site.url ).host );
+			const siteHost = normalizeHost( new URL( site.url ).host );
+			if ( hostsSameSite( subjHost, siteHost ) ) {
 				return true;
 			}
+		} catch ( e ) {
+			// malformed absolute URL — ignore, PHP guard still applies
 		}
-	} catch ( e ) {
-		// malformed URL — ignore, PHP guard still applies
 	}
 	if (
 		subjectName &&

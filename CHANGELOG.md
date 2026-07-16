@@ -12,8 +12,9 @@ stay in Pro).
 
 Unlike the other launch blocks (which emit no schema), this one **can** emit `Review` JSON-LD — but behind a
 hard, code-level **self-serving guardrail**: a "review" of your own site/brand is exactly what Google's spam
-policy penalises, so schema is suppressed automatically when the reviewed subject is this site (a same-domain
-link, or a name matching the site name). Only genuine third-party subjects get structured data — one Review per
+policy penalises, so schema is suppressed automatically when the reviewed subject is this site — a link to the
+same host (including `www.`, subdomains, and root-relative URLs) or a name matching the site name. Only genuine
+third-party subjects get structured data — one Review per
 URL, `itemReviewed` restricted to an allowlist of schema.org types, `</script>` breakout neutralised, and WP
 Review Pro wins if active. The editor shows a live warning when a subject looks self-serving.
 

@@ -75,7 +75,7 @@ class Evaluation implements ModuleInterface {
 
 		$avg      = self::average_score( $criteria );
 		$rows     = self::render_criteria( $criteria );
-		$proscons = self::render_pros_cons( $pros, $cons );
+		$proscons = self::render_pros_cons( $pros, $cons, min( $level + 1, 6 ) );
 
 		// Empty contract: nothing meaningful to show → render nothing.
 		if ( $subject === '' && $rows === '' && $verdict === '' && $methodology === '' && $proscons === '' ) {
@@ -162,7 +162,11 @@ class Evaluation implements ModuleInterface {
 		return $out;
 	}
 
-	private static function render_pros_cons( array $pros, array $cons ): string {
+	/**
+	 * @param int $sub_level Heading level for the Pros/Cons subheadings — one
+	 *                       below the subject heading so heading order never skips.
+	 */
+	private static function render_pros_cons( array $pros, array $cons, int $sub_level = 4 ): string {
 		$clean = static function ( array $items ): array {
 			$out = [];
 			foreach ( $items as $i ) {
@@ -178,19 +182,21 @@ class Evaluation implements ModuleInterface {
 		if ( ! $pros && ! $cons ) {
 			return '';
 		}
+		$sub_level = ( $sub_level >= 2 && $sub_level <= 6 ) ? $sub_level : 4;
+		$h         = 'h' . $sub_level;
 
 		$out = '<div class="zehoro-eval__proscons">';
 		if ( $pros ) {
-			$out .= '<div class="zehoro-eval__pros"><h4 class="zehoro-eval__proscons-heading">'
-				. esc_html__( 'Pros', 'zehoro-toolkit' ) . '</h4><ul>';
+			$out .= '<div class="zehoro-eval__pros"><' . $h . ' class="zehoro-eval__proscons-heading">'
+				. esc_html__( 'Pros', 'zehoro-toolkit' ) . '</' . $h . '><ul>';
 			foreach ( $pros as $p ) {
 				$out .= '<li>' . esc_html( $p ) . '</li>';
 			}
 			$out .= '</ul></div>';
 		}
 		if ( $cons ) {
-			$out .= '<div class="zehoro-eval__cons"><h4 class="zehoro-eval__proscons-heading">'
-				. esc_html__( 'Cons', 'zehoro-toolkit' ) . '</h4><ul>';
+			$out .= '<div class="zehoro-eval__cons"><' . $h . ' class="zehoro-eval__proscons-heading">'
+				. esc_html__( 'Cons', 'zehoro-toolkit' ) . '</' . $h . '><ul>';
 			foreach ( $cons as $c ) {
 				$out .= '<li>' . esc_html( $c ) . '</li>';
 			}
@@ -229,12 +235,18 @@ class Evaluation implements ModuleInterface {
 	 */
 	public static function is_self_serving( array $attributes ): bool {
 		$self      = false;
-		$site_host = wp_parse_url( home_url(), PHP_URL_HOST );
+		$site_host = self::normalize_host( (string) wp_parse_url( home_url(), PHP_URL_HOST ) );
 
 		$url = trim( (string) ( $attributes['subjectUrl'] ?? '' ) );
 		if ( $url !== '' ) {
-			$subject_host = wp_parse_url( esc_url_raw( $url ), PHP_URL_HOST );
-			if ( $subject_host && $site_host && strcasecmp( (string) $subject_host, (string) $site_host ) === 0 ) {
+			$subject_host = self::normalize_host( (string) wp_parse_url( esc_url_raw( $url ), PHP_URL_HOST ) );
+			if ( $subject_host === '' ) {
+				// No parseable host → a root-relative / same-site link (or malformed
+				// input): it resolves to THIS site, so treat as self — penalty-safe.
+				$self = true;
+			} elseif ( $site_host !== '' && self::hosts_same_site( $subject_host, $site_host ) ) {
+				// Exact host, a www variant, or a subdomain either way
+				// (shop.example.com ↔ example.com) — all the same organisation.
 				$self = true;
 			}
 		}
@@ -249,12 +261,41 @@ class Evaluation implements ModuleInterface {
 
 		/**
 		 * Filter the self-serving verdict. Return true to force-suppress the
-		 * Review schema, false to allow it.
+		 * Review schema, false to allow it. A NON-boolean return falls back to
+		 * the detected value, so a buggy callback can never accidentally
+		 * un-suppress a real self-review.
 		 *
 		 * @param bool  $self       Whether the subject is this site/brand.
 		 * @param array $attributes Block attributes.
 		 */
-		return (bool) apply_filters( 'zehoro/evaluation/is_self_serving', $self, $attributes );
+		$filtered = apply_filters( 'zehoro/evaluation/is_self_serving', $self, $attributes );
+		return is_bool( $filtered ) ? $filtered : $self;
+	}
+
+	/** Lowercase, drop a trailing dot, strip a leading `www.` — for host comparison. */
+	private static function normalize_host( string $host ): string {
+		$host = strtolower( rtrim( trim( $host ), '.' ) );
+		if ( strpos( $host, 'www.' ) === 0 ) {
+			$host = substr( $host, 4 );
+		}
+		return $host;
+	}
+
+	/**
+	 * True when two normalized hosts belong to the same site: equal, or one is a
+	 * subdomain of the other (str_ends_with is PHP 8.0 — substr keeps the 7.4 floor).
+	 */
+	private static function hosts_same_site( string $a, string $b ): bool {
+		if ( $a === '' || $b === '' ) {
+			return false;
+		}
+		if ( $a === $b ) {
+			return true;
+		}
+		$a_suffix = '.' . $a; // $b is a subdomain of $a  → $b ends with ".$a"
+		$b_suffix = '.' . $b; // $a is a subdomain of $b  → $a ends with ".$b"
+		return substr( $b, -strlen( $a_suffix ) ) === $a_suffix
+			|| substr( $a, -strlen( $b_suffix ) ) === $b_suffix;
 	}
 
 	/**
@@ -269,8 +310,17 @@ class Evaluation implements ModuleInterface {
 		if ( $subject === '' || $avg <= 0 ) {
 			return '';
 		}
-		// Non-duplication: WP Review Pro emits its own Review JSON-LD.
-		if ( class_exists( ArticleSchema::class ) && ArticleSchema::wp_review_pro_active() ) {
+		// Non-duplication: WP Review Pro (or any review plugin, via the filter)
+		// owns Review JSON-LD for this page.
+		$defer = class_exists( ArticleSchema::class ) && ArticleSchema::wp_review_pro_active();
+		/**
+		 * Let another plugin claim the Review JSON-LD for this URL. Return true
+		 * to defer (suppress this block's Review).
+		 *
+		 * @param bool  $defer      Whether a review plugin already owns the schema.
+		 * @param array $attributes Block attributes.
+		 */
+		if ( apply_filters( 'zehoro/evaluation/defer_review_schema', $defer, $attributes ) ) {
 			return '';
 		}
 		// The guardrail: never emit a review of ourselves.
