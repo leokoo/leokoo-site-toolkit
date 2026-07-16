@@ -1,0 +1,11 @@
+/**
+ * FAQ — editor-only styles. The item edits always-expanded (a plain block, not
+ * a real <details>), so hide the accordion +/− marker while editing.
+ */
+.zehoro-faq__item--editing .zehoro-faq__question::after {
+	display: none;
+}
+
+[data-rich-text-placeholder]::after {
+	opacity: 0.62;
+}

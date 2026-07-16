@@ -32,10 +32,57 @@ class FAQ implements ModuleInterface {
         add_shortcode( 'zehoro_faq', [ $this, 'render_shortcode' ] );
         add_shortcode( 'lkst_faq',   [ $this, 'render_shortcode' ] );
         add_action( 'wp_footer', [ $this, 'output_schema' ], 20 );
+        add_action( 'init', [ $this, 'register_blocks' ] );
 
         if ( is_admin() ) {
             $this->register_admin_hooks();
         }
+    }
+
+    public function register_blocks(): void {
+        register_block_type( ZEHORO_DIR . 'build/faq' );
+        register_block_type( ZEHORO_DIR . 'build/faq-item' );
+    }
+
+    /**
+     * Render seam — the FAQ container. Wraps the rendered faq-item inner blocks.
+     * The block emits NO schema (FAQ rich results were retired 2026-05-07; the
+     * value is the accessible, quotable accordion).
+     */
+    public static function render_container( array $attributes, string $content, string $wrapper = '' ): string {
+        $content = trim( $content );
+        if ( $content === '' ) {
+            return '';
+        }
+        if ( $wrapper === '' ) {
+            $wrapper = 'class="zehoro-faq"';
+        }
+        return sprintf( '<div %s>%s</div>', $wrapper, $content );
+    }
+
+    /**
+     * Render seam — one FAQ item as an accessible <details>/<summary> accordion.
+     * $content is the rendered answer inner blocks (already-escaped core-block
+     * output). The question is plain text (the editor disallows inline formats).
+     */
+    public static function render_item( array $attributes, string $content, string $wrapper = '' ): string {
+        $question = trim( wp_strip_all_tags( isset( $attributes['question'] ) ? (string) $attributes['question'] : '' ) );
+        $answer   = trim( $content );
+        if ( $question === '' && $answer === '' ) {
+            return '';
+        }
+        if ( $wrapper === '' ) {
+            $wrapper = 'class="zehoro-faq__item"';
+        }
+        $open = ! empty( $attributes['startOpen'] ) ? ' open' : '';
+
+        return sprintf(
+            '<details %1$s%2$s><summary class="zehoro-faq__question">%3$s</summary><div class="zehoro-faq__answer">%4$s</div></details>',
+            $wrapper,
+            $open,
+            esc_html( $question ),
+            $answer
+        );
     }
 
     private function register_admin_hooks(): void {

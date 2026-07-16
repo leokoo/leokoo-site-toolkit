@@ -2,6 +2,15 @@
 
 All notable changes to the **Zehoro Toolkit** will be documented in this file.
 
+## [1.31.0] - 2026-07-12
+
+### Added — FAQ block (accessible accordion, no schema; launch block #3)
+`zehoro/faq` + `zehoro/faq-item`: a question-and-answer accordion built on native `<details>`/`<summary>`
+(keyboard- and screen-reader-accessible), with **rich answers** (inner blocks — paragraphs, lists) and an
+"open by default" toggle per item. Server-rendered through one seam; theme-neutral. **No FAQPage JSON-LD** —
+Google retired FAQ rich results on 7 May 2026, so the block leads on the visible, quotable accordion rather
+than penalty-adjacent markup. The existing `[zehoro_faq]` shortcode is unchanged for backward-compat.
+
 ## [1.30.0] - 2026-07-12
 
 ### Added — Pros & Cons block (consolidated, launch block #2)
