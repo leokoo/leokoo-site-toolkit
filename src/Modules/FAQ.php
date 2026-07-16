@@ -64,8 +64,10 @@ class FAQ implements ModuleInterface {
 
     /**
      * Render seam — one FAQ item as an accessible <details>/<summary> accordion.
-     * $content is the rendered answer inner blocks (already-escaped core-block
-     * output). The question is plain text (the editor disallows inline formats).
+     * $content is the rendered answer inner blocks, echoed as-is per the standard
+     * dynamic-inner-block model (WordPress applies wp_kses_post at SAVE for
+     * authors without the unfiltered_html cap; privileged authors are trusted).
+     * The question is the load-bearing surface — plain-text'd + esc_html'd here.
      */
     public static function render_item( array $attributes, string $content, string $wrapper = '' ): string {
         $question = \Zehoro\Utils\BlockSanitize::plain_text( isset( $attributes['question'] ) ? (string) $attributes['question'] : '' );

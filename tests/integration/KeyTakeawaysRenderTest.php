@@ -99,6 +99,15 @@ class KeyTakeawaysRenderTest extends WP_UnitTestCase {
 		$this->assertStringNotContainsString( '&amp;amp;', $html );
 	}
 
+	public function test_entity_encoded_script_in_heading_is_neutralized() {
+		// The real vector: RichText stores a typed <script> entity-encoded;
+		// plain_text() decodes it to raw '<script>', so esc_html() is the only
+		// guard. Fails iff esc_html is dropped.
+		$html = KeyTakeaways::render_html( [ 'mode' => 'paragraph', 'heading' => '&lt;script&gt;alert(1)&lt;/script&gt;', 'text' => 'y' ] );
+		$this->assertStringNotContainsString( '<script', $html );
+		$this->assertStringContainsString( '&lt;script&gt;', $html );
+	}
+
 	// -------------------------------------------------------------------------
 	// Security — the seam is the only escaping boundary
 	// -------------------------------------------------------------------------

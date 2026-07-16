@@ -26,7 +26,8 @@ final class BlockSanitize {
 	 * entities, so the single esc_html() at the output site encodes exactly once.
 	 */
 	public static function plain_text( string $html ): string {
-		return trim( html_entity_decode( wp_strip_all_tags( $html ), ENT_QUOTES ) );
+		$html = preg_replace( '#<br\s*/?>#i', ' ', $html ); // soft line breaks → space, not a join
+		return trim( html_entity_decode( wp_strip_all_tags( (string) $html ), ENT_QUOTES ) );
 	}
 
 	/** Inline author formatting. wp_kses on the inline allowlist. */

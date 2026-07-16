@@ -3,7 +3,8 @@
  * Server-side render for zehoro/faq-item.
  *
  * Thin delegate to the render seam Zehoro\Modules\FAQ::render_item(). $content
- * is the rendered answer inner blocks (already-escaped core-block output).
+ * is the rendered answer inner blocks (kses'd at save for non-privileged
+ * authors; privileged authors trusted — the standard dynamic-inner-block model).
  *
  * @var array    $attributes Block attributes.
  * @var string   $content    Rendered inner blocks (the answer).

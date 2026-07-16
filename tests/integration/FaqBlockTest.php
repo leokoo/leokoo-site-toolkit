@@ -41,6 +41,18 @@ class FaqBlockTest extends WP_UnitTestCase {
 		$this->assertStringNotContainsString( '</summary><script>', $html );
 	}
 
+	public function test_entity_encoded_script_in_question_is_neutralized() {
+		// The REAL stored-XSS vector: RichText stores a typed <script> as
+		// entity-encoded '&lt;script&gt;'. plain_text() decodes it back to raw
+		// '<script>', so esc_html() at the output site is the ONLY guard. This
+		// case survives the tag-strip and fails iff esc_html is dropped.
+		$html = FAQ::render_item( [ 'question' => 'Cost &lt; $5 &amp; &lt;script&gt;alert(1)&lt;/script&gt;' ], '<p>A</p>' );
+
+		$this->assertStringNotContainsString( '<script', $html, 'no raw script tag may reach the summary' );
+		$this->assertStringContainsString( '&lt;script&gt;', $html, 'the script text is escaped, not executed' );
+		$this->assertStringContainsString( 'Cost &lt; $5 &amp;', $html );
+	}
+
 	public function test_item_wrapper_passthrough() {
 		$html = FAQ::render_item(
 			[ 'question' => 'Q' ],
@@ -100,6 +112,12 @@ class FaqBlockTest extends WP_UnitTestCase {
 		$this->assertMatchesRegularExpression( '/<details[^>]*\sopen>/', $out );
 	}
 
+	public function test_defaults_closed_through_do_blocks() {
+		// startOpen omitted → must NOT render ' open' (guards boolean coercion).
+		$out = do_blocks( self::faq_block( '<!-- wp:paragraph --><p>A</p><!-- /wp:paragraph -->', '{"question":"Q?"}' ) );
+		$this->assertDoesNotMatchRegularExpression( '/<details[^>]*\sopen>/', $out );
+	}
+
 	public function test_question_empty_item_collapses() {
 		// A filled answer with no question must NOT render an unlabeled <summary>.
 		$out = do_blocks( self::faq_block(
@@ -120,18 +138,13 @@ class FaqBlockTest extends WP_UnitTestCase {
 		$this->assertStringNotContainsString( '&amp;amp;', $out );
 	}
 
-	public function test_block_render_does_not_feed_faqpage_schema() {
-		// FAQPage JSON-LD is emitted only by output_schema() (the real emitter).
-		// Rendering the FAQ blocks must not feed it — the block seams are static
-		// and never populate the schema collector.
-		$faq = new FAQ();
-		do_blocks( self::faq_block( '<!-- wp:paragraph --><p>A.</p><!-- /wp:paragraph -->' ) );
+	public function test_block_render_output_has_no_schema() {
+		// The block's render output must contain no JSON-LD. This fails if a
+		// future change makes the render seams echo FAQPage schema.
+		$out = do_blocks( self::faq_block( '<!-- wp:paragraph --><p>A.</p><!-- /wp:paragraph -->' ) );
 
-		ob_start();
-		$faq->output_schema();
-		$emitted = (string) ob_get_clean();
-
-		$this->assertStringNotContainsString( 'FAQPage', $emitted, 'the block path must emit no FAQ schema' );
+		$this->assertStringNotContainsString( 'application/ld+json', $out );
+		$this->assertStringNotContainsString( 'FAQPage', $out );
 	}
 
 	public function test_shortcode_still_emits_faqpage_schema() {

@@ -29,16 +29,24 @@
 			display: none;
 		}
 
+		// Presentational chevron — empty content + CSS borders so it never enters
+		// the <summary>'s accessible name (native details already conveys state).
 		&::after {
-			content: "+";
+			content: "";
 			position: absolute;
-			inset-inline-end: 1.1em;
-			font-weight: 400;
+			inset-inline-end: 1.25em;
+			top: 1.15em;
+			width: 0.45em;
+			height: 0.45em;
+			border-right: 2px solid currentColor;
+			border-bottom: 2px solid currentColor;
+			transform: rotate( 45deg );
+			transition: transform 0.15s ease;
 		}
 	}
 
 	&__item[open] &__question::after {
-		content: "\2212"; // − (minus)
+		transform: rotate( -135deg );
 	}
 
 	&__answer {
