@@ -2,6 +2,16 @@
 
 All notable changes to the **Zehoro Toolkit** will be documented in this file.
 
+## [1.34.0] - 2026-07-17
+
+### Changed — lean Free: editorial/utility modules moving to Pro (reorg stage A)
+Free is being curated down to its wordpress.org funnel — the 5 launch blocks (Key Takeaways, Pros & Cons, FAQ,
+Author Box, "We Tested") + Table of Contents + Article schema + Styles. Modules with no high-intent-install
+keyword are relocating to Zehoro Toolkit Pro. **Stage A moves `archive_cleanup`, `stat_callout`,
+`inline_product`, `testimonial`** (block names `lkst/*` unchanged, so existing content renders identically; the
+blocks' CSS travels with them). On sites running Pro these modules keep working (Pro re-registers them into the
+shared module registry and activates them once via `ModuleSeeder`); Free-only sites no longer ship them.
+
 ## [1.33.0] - 2026-07-16
 
 ### Added — "We Tested" evaluation block (launch block #5)
