@@ -12,7 +12,6 @@
   "textdomain": "zehoro-toolkit",
   "supports": {
     "html": false,
-    "anchor": true,
     "reusable": false
   },
   "attributes": {

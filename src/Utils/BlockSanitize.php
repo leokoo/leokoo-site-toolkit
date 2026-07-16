@@ -27,7 +27,9 @@ final class BlockSanitize {
 	 */
 	public static function plain_text( string $html ): string {
 		$html = preg_replace( '#<br\s*/?>#i', ' ', $html ); // soft line breaks → space, not a join
-		return trim( html_entity_decode( wp_strip_all_tags( (string) $html ), ENT_QUOTES ) );
+		// Explicit UTF-8 — PHP < 8.1 defaults html_entity_decode() to ISO-8859-1,
+		// which mojibakes &mdash;/&hellip;/&nbsp; on the plugin's 7.4 floor.
+		return trim( html_entity_decode( wp_strip_all_tags( (string) $html ), ENT_QUOTES, 'UTF-8' ) );
 	}
 
 	/** Inline author formatting. wp_kses on the inline allowlist. */

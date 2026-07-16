@@ -35,10 +35,26 @@ class FaqBlockTest extends WP_UnitTestCase {
 		$this->assertSame( '', FAQ::render_item( [ 'question' => '' ], '   ' ) );
 	}
 
-	public function test_item_question_is_escaped() {
+	public function test_raw_tags_in_question_are_stripped_defense_in_depth() {
+		// Defense-in-depth: raw tags are stripped (question collapses to empty →
+		// item renders nothing). The load-bearing ESCAPE guarantee is pinned by
+		// test_entity_encoded_script_in_question_is_neutralized, not this test.
 		$html = FAQ::render_item( [ 'question' => '</summary><script>alert(1)</script>' ], '<p>A</p>' );
 		$this->assertStringNotContainsString( '<script', $html );
-		$this->assertStringNotContainsString( '</summary><script>', $html );
+	}
+
+	public function test_question_html_entities_decode_as_utf8() {
+		// &mdash;/&hellip; must not mojibake (PHP 7.4 html_entity_decode default charset).
+		$html = FAQ::render_item( [ 'question' => 'Setup &mdash; step by step&hellip;' ], '<p>A</p>' );
+		$this->assertStringContainsString( "Setup \u{2014} step by step\u{2026}", $html );
+	}
+
+	public function test_question_with_empty_answer_still_renders() {
+		// A question with no answer yet is a valid transitional state — render the
+		// labelled disclosure (an empty answer body is acceptable).
+		$html = FAQ::render_item( [ 'question' => 'Q?' ], '' );
+		$this->assertStringContainsString( '<summary class="zehoro-faq__question">Q?</summary>', $html );
+		$this->assertStringContainsString( '<div class="zehoro-faq__answer"></div>', $html );
 	}
 
 	public function test_entity_encoded_script_in_question_is_neutralized() {

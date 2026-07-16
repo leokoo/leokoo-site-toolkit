@@ -9,8 +9,7 @@
 	"keywords": [ "faq", "questions", "answers", "accordion", "q&a" ],
 	"textdomain": "zehoro-toolkit",
 	"supports": {
-		"html": false,
-		"anchor": true
+		"html": false
 	},
 	"editorScript": "file:./index.js",
 	"editorStyle": "file:./index.css",
