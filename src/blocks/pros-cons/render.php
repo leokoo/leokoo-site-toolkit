@@ -17,9 +17,12 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-$zehoro_pc_show    = isset( $attributes['show'] ) ? (string) $attributes['show'] : 'both';
+$zehoro_pc_show = isset( $attributes['show'] ) ? (string) $attributes['show'] : 'both';
+if ( ! in_array( $zehoro_pc_show, [ 'both', 'pros', 'cons' ], true ) ) {
+	$zehoro_pc_show = 'both';
+}
 $zehoro_pc_wrapper = get_block_wrapper_attributes(
-	[ 'class' => 'zehoro-pros-cons zehoro-pros-cons--' . preg_replace( '/[^a-z]/', '', $zehoro_pc_show ) ]
+	[ 'class' => 'zehoro-pros-cons zehoro-pros-cons--' . $zehoro_pc_show ]
 );
 
 // render_html escapes/sanitizes every field internally.

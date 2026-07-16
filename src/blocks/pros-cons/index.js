@@ -6,7 +6,7 @@
  * consolidated block replaces the retired lkst/pros-cons container + standalone
  * lkst/pros and lkst/cons — the `show` toggle covers the single-list cases.
  */
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { registerBlockType, createBlock } from '@wordpress/blocks';
 import {
 	useBlockProps,
@@ -259,7 +259,11 @@ function legacyListEdit( variant, icon, label ) {
 function registerLegacyList( name, variant, icon, label ) {
 	registerBlockType( name, {
 		apiVersion: 3,
-		title: `${ label } (legacy)`,
+		title: sprintf(
+			/* translators: %s: the block label, e.g. "Pros". */
+			__( '%s (legacy)', 'zehoro-toolkit' ),
+			label
+		),
 		category: 'zehoro-toolkit',
 		icon: variant === 'pros' ? 'thumbs-up' : 'thumbs-down',
 		description: __(

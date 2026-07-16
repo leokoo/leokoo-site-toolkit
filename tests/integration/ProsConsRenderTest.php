@@ -69,10 +69,43 @@ class ProsConsRenderTest extends WP_UnitTestCase {
 		$this->assertStringContainsString( '<h2 class="zehoro-pros-cons__title">', $html );
 	}
 
-	public function test_script_is_stripped() {
-		$html = ProsCons::render_html( [ 'show' => 'pros', 'pros' => '<li>ok<script>alert(1)</script></li>' ] );
-		$this->assertStringNotContainsString( '<script', $html );
+	public function test_dangerous_markup_is_stripped() {
+		// Pin the real wp_kses guarantees (not just the <script> tag): event
+		// handlers, <img>, and javascript: hrefs must all be removed.
+		$html = ProsCons::render_html( [
+			'show' => 'pros',
+			'pros' => '<li>ok<a href="javascript:alert(1)" onclick="x">y</a><img src=z onerror=alert(1)><script>alert(1)</script></li>',
+		] );
+
 		$this->assertStringContainsString( 'ok', $html );
+		foreach ( [ '<script', 'javascript:', 'onclick', 'onerror', '<img' ] as $needle ) {
+			$this->assertStringNotContainsString( $needle, $html, "'{$needle}' must be stripped" );
+		}
+	}
+
+	public function test_title_is_escaped() {
+		$html = ProsCons::render_html( [
+			'show'      => 'pros',
+			'prosTitle' => '</h3><script>alert(1)</script>"x',
+			'pros'      => '<li>x</li>',
+		] );
+
+		$this->assertStringNotContainsString( '<script', $html );
+		$this->assertStringNotContainsString( '</h3><script>', $html );
+	}
+
+	public function test_blank_title_falls_back_to_i18n_default() {
+		// block.json no longer hardcodes 'Pros'/'Cons', so the __() fallback must fire.
+		$html = ProsCons::render_html( [ 'show' => 'both', 'pros' => '<li>x</li>', 'cons' => '<li>y</li>' ] );
+		$this->assertStringContainsString( '>Pros</h3>', $html );
+		$this->assertStringContainsString( '>Cons</h3>', $html );
+	}
+
+	public function test_default_titles_render_through_do_blocks() {
+		// The real block path (WP merges block.json defaults) must still show titles.
+		$out = do_blocks( '<!-- wp:zehoro/pros-cons {"show":"both","pros":"<li>a</li>","cons":"<li>b</li>"} /-->' );
+		$this->assertStringContainsString( '>Pros</h3>', $out );
+		$this->assertStringContainsString( '>Cons</h3>', $out );
 	}
 
 	public function test_wrapper_passthrough() {

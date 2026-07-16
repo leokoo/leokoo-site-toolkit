@@ -92,7 +92,7 @@ class ProsCons implements ModuleInterface {
 	}
 
 	private static function render_col( string $variant, $title, $items, int $level ): string {
-		$items = self::sanitize_list( (string) $items );
+		$items = \Zehoro\Utils\BlockSanitize::list_items( (string) $items );
 		if ( trim( wp_strip_all_tags( $items ) ) === '' ) {
 			return ''; // empty column renders nothing
 		}
@@ -180,11 +180,11 @@ class ProsCons implements ModuleInterface {
 		}
 
 		// The old heading was static boilerplate; let the new block default the title.
-		return self::new_block( [ 'show' => $variant, $variant => self::sanitize_list( $items ) ] );
+		return self::new_block( [ 'show' => $variant, $variant => \Zehoro\Utils\BlockSanitize::list_items( $items ) ] );
 	}
 
 	public static function migrate_container( array $block ): ?array {
-		$attrs = [ 'show' => 'both' ];
+		$attrs = [];
 
 		foreach ( ( $block['innerBlocks'] ?? [] ) as $inner ) {
 			$inner_name = $inner['blockName'] ?? '';
@@ -193,19 +193,28 @@ class ProsCons implements ModuleInterface {
 			if ( $inner_name === self::LEGACY_PROS ) {
 				$items = self::inner_of_class( $inner_html, 'lkst-pros-list' );
 				if ( trim( wp_strip_all_tags( $items ) ) !== '' ) {
-					$attrs['pros'] = self::sanitize_list( $items );
+					$attrs['pros'] = \Zehoro\Utils\BlockSanitize::list_items( $items );
 				}
 			} elseif ( $inner_name === self::LEGACY_CONS ) {
 				$items = self::inner_of_class( $inner_html, 'lkst-cons-list' );
 				if ( trim( wp_strip_all_tags( $items ) ) !== '' ) {
-					$attrs['cons'] = self::sanitize_list( $items );
+					$attrs['cons'] = \Zehoro\Utils\BlockSanitize::list_items( $items );
 				}
+			} elseif ( $inner_name !== '' ) {
+				// An unexpected inner block: don't silently drop it — leave the whole
+				// container as-is for the safety net (never a lossy rewrite).
+				return null;
 			}
 		}
 
-		if ( empty( $attrs['pros'] ) && empty( $attrs['cons'] ) ) {
+		$has_pros = ! empty( $attrs['pros'] );
+		$has_cons = ! empty( $attrs['cons'] );
+		if ( ! $has_pros && ! $has_cons ) {
 			return null; // nothing to carry across
 		}
+
+		// Match `show` to the content actually present (avoids a lopsided both-box).
+		$attrs['show'] = ( $has_pros && $has_cons ) ? 'both' : ( $has_pros ? 'pros' : 'cons' );
 
 		return self::new_block( $attrs );
 	}
@@ -226,7 +235,9 @@ class ProsCons implements ModuleInterface {
 
 	/** Inner HTML of the first element carrying $class (DOM, robust to malformed input). */
 	public static function inner_of_class( string $html, string $class ): string {
-		if ( trim( $html ) === '' || ! class_exists( 'DOMDocument' ) ) {
+		// $class is interpolated into an XPath predicate below — constrain it to a
+		// safe class-token charset so a caller can never inject XPath.
+		if ( trim( $html ) === '' || ! preg_match( '/^[A-Za-z0-9_-]+$/', $class ) || ! class_exists( 'DOMDocument' ) ) {
 			return '';
 		}
 
@@ -260,32 +271,5 @@ class ProsCons implements ModuleInterface {
 		if ( wp_style_is( $handle, 'registered' ) && ! wp_style_is( $handle, 'enqueued' ) ) {
 			wp_enqueue_style( $handle );
 		}
-	}
-
-	private static function sanitize_list( string $html ): string {
-		$allowed       = self::allowed_inline();
-		$allowed['li'] = [ 'class' => true ];
-		return wp_kses( $html, $allowed );
-	}
-
-	private static function allowed_inline(): array {
-		// No `target` on <a> — a dynamic block's output never passes through
-		// wp_targeted_link_rel, so target="_blank" would render without noopener.
-		return [
-			'a'      => [ 'href' => true, 'title' => true, 'rel' => true ],
-			'strong' => [],
-			'b'      => [],
-			'em'     => [],
-			'i'      => [],
-			'code'   => [],
-			'mark'   => [],
-			'sub'    => [],
-			'sup'    => [],
-			's'      => [],
-			'del'    => [],
-			'ins'    => [],
-			'br'     => [],
-			'span'   => [ 'class' => true ],
-		];
 	}
 }

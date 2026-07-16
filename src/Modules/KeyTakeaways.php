@@ -150,17 +150,17 @@ class KeyTakeaways implements ModuleInterface {
 			// lkst/tldr box rather than flatten it into one inline paragraph.
 			// Media-only content counts as visible so it renders through the seam
 			// instead of falling back to the raw (unstyled) legacy markup.
-			$rich = self::sanitize_rich( isset( $attributes['text'] ) ? (string) $attributes['text'] : '' );
+			$rich = \Zehoro\Utils\BlockSanitize::rich( isset( $attributes['text'] ) ? (string) $attributes['text'] : '' );
 			if ( self::has_rich_content( $rich ) ) {
 				$body = '<div class="zehoro-key-takeaways__summary">' . $rich . '</div>';
 			}
 		} elseif ( $mode === 'paragraph' ) {
-			$text = self::sanitize_inline( isset( $attributes['text'] ) ? (string) $attributes['text'] : '' );
+			$text = \Zehoro\Utils\BlockSanitize::inline( isset( $attributes['text'] ) ? (string) $attributes['text'] : '' );
 			if ( self::has_visible_text( $text ) ) {
 				$body = '<p class="zehoro-key-takeaways__summary">' . $text . '</p>';
 			}
 		} else {
-			$items = self::sanitize_list( isset( $attributes['items'] ) ? (string) $attributes['items'] : '' );
+			$items = \Zehoro\Utils\BlockSanitize::list_items( isset( $attributes['items'] ) ? (string) $attributes['items'] : '' );
 			if ( self::has_visible_text( $items ) ) {
 				$body = '<ul class="zehoro-key-takeaways__list">' . $items . '</ul>';
 			}
@@ -302,54 +302,4 @@ class KeyTakeaways implements ModuleInterface {
 			|| (bool) preg_match( '#<(img|figure|iframe|video|audio)\b#i', $html );
 	}
 
-	private static function sanitize_inline( string $html ): string {
-		return wp_kses( $html, self::allowed_inline() );
-	}
-
-	private static function sanitize_list( string $html ): string {
-		$allowed       = self::allowed_inline();
-		$allowed['li'] = [ 'class' => true ];
-		return wp_kses( $html, $allowed );
-	}
-
-	/** Block-level allowlist for the lossless legacy ('rich') path only. */
-	private static function sanitize_rich( string $html ): string {
-		$allowed               = self::allowed_inline();
-		$allowed['p']          = [];
-		$allowed['ul']         = [ 'class' => true ];
-		$allowed['ol']         = [ 'class' => true ];
-		$allowed['li']         = [ 'class' => true ];
-		$allowed['h3']         = [];
-		$allowed['h4']         = [];
-		$allowed['h5']         = [];
-		$allowed['h6']         = [];
-		$allowed['blockquote'] = [];
-		// Preserve inline media/markup a legacy box may carry (truly lossless).
-		$allowed['img']        = [ 'src' => true, 'alt' => true, 'width' => true, 'height' => true, 'loading' => true, 'class' => true ];
-		$allowed['span']       = [ 'class' => true ];
-		return wp_kses( $html, $allowed );
-	}
-
-	private static function allowed_inline(): array {
-		// No `target` — a dynamic block's output never passes through
-		// wp_targeted_link_rel, so target="_blank" would render without
-		// rel="noopener" (reverse-tabnabbing). An answer-first summary does
-		// not need new-tab links; keep the surface closed.
-		return [
-			'a'      => [ 'href' => true, 'title' => true, 'rel' => true ],
-			'strong' => [],
-			'b'      => [],
-			'em'     => [],
-			'i'      => [],
-			'code'   => [],
-			'mark'   => [],
-			'sub'    => [],
-			'sup'    => [],
-			's'      => [],
-			'del'    => [],
-			'ins'    => [],
-			'br'     => [],
-			'span'   => [ 'class' => true ],
-		];
-	}
 }

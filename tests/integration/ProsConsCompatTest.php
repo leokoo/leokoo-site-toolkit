@@ -153,4 +153,47 @@ class ProsConsCompatTest extends WP_UnitTestCase {
 		$this->assertSame( 'skipped', MigrateBlocksCommand::migrate_post( $id, true, $stats ) );
 		$this->assertStringContainsString( 'wp:lkst/pros', (string) get_post_field( 'post_content', $id ) );
 	}
+
+	public function test_container_renders_end_to_end_via_safety_net() {
+		// The full front-end path: an un-migrated container (real inner pros+cons)
+		// through do_blocks — inner rewritten, wrapper stripped, no lkst-* leak.
+		$rendered = do_blocks( self::container_content( '<li>Fast</li>', '<li>Loud</li>' ) );
+
+		$this->assertStringContainsString( 'zehoro-pros-cons__pros', $rendered );
+		$this->assertStringContainsString( 'zehoro-pros-cons__cons', $rendered );
+		$this->assertStringContainsString( '<li>Fast</li>', $rendered );
+		$this->assertStringContainsString( '<li>Loud</li>', $rendered );
+		$this->assertStringNotContainsString( 'lkst-', $rendered );
+	}
+
+	public function test_migrate_container_single_side_sets_show() {
+		// Container with only a pros inner block → show should be 'pros', not 'both'
+		// (no lopsided box).
+		$content = "<!-- wp:lkst/pros-cons -->\n"
+			. '<div class="wp-block-lkst-pros-cons lkst-pros-cons-wrapper lkst-editorial-block">'
+			. "<!-- wp:lkst/pros -->\n" . self::pros_markup( '<li>Only pros</li>' ) . "\n<!-- /wp:lkst/pros -->"
+			. "</div>\n<!-- /wp:lkst/pros-cons -->";
+		$id = self::factory()->post->create( [ 'post_content' => $content ] );
+
+		$this->assertSame( 'changed', MigrateBlocksCommand::migrate_post( $id, true ) );
+		$stored = (string) get_post_field( 'post_content', $id );
+		$this->assertStringContainsString( '"show":"pros"', $stored );
+		$this->assertStringNotContainsString( '"show":"both"', $stored );
+	}
+
+	public function test_migrate_container_leaves_stray_inner_block_untouched() {
+		// A container holding an unexpected inner block must NOT be lossy-converted.
+		$content = "<!-- wp:lkst/pros-cons -->\n"
+			. '<div class="wp-block-lkst-pros-cons lkst-pros-cons-wrapper lkst-editorial-block">'
+			. "<!-- wp:lkst/pros -->\n" . self::pros_markup( '<li>Pro</li>' ) . "\n<!-- /wp:lkst/pros -->"
+			. "<!-- wp:paragraph -->\n<p>Stray content</p>\n<!-- /wp:paragraph -->"
+			. "</div>\n<!-- /wp:lkst/pros-cons -->";
+		$id = self::factory()->post->create( [ 'post_content' => $content ] );
+
+		$stats = [];
+		$this->assertSame( 'skipped', MigrateBlocksCommand::migrate_post( $id, true, $stats ) );
+		$stored = (string) get_post_field( 'post_content', $id );
+		$this->assertStringContainsString( 'wp:lkst/pros-cons', $stored );
+		$this->assertStringContainsString( 'Stray content', $stored );
+	}
 }

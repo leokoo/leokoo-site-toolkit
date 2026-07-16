@@ -22,11 +22,11 @@
   "attributes": {
     "prosTitle": {
       "type": "string",
-      "default": "Pros"
+      "default": ""
     },
     "consTitle": {
       "type": "string",
-      "default": "Cons"
+      "default": ""
     },
     "pros": {
       "type": "string",
