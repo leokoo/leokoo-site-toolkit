@@ -53,8 +53,72 @@ class KeyTakeaways implements ModuleInterface {
 		// Belt-and-suspenders: re-render any un-migrated legacy block through
 		// the new seam so it never appears unstyled or as an editor error.
 		add_filter( 'render_block', [ $this, 'legacy_render_safety_net' ], 10, 2 );
+		// Contribute this module's rename to the block migrator registry.
+		add_filter( 'zehoro/block_migrations', [ self::class, 'register_migration' ] );
 
 		\Zehoro\Cli\MigrateBlocksCommand::register();
+	}
+
+	/** Register this module's legacy block rename with the migrator. */
+	public static function register_migration( array $renames ): array {
+		$renames[ self::LEGACY_BLOCK ] = [ self::class, 'migrate_legacy_block' ];
+		return $renames;
+	}
+
+	/**
+	 * Migrator handler for a legacy lkst/tldr block. Returns the replacement
+	 * zehoro/key-takeaways block, or null when the content has block-level
+	 * structure the constrained block would flatten (left as-is; the safety net
+	 * renders it losslessly — never a silent lossy rewrite).
+	 */
+	public static function migrate_legacy_block( array $block ): ?array {
+		$attrs   = ( isset( $block['attrs'] ) && is_array( $block['attrs'] ) ) ? $block['attrs'] : [];
+		$heading = isset( $attrs['heading'] ) ? (string) $attrs['heading'] : '';
+		$content = self::extract_legacy_content( (string) ( $block['innerHTML'] ?? '' ) );
+		if ( $content === '' && isset( $attrs['content'] ) ) {
+			$content = (string) $attrs['content'];
+		}
+
+		$plan = self::plan_conversion( $content );
+		if ( $plan === null ) {
+			return null;
+		}
+		// Preserve the legacy default heading casing when the old block used the default.
+		$plan['heading'] = ( $heading !== '' ) ? $heading : self::LEGACY_DEFAULT_HEADING;
+
+		return [
+			'blockName'    => 'zehoro/key-takeaways',
+			'attrs'        => $plan,
+			'innerBlocks'  => [],
+			'innerHTML'    => '',
+			'innerContent' => [],
+		];
+	}
+
+	/**
+	 * Decide how to carry legacy content into the new block WITHOUT losing
+	 * structure. Returns new-block attrs (mode + text) for clean inline content;
+	 * null when the content has block-level structure (caller leaves it as-is).
+	 */
+	private static function plan_conversion( string $content ): ?array {
+		$content = trim( $content );
+		if ( $content === '' ) {
+			return null;
+		}
+		if ( preg_match( '#^<p\b[^>]*>(.*)</p>$#is', $content, $m ) ) {
+			$inner = $m[1];
+			return self::has_block_tags( $inner ) ? null : [ 'mode' => 'paragraph', 'text' => $inner ];
+		}
+		if ( self::has_block_tags( $content ) ) {
+			return null;
+		}
+		return [ 'mode' => 'paragraph', 'text' => $content ];
+	}
+
+	private static function has_block_tags( string $html ): bool {
+		// `img` is included so an image-bearing box is left as-is (the paragraph
+		// path's inline allowlist would drop it); the safety net renders it.
+		return (bool) preg_match( '#<\s*(p|div|ul|ol|li|h[1-6]|blockquote|table|figure|section|article|pre|hr|img)\b#i', $html );
 	}
 
 	public function register_block(): void {

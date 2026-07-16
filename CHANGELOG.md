@@ -2,6 +2,22 @@
 
 All notable changes to the **Zehoro Toolkit** will be documented in this file.
 
+## [1.30.0] - 2026-07-12
+
+### Added — Pros & Cons block (consolidated, launch block #2)
+A single dynamic `zehoro/pros-cons` block: a scannable two-column Pros & Cons box (semantic ✓/✕ list markers,
+theme-neutral, CSS-variable accents you can override) with a **show** toggle (both | pros | cons) that also
+covers a single Pros or Cons list. Server-rendered through one seam, heading level H2–H4, i18n, zero outbound
+HTTP, **no schema** (a standalone pros/cons list has no valid type — penalty-safe), empty renders nothing.
+
+### Changed — retired the 3-block `lkst/*` set; consolidated into one
+Replaces the retired `lkst/pros-cons` (an InnerBlocks container), `lkst/pros`, and `lkst/cons`. Backward-compat
+mirrors Key Takeaways: a `render_block` **safety net** renders any un-migrated legacy block through the seam
+(the container's dead wrapper stripped — no `lkst-*` leak); **editor bridges** keep all three valid in Gutenberg
+(no invalid-content warning) with a one-click transform to the consolidated block; and `wp zehoro migrate-blocks`
+converts them, **unpacking the container's inner pros/cons into one block**. The migrator is now a generalized
+**rename registry** (the `zehoro/block_migrations` filter) shared by every block rename.
+
 ## [1.29.0] - 2026-07-12
 
 ### Added — Key Takeaways block (first launch block; supersedes `lkst/tldr`)
