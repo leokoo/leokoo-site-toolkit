@@ -346,11 +346,6 @@
 	line-height: 1;
 }
 
-/* Contextual CTA wrappers */
-.lkst-contextual-cta {
-    
-}
-
 
 /* =============================================================================
    Table of Contents (Wirecutter Style)
@@ -417,10 +412,6 @@
 @keyframes lkst-marquee-anim {
     0% { transform: translateX(0); }
     100% { transform: translateX(var(--scroll-dist)); }
-}
-    85%, 100% { transform: translateX(var(--scroll-dist)); }
-}
-    85%, 100% { transform: translateX(var(--scroll-dist)); }
 }
 
 .zehoro-toc-title strong {

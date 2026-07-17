@@ -4,7 +4,7 @@ Tags: table of contents, faq, schema, author box, structured data
 Requires at least: 6.0
 Tested up to: 7.0
 Requires PHP: 7.4
-Stable tag: 1.33.0
+Stable tag: 1.36.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -76,6 +76,9 @@ The content features are native Gutenberg blocks. Page builders can use the shor
 4. SEO-plugin coexistence: Zehoro detects your SEO plugin and stands its schema down, with a one-click override.
 
 == Changelog ==
+
+= 1.34.0 – 1.36.0 =
+* Free is now deliberately lean: the five launch blocks (Key Takeaways, Pros & Cons, FAQ, Author Box, "We Tested") plus Table of Contents, Article schema, and Visual Styles. Thirteen secondary modules (Callout, Stat Callout, Steps, Testimonial, Inline Product, Content Box, CTA Swap, Disclaimer, Last Updated, Category Pills, Home Filter Pills, RSS CPT Support, Archive Title Cleanup) moved to Zehoro Toolkit Pro — on sites running Pro nothing changes: block names, shortcodes, settings, and stored content all keep working.
 
 = 1.33.0 =
 * New **"We Tested" evaluation block** — a hands-on scorecard (per-criteria scores, methodology, pros/cons, verdict). Emits Review schema only for genuine third-party subjects; a review of your own site or brand is automatically suppressed to stay within search-engine guidelines.
