@@ -2,6 +2,23 @@
 
 All notable changes to the **Zehoro Toolkit** will be documented in this file.
 
+## [1.36.2] - 2026-07-21
+
+### Fixed — wp.org review-readiness hardening
+Remediations from a wp.org submission audit, none of which change how content renders:
+- **Table of Contents scroll-spy (security):** the active-section label is now built with `textContent` /
+  `document.createElement` instead of `innerHTML`, closing a stored DOM-XSS path where an entity-encoded
+  heading (e.g. `&lt;img onerror=…&gt;`) could round-trip back into live markup in the marquee label.
+- **Noscript module-save:** the no-JS save fallback moved off the render callback onto `admin_init`, so its
+  POST-Redirect-GET redirect fires before headers are sent (previously silently dropped).
+- **PHP 8.1 deprecation:** hidden per-module settings pages register with `''` instead of `null` as the
+  parent slug, so `add_submenu_page()` no longer emits a deprecation notice.
+- **i18n:** front-end Table of Contents strings ("BROWSE", the default section label, the toggle aria-label)
+  are translatable, and the JS scroll-to-top reset label is localized in lockstep.
+- **Logging:** the `lkst_*` → `zehoro_*` rename-migrator log line is now gated behind `WP_DEBUG`.
+- Minor: null-safe `the_content` handling in the TOC filter; `phpcs:ignore` annotations on the deactivation
+  transient sweep; readme install step points at the Free "Modules" screen.
+
 ## [1.36.1] - 2026-07-17
 
 ### Fixed — stylesheet down to Free-owned rules only

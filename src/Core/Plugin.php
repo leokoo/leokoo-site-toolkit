@@ -456,7 +456,10 @@ class Plugin {
 	public static function deactivate(): void {
 		global $wpdb;
 		// Deactivation transient cleanup covers both legacy (lkst_) and
-		// canonical (zehoro_) prefixes during the rename transition.
+		// canonical (zehoro_) prefixes during the rename transition. The LIKE
+		// patterns are static literals (no user input) and this is a one-off
+		// deactivation sweep, so a direct query with no cache is correct here.
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		$wpdb->query( "DELETE FROM {$wpdb->options} WHERE option_name LIKE '_transient_lkst_%' OR option_name LIKE '_transient_timeout_lkst_%' OR option_name LIKE '_transient_zehoro_%' OR option_name LIKE '_transient_timeout_zehoro_%'" );
 		flush_rewrite_rules();
 	}

@@ -285,8 +285,10 @@ class ZehoroRenameMigrator {
 
 		update_option( self::MIGRATION_FLAG, '1', false );
 
-		if ( ( $migrated_options + $migrated_meta ) > 0 && function_exists( 'error_log' ) ) {
-			error_log( sprintf(
+		if ( ( $migrated_options + $migrated_meta ) > 0
+			&& defined( 'WP_DEBUG' ) && WP_DEBUG
+			&& function_exists( 'error_log' ) ) {
+			error_log( sprintf( // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
 				'[zehoro/rename] migrated %d option(s) + %d post-meta row(s) from lkst_* to zehoro_*.',
 				$migrated_options,
 				$migrated_meta

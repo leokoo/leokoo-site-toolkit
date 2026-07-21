@@ -4,7 +4,7 @@ Tags: table of contents, faq, schema, author box, structured data
 Requires at least: 6.0
 Tested up to: 7.0
 Requires PHP: 7.4
-Stable tag: 1.36.1
+Stable tag: 1.36.2
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -42,7 +42,7 @@ Zehoro Toolkit is the free base for **Zehoro Toolkit Pro**, which adds the conte
 
 1. In your WordPress admin, go to **Plugins → Add New**, search for "Zehoro Toolkit", and click **Install Now**.
 2. Activate the plugin.
-3. (Optional) Visit **Zehoro → Start Here** to see the available modules. Everything works with default settings — there is nothing you must configure.
+3. (Optional) Visit **Zehoro → Modules** to see the available modules. Everything works with default settings — there is nothing you must configure.
 
 That's it. No keys, no accounts.
 
@@ -79,7 +79,10 @@ The content features are native Gutenberg blocks. Page builders can use the shor
 
 == Changelog ==
 
-= 1.34.0 – 1.36.0 =
+= 1.36.2 =
+* Hardening and wp.org review-readiness: the Table of Contents scroll-spy now builds its label with safe DOM APIs (no `innerHTML`); the noscript module-save fallback redirects correctly; hidden settings pages register without a PHP 8.1 deprecation notice; front-end Table of Contents strings are translatable; the rename-migrator log is `WP_DEBUG`-gated. No change to how your content renders.
+
+= 1.34.0 – 1.36.1 =
 * Free is now deliberately lean: the five launch blocks (Key Takeaways, Pros & Cons, FAQ, Author Box, "We Tested") plus Table of Contents, Article schema, and Visual Styles. Thirteen secondary modules (Callout, Stat Callout, Steps, Testimonial, Inline Product, Content Box, CTA Swap, Disclaimer, Last Updated, Category Pills, Home Filter Pills, RSS CPT Support, Archive Title Cleanup) moved to Zehoro Toolkit Pro — on sites running Pro nothing changes: block names, shortcodes, settings, and stored content all keep working.
 
 = 1.33.0 =
@@ -132,6 +135,9 @@ The content features are native Gutenberg blocks. Page builders can use the shor
 * Internationalization: text-domain loading aligned for translation; bundled translation template.
 
 == Upgrade Notice ==
+
+= 1.36.2 =
+Security and review-readiness hardening (Table of Contents rendering, noscript save, i18n). Recommended update.
 
 = 1.33.0 =
 Adds the "We Tested" evaluation block (with penalty-safe review schema) — the fifth and final launch block. Recommended update.

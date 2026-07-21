@@ -102,7 +102,7 @@ class FAQ implements ModuleInterface {
 
     public function register_settings_page(): void {
         add_submenu_page(
-            null,
+            '',
             __( 'FAQ Settings', 'zehoro-toolkit' ),
             __( 'FAQ Settings', 'zehoro-toolkit' ),
             'manage_options',

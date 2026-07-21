@@ -2,24 +2,24 @@
 # This file is distributed under the GPLv2 or later.
 msgid ""
 msgstr ""
-"Project-Id-Version: Zehoro Toolkit 1.36.1\n"
-"Report-Msgid-Bugs-To: https://github.com/leokoo/zehoro-toolkit/issues\n"
+"Project-Id-Version: Zehoro Toolkit 1.36.2\n"
+"Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/zehoro-toolkit\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-07-21T04:10:42+00:00\n"
+"POT-Creation-Date: 2026-07-21T06:46:33+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: zehoro-toolkit\n"
 
 #. Plugin Name of the plugin
 #: zehoro-toolkit.php
-#: src/Admin/Dashboard.php:56
-#: src/Admin/Dashboard.php:498
-#: src/Admin/Dashboard.php:753
-#: src/Admin/Dashboard.php:789
+#: src/Admin/Dashboard.php:60
+#: src/Admin/Dashboard.php:510
+#: src/Admin/Dashboard.php:765
+#: src/Admin/Dashboard.php:801
 #: src/Core/Plugin.php:380
 msgid "Zehoro Toolkit"
 msgstr ""
@@ -40,403 +40,403 @@ msgstr ""
 msgid "Leo Koo"
 msgstr ""
 
-#: src/Admin/Dashboard.php:57
+#: src/Admin/Dashboard.php:61
 msgid "Zehoro"
 msgstr ""
 
-#: src/Admin/Dashboard.php:67
-#: src/Admin/Dashboard.php:68
+#: src/Admin/Dashboard.php:71
+#: src/Admin/Dashboard.php:72
 msgid "Start Here"
 msgstr ""
 
-#: src/Admin/Dashboard.php:67
-#: src/Admin/Dashboard.php:68
-#: src/Admin/Dashboard.php:78
-#: src/Admin/Dashboard.php:79
-#: src/Admin/Dashboard.php:499
+#: src/Admin/Dashboard.php:71
+#: src/Admin/Dashboard.php:72
+#: src/Admin/Dashboard.php:82
+#: src/Admin/Dashboard.php:83
+#: src/Admin/Dashboard.php:511
 msgid "Modules"
 msgstr ""
 
-#: src/Admin/Dashboard.php:91
-#: src/Admin/Dashboard.php:790
+#: src/Admin/Dashboard.php:95
+#: src/Admin/Dashboard.php:802
 msgid "Author Box Settings"
 msgstr ""
 
-#: src/Admin/Dashboard.php:91
+#: src/Admin/Dashboard.php:95
 #: build/author-box/index.js:1
 #: src/blocks/author-box/index.js:27
 msgid "Author Box"
 msgstr ""
 
-#: src/Admin/Dashboard.php:95
+#: src/Admin/Dashboard.php:99
 msgid "Table of Contents"
 msgstr ""
 
-#: src/Admin/Dashboard.php:104
-#: src/Admin/Dashboard.php:754
+#: src/Admin/Dashboard.php:108
+#: src/Admin/Dashboard.php:766
 msgid "Visual Styles"
 msgstr ""
 
-#: src/Admin/Dashboard.php:135
+#: src/Admin/Dashboard.php:139
 msgid "Could not save — check your connection and try again."
 msgstr ""
 
 #. translators: {scope} is "all modules" or a category name
-#: src/Admin/Dashboard.php:137
+#: src/Admin/Dashboard.php:141
 msgid "Enable {scope}?"
 msgstr ""
 
-#: src/Admin/Dashboard.php:138
+#: src/Admin/Dashboard.php:142
 msgid "Disable {scope}? Their features stop working until re-enabled."
 msgstr ""
 
-#: src/Admin/Dashboard.php:139
+#: src/Admin/Dashboard.php:143
 msgid "all modules"
 msgstr ""
 
 #. translators: %s: category name
-#: src/Admin/Dashboard.php:141
+#: src/Admin/Dashboard.php:145
 msgid "all modules in “{group}”"
 msgstr ""
 
 #. translators: {count}: module count, {title}: preset name
-#: src/Admin/Dashboard.php:143
+#: src/Admin/Dashboard.php:147
 msgid "Enable the {count} modules in “{title}”? Nothing will be disabled."
 msgstr ""
 
-#: src/Admin/Dashboard.php:167
+#: src/Admin/Dashboard.php:171
 msgid "Affiliate marketer"
 msgstr ""
 
-#: src/Admin/Dashboard.php:168
+#: src/Admin/Dashboard.php:172
 msgid "Product boxes, comparisons, verdicts and disclosure for monetised reviews — plus the GSC loop with affiliate-click conversion tracking, so you see which post earns."
 msgstr ""
 
-#: src/Admin/Dashboard.php:179
+#: src/Admin/Dashboard.php:183
 msgid "Content publisher / blogger"
 msgstr ""
 
-#: src/Admin/Dashboard.php:180
+#: src/Admin/Dashboard.php:184
 msgid "E-E-A-T signals (author box, freshness, FAQ, schema), editorial blocks, the rewrite workflow and the full GSC loop — which post to fix next, and proof the fix worked."
 msgstr ""
 
-#: src/Admin/Dashboard.php:190
+#: src/Admin/Dashboard.php:194
 msgid "Local service business"
 msgstr ""
 
-#: src/Admin/Dashboard.php:191
+#: src/Admin/Dashboard.php:195
 msgid "Content that converts to enquiries: sticky CTA, WhatsApp/form conversion tracking via the stream, trust blocks — and the GSC loop tuned to service pages."
 msgstr ""
 
-#: src/Admin/Dashboard.php:223
+#: src/Admin/Dashboard.php:227
 msgid "Recommended setups — enable a curated module set for your kind of site"
 msgstr ""
 
 #. translators: %d: number of modules in the preset
-#: src/Admin/Dashboard.php:234
+#: src/Admin/Dashboard.php:238
 #, php-format
 msgid "Enable these %d modules"
 msgstr ""
 
-#: src/Admin/Dashboard.php:240
+#: src/Admin/Dashboard.php:244
 msgid "Presets only enable modules — nothing you already use gets turned off. You can fine-tune with the switches below afterwards."
 msgstr ""
 
-#: src/Admin/Dashboard.php:281
+#: src/Admin/Dashboard.php:285
 #: src/Core/Plugin.php:163
 msgid "Blocks"
 msgstr ""
 
-#: src/Admin/Dashboard.php:282
-msgid "Ready-made content blocks for your posts — callouts, FAQs, pros & cons, comparison and review boxes, and more. Turn the set on, then switch off any you do not use."
+#: src/Admin/Dashboard.php:286
+msgid "Ready-made content blocks for your posts — Key Takeaways, Pros & Cons, FAQ accordions, and author boxes. Turn the set on, then switch off any you do not use."
 msgstr ""
 
-#: src/Admin/Dashboard.php:285
+#: src/Admin/Dashboard.php:289
 #: src/Core/Plugin.php:115
 msgid "Schema"
 msgstr ""
 
-#: src/Admin/Dashboard.php:286
-msgid "Structured data that helps Google show rich results for your articles, FAQs and how-tos. Pauses automatically if a dedicated SEO plugin already handles it."
+#: src/Admin/Dashboard.php:290
+msgid "Structured data that helps Google show rich results for your articles. Pauses automatically if a dedicated SEO plugin already handles it."
 msgstr ""
 
-#: src/Admin/Dashboard.php:289
+#: src/Admin/Dashboard.php:293
 msgid "Reading & Trust"
 msgstr ""
 
-#: src/Admin/Dashboard.php:290
-msgid "Reader-facing touches that build trust — a table of contents, last-updated and freshness stamps, and disclosure notices."
+#: src/Admin/Dashboard.php:294
+msgid "Reader-facing touches that build trust — starting with an automatic, accessible table of contents."
 msgstr ""
 
 #. translators: %d: number of features
-#: src/Admin/Dashboard.php:362
+#: src/Admin/Dashboard.php:366
 #, php-format
 msgid "%d feature"
 msgid_plural "%d features"
 msgstr[0] ""
 msgstr[1] ""
 
-#: src/Admin/Dashboard.php:371
+#: src/Admin/Dashboard.php:375
 #, php-format
 msgid " of %d on — manage individually"
 msgstr ""
 
-#: src/Admin/Dashboard.php:381
+#: src/Admin/Dashboard.php:385
 #: zehoro-toolkit.php:113
 msgid "Settings"
 msgstr ""
 
-#: src/Admin/Dashboard.php:415
+#: src/Admin/Dashboard.php:427
 msgid "Modules updated successfully."
 msgstr ""
 
-#: src/Admin/Dashboard.php:500
+#: src/Admin/Dashboard.php:512
 msgid "Enable or disable specific features of the toolkit. Only active modules load their code."
 msgstr ""
 
-#: src/Admin/Dashboard.php:506
+#: src/Admin/Dashboard.php:518
 msgid "Module buckets"
 msgstr ""
 
-#: src/Admin/Dashboard.php:510
+#: src/Admin/Dashboard.php:522
 msgid "All modules"
 msgstr ""
 
-#: src/Admin/Dashboard.php:519
+#: src/Admin/Dashboard.php:531
 msgid "Core"
 msgstr ""
 
-#: src/Admin/Dashboard.php:520
+#: src/Admin/Dashboard.php:532
 msgid "the content-business engine"
 msgstr ""
 
-#: src/Admin/Dashboard.php:532
+#: src/Admin/Dashboard.php:544
 msgid "Surface"
 msgstr ""
 
-#: src/Admin/Dashboard.php:533
+#: src/Admin/Dashboard.php:545
 msgid "WordPress rendering"
 msgstr ""
 
-#: src/Admin/Dashboard.php:555
+#: src/Admin/Dashboard.php:567
 msgid "Search modules…"
 msgstr ""
 
-#: src/Admin/Dashboard.php:557
+#: src/Admin/Dashboard.php:569
 msgid "Search modules"
 msgstr ""
 
-#: src/Admin/Dashboard.php:559
+#: src/Admin/Dashboard.php:571
 msgid "Clear search"
 msgstr ""
 
-#: src/Admin/Dashboard.php:561
+#: src/Admin/Dashboard.php:573
 msgid "Filter by status"
 msgstr ""
 
-#: src/Admin/Dashboard.php:562
+#: src/Admin/Dashboard.php:574
 msgid "All"
 msgstr ""
 
-#: src/Admin/Dashboard.php:563
+#: src/Admin/Dashboard.php:575
 msgid "Active"
 msgstr ""
 
-#: src/Admin/Dashboard.php:564
+#: src/Admin/Dashboard.php:576
 msgid "Inactive"
 msgstr ""
 
-#: src/Admin/Dashboard.php:565
+#: src/Admin/Dashboard.php:577
 msgid "Free"
 msgstr ""
 
-#: src/Admin/Dashboard.php:566
+#: src/Admin/Dashboard.php:578
 msgid "Pro"
 msgstr ""
 
-#: src/Admin/Dashboard.php:568
+#: src/Admin/Dashboard.php:580
 msgid "Bulk actions"
 msgstr ""
 
-#: src/Admin/Dashboard.php:569
+#: src/Admin/Dashboard.php:581
 msgid "Enable all"
 msgstr ""
 
-#: src/Admin/Dashboard.php:570
+#: src/Admin/Dashboard.php:582
 msgid "Disable all"
 msgstr ""
 
-#: src/Admin/Dashboard.php:572
+#: src/Admin/Dashboard.php:584
 msgid "Layout"
 msgstr ""
 
-#: src/Admin/Dashboard.php:573
+#: src/Admin/Dashboard.php:585
 msgid "Grid layout"
 msgstr ""
 
-#: src/Admin/Dashboard.php:573
+#: src/Admin/Dashboard.php:585
 msgid "Grid"
 msgstr ""
 
-#: src/Admin/Dashboard.php:576
+#: src/Admin/Dashboard.php:588
 msgid "List layout"
 msgstr ""
 
-#: src/Admin/Dashboard.php:576
+#: src/Admin/Dashboard.php:588
 msgid "List"
 msgstr ""
 
 #. translators: 1: visible count 2: total count
-#: src/Admin/Dashboard.php:584
+#: src/Admin/Dashboard.php:596
 #, php-format
 msgid "Showing %1$s of %2$s"
 msgstr ""
 
-#: src/Admin/Dashboard.php:625
+#: src/Admin/Dashboard.php:637
 msgid "Block"
 msgstr ""
 
-#: src/Admin/Dashboard.php:625
+#: src/Admin/Dashboard.php:637
 msgid "Tool"
 msgstr ""
 
-#: src/Admin/Dashboard.php:628
+#: src/Admin/Dashboard.php:640
 msgid "AI"
 msgstr ""
 
-#: src/Admin/Dashboard.php:628
+#: src/Admin/Dashboard.php:640
 msgid "GSC"
 msgstr ""
 
-#: src/Admin/Dashboard.php:642
+#: src/Admin/Dashboard.php:654
 msgid "Configure"
 msgstr ""
 
-#: src/Admin/Dashboard.php:645
+#: src/Admin/Dashboard.php:657
 msgid "No settings needed"
 msgstr ""
 
-#: src/Admin/Dashboard.php:648
+#: src/Admin/Dashboard.php:660
 msgid "Documentation"
 msgstr ""
 
-#: src/Admin/Dashboard.php:657
+#: src/Admin/Dashboard.php:669
 msgid "No modules match the current filter."
 msgstr ""
 
-#: src/Admin/Dashboard.php:661
+#: src/Admin/Dashboard.php:673
 msgid "Save Module Settings"
 msgstr ""
 
-#: src/Admin/Dashboard.php:684
+#: src/Admin/Dashboard.php:696
 msgid "Erased"
 msgstr ""
 
-#: src/Admin/Dashboard.php:684
+#: src/Admin/Dashboard.php:696
 msgid "All Zehoro Toolkit data was erased."
 msgstr ""
 
-#: src/Admin/Dashboard.php:687
+#: src/Admin/Dashboard.php:699
 msgid "Saved"
 msgstr ""
 
-#: src/Admin/Dashboard.php:687
+#: src/Admin/Dashboard.php:699
 msgid "Saved."
 msgstr ""
 
-#: src/Admin/Dashboard.php:690
+#: src/Admin/Dashboard.php:702
 msgid "Danger Zone"
 msgstr ""
 
-#: src/Admin/Dashboard.php:692
+#: src/Admin/Dashboard.php:704
 msgid "Zehoro keeps your settings when you deactivate or delete the plugin — so a temporary uninstall (e.g. to troubleshoot) never loses your data. Use the controls below only if you actually want to wipe everything."
 msgstr ""
 
-#: src/Admin/Dashboard.php:700
+#: src/Admin/Dashboard.php:712
 msgid "Delete all Zehoro data when I delete this plugin. Off by default — your settings survive a delete and reinstall."
 msgstr ""
 
-#: src/Admin/Dashboard.php:702
+#: src/Admin/Dashboard.php:714
 msgid "Save"
 msgstr ""
 
-#: src/Admin/Dashboard.php:707
+#: src/Admin/Dashboard.php:719
 msgid "This permanently deletes ALL Zehoro Toolkit settings, options, and stored data on this site. It cannot be undone. Continue?"
 msgstr ""
 
-#: src/Admin/Dashboard.php:711
+#: src/Admin/Dashboard.php:723
 msgid "Erase everything now — options, post/user meta, and cached data. The plugin keeps running with fresh defaults."
 msgstr ""
 
-#: src/Admin/Dashboard.php:712
+#: src/Admin/Dashboard.php:724
 msgid "Erase all Zehoro data now"
 msgstr ""
 
-#: src/Admin/Dashboard.php:724
+#: src/Admin/Dashboard.php:736
 #: src/Admin/SeoCoexistenceNotice.php:60
 msgid "Insufficient permissions."
 msgstr ""
 
-#: src/Admin/Dashboard.php:742
+#: src/Admin/Dashboard.php:754
 msgid "Primary Brand Color"
 msgstr ""
 
-#: src/Admin/Dashboard.php:743
+#: src/Admin/Dashboard.php:755
 msgid "Primary Contrast Color"
 msgstr ""
 
-#: src/Admin/Dashboard.php:744
+#: src/Admin/Dashboard.php:756
 msgid "Secondary Brand Color"
 msgstr ""
 
-#: src/Admin/Dashboard.php:745
+#: src/Admin/Dashboard.php:757
 msgid "Dark Background"
 msgstr ""
 
-#: src/Admin/Dashboard.php:746
+#: src/Admin/Dashboard.php:758
 msgid "Light Background"
 msgstr ""
 
-#: src/Admin/Dashboard.php:755
+#: src/Admin/Dashboard.php:767
 msgid "Customize the colors used across all toolkit modules."
 msgstr ""
 
-#: src/Admin/Dashboard.php:758
-#: src/Admin/Dashboard.php:794
-#: src/Modules/TableOfContents.php:277
+#: src/Admin/Dashboard.php:770
+#: src/Admin/Dashboard.php:806
+#: src/Modules/TableOfContents.php:285
 msgid "Back to Modules"
 msgstr ""
 
-#: src/Admin/Dashboard.php:763
+#: src/Admin/Dashboard.php:775
 msgid "Brand colours"
 msgstr ""
 
-#: src/Admin/Dashboard.php:773
-#: src/Admin/Dashboard.php:819
+#: src/Admin/Dashboard.php:785
+#: src/Admin/Dashboard.php:831
 msgid "Save Changes"
 msgstr ""
 
-#: src/Admin/Dashboard.php:791
+#: src/Admin/Dashboard.php:803
 msgid "The call-to-action buttons shown in the author box."
 msgstr ""
 
-#: src/Admin/Dashboard.php:799
+#: src/Admin/Dashboard.php:811
 msgid "CTA Buttons"
 msgstr ""
 
-#: src/Admin/Dashboard.php:804
+#: src/Admin/Dashboard.php:816
 msgid "Primary button label"
 msgstr ""
 
-#: src/Admin/Dashboard.php:808
+#: src/Admin/Dashboard.php:820
 msgid "Primary button URL"
 msgstr ""
 
-#: src/Admin/Dashboard.php:812
+#: src/Admin/Dashboard.php:824
 msgid "Secondary button label"
 msgstr ""
 
-#: src/Admin/Dashboard.php:816
+#: src/Admin/Dashboard.php:828
 msgid "Secondary button URL"
 msgstr ""
 
@@ -609,39 +609,53 @@ msgstr ""
 msgid "Key takeaways"
 msgstr ""
 
-#: src/Modules/TableOfContents.php:278
+#: src/Modules/TableOfContents.php:85
+#: src/Modules/TableOfContents.php:264
+msgid "Sections in this article"
+msgstr ""
+
+#: src/Modules/TableOfContents.php:264
+msgctxt "table of contents eyebrow label"
+msgid "BROWSE"
+msgstr ""
+
+#: src/Modules/TableOfContents.php:265
+msgid "Toggle table of contents"
+msgstr ""
+
+#: src/Modules/TableOfContents.php:286
 msgid "Table of Contents Settings"
 msgstr ""
 
-#: src/Modules/TableOfContents.php:283
+#: src/Modules/TableOfContents.php:291
 msgid "Insertion Method"
 msgstr ""
 
-#: src/Modules/TableOfContents.php:287
+#: src/Modules/TableOfContents.php:295
 msgid "Auto-inject"
 msgstr ""
 
-#: src/Modules/TableOfContents.php:288
+#: src/Modules/TableOfContents.php:296
 msgid "(Automatically adds the TOC to the very top of the post content)"
 msgstr ""
 
-#: src/Modules/TableOfContents.php:292
+#: src/Modules/TableOfContents.php:300
 msgid "Shortcode Only"
 msgstr ""
 
-#: src/Modules/TableOfContents.php:293
+#: src/Modules/TableOfContents.php:301
 msgid "(Only renders where you place the [zehoro_toc] shortcode)"
 msgstr ""
 
-#: src/Modules/TableOfContents.php:298
+#: src/Modules/TableOfContents.php:306
 msgid "Active Post Types"
 msgstr ""
 
-#: src/Modules/TableOfContents.php:311
+#: src/Modules/TableOfContents.php:319
 msgid "Select which post types the TOC should be generated for."
 msgstr ""
 
-#: src/Modules/TableOfContents.php:315
+#: src/Modules/TableOfContents.php:323
 msgid "Save Settings"
 msgstr ""
 

@@ -25,6 +25,10 @@ class Dashboard {
 		add_action( 'admin_menu',             [ $this, 'register_menus' ], 9 );
 		add_action( 'admin_enqueue_scripts',  [ $this, 'enqueue_assets' ] );
 		add_action( 'admin_init',             [ $this, 'register_settings' ] );
+		// The noscript module-save must be handled before any admin HTML is sent,
+		// so its POST-Redirect-GET redirect actually fires (a render callback runs
+		// after headers are already out).
+		add_action( 'admin_init',             [ $this, 'maybe_handle_module_save' ] );
 		add_action( 'admin_post_zehoro_danger', [ $this, 'handle_danger' ] );
 	}
 
@@ -88,11 +92,11 @@ class Dashboard {
 		// Discovery flows through the Modules grid's "Configure" links.
 		// Phase 0 module refactor — task #36.
 		if ( in_array( 'author_box', $this->active, true ) ) {
-			add_submenu_page( null, __( 'Author Box Settings', 'zehoro-toolkit' ), __( 'Author Box', 'zehoro-toolkit' ), 'manage_options', 'zehoro-author-box', [ $this, 'render_author_box_settings_page' ] );
+			add_submenu_page( '', __( 'Author Box Settings', 'zehoro-toolkit' ), __( 'Author Box', 'zehoro-toolkit' ), 'manage_options', 'zehoro-author-box', [ $this, 'render_author_box_settings_page' ] );
 		}
 
 		if ( in_array( 'table_of_contents', $this->active, true ) ) {
-			add_submenu_page( null, __( 'Table of Contents', 'zehoro-toolkit' ), __( 'Table of Contents', 'zehoro-toolkit' ), 'manage_options', 'zehoro-toc-settings',
+			add_submenu_page( '', __( 'Table of Contents', 'zehoro-toolkit' ), __( 'Table of Contents', 'zehoro-toolkit' ), 'manage_options', 'zehoro-toc-settings',
 				[ new \Zehoro\Modules\TableOfContents(), 'render_page' ]
 			);
 		}
@@ -101,7 +105,7 @@ class Dashboard {
 		// registers zehoro-rss-feed itself — lean-Free reorg, stage C.)
 
 		if ( in_array( 'styles', $this->active, true ) ) {
-			add_submenu_page( null, __( 'Visual Styles', 'zehoro-toolkit' ), __( 'Visual Styles', 'zehoro-toolkit' ), 'manage_options', 'zehoro-styles', [ $this, 'render_styles_settings_page' ] );
+			add_submenu_page( '', __( 'Visual Styles', 'zehoro-toolkit' ), __( 'Visual Styles', 'zehoro-toolkit' ), 'manage_options', 'zehoro-styles', [ $this, 'render_styles_settings_page' ] );
 		}
 	}
 
@@ -388,24 +392,32 @@ class Dashboard {
 		<?php
 	}
 
+	/**
+	 * Noscript module-save handler — POST-Redirect-GET.
+	 *
+	 * Hooked on admin_init (before any admin HTML is sent) so the redirect
+	 * actually fires; running it inside the render callback would attempt the
+	 * redirect after headers are already out. The JS path uses the REST bulk
+	 * route; this is the no-JS fallback behind the same nonce + capability.
+	 */
+	public function maybe_handle_module_save(): void {
+		if ( ! isset( $_POST['zehoro_save_modules'] ) ) return;
+		if ( ! current_user_can( 'manage_options' ) ) return;
+		check_admin_referer( 'zehoro_modules_action', 'zehoro_modules_nonce' );
+
+		// Sanitise + intersect against the real registry so junk keys can't be
+		// persisted (parity with the REST bulk route).
+		$posted     = ( isset( $_POST['modules'] ) && is_array( $_POST['modules'] ) )
+			? array_map( 'sanitize_key', array_keys( wp_unslash( $_POST['modules'] ) ) )
+			: [];
+		$new_active = array_values( array_intersect( $posted, array_keys( \Zehoro\Core\Plugin::get_registered_modules() ) ) );
+		update_option( 'zehoro_active_modules', $new_active );
+		wp_safe_redirect( add_query_arg( [ 'page' => 'zehoro-dashboard', 'updated' => '1' ], admin_url( 'admin.php' ) ) );
+		exit;
+	}
+
 	public function render_dashboard_page(): void {
 		if ( ! current_user_can( 'manage_options' ) ) return;
-
-		// POST handler: save modules, then redirect (POST-Redirect-GET pattern).
-		// Without a redirect the user can re-submit by refreshing, and the browser
-		// shows a "resubmit form?" warning.
-		if ( isset( $_POST['zehoro_save_modules'] ) && check_admin_referer( 'zehoro_modules_action', 'zehoro_modules_nonce' ) ) {
-			// Sanitise + intersect against the real registry so junk keys can't be
-			// persisted (parity with the REST bulk route). Nonce + capability are
-			// already enforced above; this is defence-in-depth for the noscript path.
-			$posted     = ( isset( $_POST['modules'] ) && is_array( $_POST['modules'] ) )
-				? array_map( 'sanitize_key', array_keys( wp_unslash( $_POST['modules'] ) ) )
-				: [];
-			$new_active = array_values( array_intersect( $posted, array_keys( \Zehoro\Core\Plugin::get_registered_modules() ) ) );
-			update_option( 'zehoro_active_modules', $new_active );
-			wp_safe_redirect( add_query_arg( [ 'page' => 'zehoro-dashboard', 'updated' => '1' ], admin_url( 'admin.php' ) ) );
-			exit;
-		}
 
 		$registered = Plugin::get_registered_modules();
 		$default_active = array_keys( array_filter( $registered, function($m) { return ! empty( $m['default'] ); } ) );
