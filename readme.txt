@@ -70,10 +70,12 @@ The content features are native Gutenberg blocks. Page builders can use the shor
 
 == Screenshots ==
 
-1. The Start Here screen — every available module at a glance.
-2. Table of Contents rendered on a post.
-3. The FAQ block (accordion plus structured data).
-4. SEO-plugin coexistence: Zehoro detects your SEO plugin and stands its schema down, with a one-click override.
+1. The Modules screen — every feature at a glance, on/off per module.
+2. Key Takeaways — a scannable summary box for the top of a post.
+3. The "We Tested" evaluation scorecard — criteria scores, methodology, pros/cons, and a verdict.
+4. The FAQ accordion — accessible, native details/summary.
+5. Pros & Cons — a two-column verdict box.
+6. The Author Box — an E-E-A-T trust card auto-filled from the post author.
 
 == Changelog ==
 

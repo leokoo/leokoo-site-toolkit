@@ -279,15 +279,15 @@ class Dashboard {
 		return (array) apply_filters( 'zehoro/module_suites', [
 			'editorial_blocks' => [
 				'label' => __( 'Blocks', 'zehoro-toolkit' ),
-				'desc'  => __( 'Ready-made content blocks for your posts — callouts, FAQs, pros & cons, comparison and review boxes, and more. Turn the set on, then switch off any you do not use.', 'zehoro-toolkit' ),
+				'desc'  => __( 'Ready-made content blocks for your posts — Key Takeaways, Pros & Cons, FAQ accordions, and author boxes. Turn the set on, then switch off any you do not use.', 'zehoro-toolkit' ),
 			],
 			'schema' => [
 				'label' => __( 'Schema', 'zehoro-toolkit' ),
-				'desc'  => __( 'Structured data that helps Google show rich results for your articles, FAQs and how-tos. Pauses automatically if a dedicated SEO plugin already handles it.', 'zehoro-toolkit' ),
+				'desc'  => __( 'Structured data that helps Google show rich results for your articles. Pauses automatically if a dedicated SEO plugin already handles it.', 'zehoro-toolkit' ),
 			],
 			'reading_ux' => [
 				'label' => __( 'Reading & Trust', 'zehoro-toolkit' ),
-				'desc'  => __( 'Reader-facing touches that build trust — a table of contents, last-updated and freshness stamps, and disclosure notices.', 'zehoro-toolkit' ),
+				'desc'  => __( 'Reader-facing touches that build trust — starting with an automatic, accessible table of contents.', 'zehoro-toolkit' ),
 			],
 		] );
 	}
