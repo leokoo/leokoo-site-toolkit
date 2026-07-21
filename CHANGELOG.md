@@ -2,6 +2,15 @@
 
 All notable changes to the **Zehoro Toolkit** will be documented in this file.
 
+## [1.36.1] - 2026-07-17
+
+### Fixed — stylesheet down to Free-owned rules only
+Removed four dead CSS sections (`#lkst-sticky-bar`, `.lkst-freshness-log`, `.lkst-affiliate-disclosure`,
+`.lkst-inline-post`) whose emitters were renamed to `zehoro-*` inline-styled markup in Pro long ago — the
+class strings no longer exist anywhere outside this stylesheet. The remaining sections all have a live
+consumer, except the ticker/post-nav rules, which stay deliberately until leokoo.com migrates off the placed
+markup of those retired modules.
+
 ## [1.36.0] - 2026-07-17
 
 ### Changed — lean Free reorg stage C (final): the last four modules relocate to Pro
