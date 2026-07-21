@@ -96,6 +96,7 @@ class Evaluation implements ModuleInterface {
 		}
 		if ( $avg > 0 ) {
 			$html .= '<div class="zehoro-eval__score" aria-label="'
+				/* translators: %s: the averaged criteria score, e.g. "4.5" */
 				. esc_attr( sprintf( __( 'Overall score: %s out of 5', 'zehoro-toolkit' ), number_format_i18n( $avg, 1 ) ) )
 				. '"><span class="zehoro-eval__score-num">' . esc_html( number_format_i18n( $avg, 1 ) ) . '</span>'
 				. '<span class="zehoro-eval__score-max">/5</span></div>';
@@ -152,7 +153,9 @@ class Evaluation implements ModuleInterface {
 			$out .= '</div>';
 			if ( $score > 0 ) {
 				$label = $name !== ''
+					/* translators: 1: the criterion name, e.g. "Build quality"; 2: its score, e.g. "4.0" */
 					? sprintf( __( '%1$s: %2$s out of 5', 'zehoro-toolkit' ), $name, number_format_i18n( $score, 1 ) )
+					/* translators: %s: the criterion score, e.g. "4.0" */
 					: sprintf( __( '%s out of 5', 'zehoro-toolkit' ), number_format_i18n( $score, 1 ) );
 				$out .= '<div class="zehoro-eval__bar" role="img" aria-label="' . esc_attr( $label ) . '">'
 					. '<span class="zehoro-eval__bar-fill" style="width:' . esc_attr( (string) $pct ) . '%"></span></div>';

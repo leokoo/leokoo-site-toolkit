@@ -28,7 +28,11 @@ const StarPicker = ( { value, onChange } ) => (
 				type="button"
 				className={ `zehoro-eval-editor__star ${ n <= value ? 'is-filled' : '' }` }
 				onClick={ () => onChange( n === value ? 0 : n ) }
-				aria-label={ sprintf( _n( '%d star', '%d stars', n, 'zehoro-toolkit' ), n ) }
+				aria-label={ sprintf(
+					/* translators: %d: the star rating value (1–5) */
+					_n( '%d star', '%d stars', n, 'zehoro-toolkit' ),
+					n
+				) }
 			>
 				★
 			</button>

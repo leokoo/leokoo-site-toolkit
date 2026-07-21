@@ -1,29 +1,461 @@
-# SOME DESCRIPTIVE TITLE.
-# Copyright (C) YEAR Leo Koo
-# This file is distributed under the same license as the zehoro-toolkit package.
-# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
-#
-#, fuzzy
+# Copyright (C) 2026 Leo Koo
+# This file is distributed under the GPLv2 or later.
 msgid ""
 msgstr ""
-"Project-Id-Version: zehoro-toolkit 1.22.0\n"
-"Report-Msgid-Bugs-To: https://leokoo.com\n"
-"POT-Creation-Date: 2026-06-14 16:53+0800\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Project-Id-Version: Zehoro Toolkit 1.36.1\n"
+"Report-Msgid-Bugs-To: https://github.com/leokoo/zehoro-toolkit/issues\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
-"Language: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
-"X-Domain: zehoro-toolkit\n"
 "Content-Transfer-Encoding: 8bit\n"
+"POT-Creation-Date: 2026-07-21T04:10:42+00:00\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"X-Generator: WP-CLI 2.12.0\n"
+"X-Domain: zehoro-toolkit\n"
+
+#. Plugin Name of the plugin
+#: zehoro-toolkit.php
+#: src/Admin/Dashboard.php:56
+#: src/Admin/Dashboard.php:498
+#: src/Admin/Dashboard.php:753
+#: src/Admin/Dashboard.php:789
+#: src/Core/Plugin.php:380
+msgid "Zehoro Toolkit"
+msgstr ""
+
+#. Plugin URI of the plugin
+#. Author URI of the plugin
+#: zehoro-toolkit.php
+msgid "https://leokoo.com"
+msgstr ""
+
+#. Description of the plugin
+#: zehoro-toolkit.php
+msgid "Editorial toolkit for WordPress — Article schema (E-E-A-T), Table of Contents, FAQ, author boxes, and content blocks. The free base for Zehoro Toolkit Pro."
+msgstr ""
+
+#. Author of the plugin
+#: zehoro-toolkit.php
+msgid "Leo Koo"
+msgstr ""
+
+#: src/Admin/Dashboard.php:57
+msgid "Zehoro"
+msgstr ""
+
+#: src/Admin/Dashboard.php:67
+#: src/Admin/Dashboard.php:68
+msgid "Start Here"
+msgstr ""
+
+#: src/Admin/Dashboard.php:67
+#: src/Admin/Dashboard.php:68
+#: src/Admin/Dashboard.php:78
+#: src/Admin/Dashboard.php:79
+#: src/Admin/Dashboard.php:499
+msgid "Modules"
+msgstr ""
+
+#: src/Admin/Dashboard.php:91
+#: src/Admin/Dashboard.php:790
+msgid "Author Box Settings"
+msgstr ""
+
+#: src/Admin/Dashboard.php:91
+#: build/author-box/index.js:1
+#: src/blocks/author-box/index.js:27
+msgid "Author Box"
+msgstr ""
+
+#: src/Admin/Dashboard.php:95
+msgid "Table of Contents"
+msgstr ""
+
+#: src/Admin/Dashboard.php:104
+#: src/Admin/Dashboard.php:754
+msgid "Visual Styles"
+msgstr ""
+
+#: src/Admin/Dashboard.php:135
+msgid "Could not save — check your connection and try again."
+msgstr ""
+
+#. translators: {scope} is "all modules" or a category name
+#: src/Admin/Dashboard.php:137
+msgid "Enable {scope}?"
+msgstr ""
+
+#: src/Admin/Dashboard.php:138
+msgid "Disable {scope}? Their features stop working until re-enabled."
+msgstr ""
+
+#: src/Admin/Dashboard.php:139
+msgid "all modules"
+msgstr ""
+
+#. translators: %s: category name
+#: src/Admin/Dashboard.php:141
+msgid "all modules in “{group}”"
+msgstr ""
+
+#. translators: {count}: module count, {title}: preset name
+#: src/Admin/Dashboard.php:143
+msgid "Enable the {count} modules in “{title}”? Nothing will be disabled."
+msgstr ""
+
+#: src/Admin/Dashboard.php:167
+msgid "Affiliate marketer"
+msgstr ""
+
+#: src/Admin/Dashboard.php:168
+msgid "Product boxes, comparisons, verdicts and disclosure for monetised reviews — plus the GSC loop with affiliate-click conversion tracking, so you see which post earns."
+msgstr ""
+
+#: src/Admin/Dashboard.php:179
+msgid "Content publisher / blogger"
+msgstr ""
+
+#: src/Admin/Dashboard.php:180
+msgid "E-E-A-T signals (author box, freshness, FAQ, schema), editorial blocks, the rewrite workflow and the full GSC loop — which post to fix next, and proof the fix worked."
+msgstr ""
+
+#: src/Admin/Dashboard.php:190
+msgid "Local service business"
+msgstr ""
+
+#: src/Admin/Dashboard.php:191
+msgid "Content that converts to enquiries: sticky CTA, WhatsApp/form conversion tracking via the stream, trust blocks — and the GSC loop tuned to service pages."
+msgstr ""
+
+#: src/Admin/Dashboard.php:223
+msgid "Recommended setups — enable a curated module set for your kind of site"
+msgstr ""
+
+#. translators: %d: number of modules in the preset
+#: src/Admin/Dashboard.php:234
+#, php-format
+msgid "Enable these %d modules"
+msgstr ""
+
+#: src/Admin/Dashboard.php:240
+msgid "Presets only enable modules — nothing you already use gets turned off. You can fine-tune with the switches below afterwards."
+msgstr ""
+
+#: src/Admin/Dashboard.php:281
+#: src/Core/Plugin.php:163
+msgid "Blocks"
+msgstr ""
+
+#: src/Admin/Dashboard.php:282
+msgid "Ready-made content blocks for your posts — callouts, FAQs, pros & cons, comparison and review boxes, and more. Turn the set on, then switch off any you do not use."
+msgstr ""
+
+#: src/Admin/Dashboard.php:285
+#: src/Core/Plugin.php:115
+msgid "Schema"
+msgstr ""
+
+#: src/Admin/Dashboard.php:286
+msgid "Structured data that helps Google show rich results for your articles, FAQs and how-tos. Pauses automatically if a dedicated SEO plugin already handles it."
+msgstr ""
+
+#: src/Admin/Dashboard.php:289
+msgid "Reading & Trust"
+msgstr ""
+
+#: src/Admin/Dashboard.php:290
+msgid "Reader-facing touches that build trust — a table of contents, last-updated and freshness stamps, and disclosure notices."
+msgstr ""
+
+#. translators: %d: number of features
+#: src/Admin/Dashboard.php:362
+#, php-format
+msgid "%d feature"
+msgid_plural "%d features"
+msgstr[0] ""
+msgstr[1] ""
+
+#: src/Admin/Dashboard.php:371
+#, php-format
+msgid " of %d on — manage individually"
+msgstr ""
+
+#: src/Admin/Dashboard.php:381
+#: zehoro-toolkit.php:113
+msgid "Settings"
+msgstr ""
+
+#: src/Admin/Dashboard.php:415
+msgid "Modules updated successfully."
+msgstr ""
+
+#: src/Admin/Dashboard.php:500
+msgid "Enable or disable specific features of the toolkit. Only active modules load their code."
+msgstr ""
+
+#: src/Admin/Dashboard.php:506
+msgid "Module buckets"
+msgstr ""
+
+#: src/Admin/Dashboard.php:510
+msgid "All modules"
+msgstr ""
+
+#: src/Admin/Dashboard.php:519
+msgid "Core"
+msgstr ""
+
+#: src/Admin/Dashboard.php:520
+msgid "the content-business engine"
+msgstr ""
+
+#: src/Admin/Dashboard.php:532
+msgid "Surface"
+msgstr ""
+
+#: src/Admin/Dashboard.php:533
+msgid "WordPress rendering"
+msgstr ""
+
+#: src/Admin/Dashboard.php:555
+msgid "Search modules…"
+msgstr ""
+
+#: src/Admin/Dashboard.php:557
+msgid "Search modules"
+msgstr ""
+
+#: src/Admin/Dashboard.php:559
+msgid "Clear search"
+msgstr ""
+
+#: src/Admin/Dashboard.php:561
+msgid "Filter by status"
+msgstr ""
+
+#: src/Admin/Dashboard.php:562
+msgid "All"
+msgstr ""
+
+#: src/Admin/Dashboard.php:563
+msgid "Active"
+msgstr ""
+
+#: src/Admin/Dashboard.php:564
+msgid "Inactive"
+msgstr ""
+
+#: src/Admin/Dashboard.php:565
+msgid "Free"
+msgstr ""
+
+#: src/Admin/Dashboard.php:566
+msgid "Pro"
+msgstr ""
+
+#: src/Admin/Dashboard.php:568
+msgid "Bulk actions"
+msgstr ""
+
+#: src/Admin/Dashboard.php:569
+msgid "Enable all"
+msgstr ""
+
+#: src/Admin/Dashboard.php:570
+msgid "Disable all"
+msgstr ""
+
+#: src/Admin/Dashboard.php:572
+msgid "Layout"
+msgstr ""
+
+#: src/Admin/Dashboard.php:573
+msgid "Grid layout"
+msgstr ""
+
+#: src/Admin/Dashboard.php:573
+msgid "Grid"
+msgstr ""
+
+#: src/Admin/Dashboard.php:576
+msgid "List layout"
+msgstr ""
+
+#: src/Admin/Dashboard.php:576
+msgid "List"
+msgstr ""
+
+#. translators: 1: visible count 2: total count
+#: src/Admin/Dashboard.php:584
+#, php-format
+msgid "Showing %1$s of %2$s"
+msgstr ""
+
+#: src/Admin/Dashboard.php:625
+msgid "Block"
+msgstr ""
+
+#: src/Admin/Dashboard.php:625
+msgid "Tool"
+msgstr ""
+
+#: src/Admin/Dashboard.php:628
+msgid "AI"
+msgstr ""
+
+#: src/Admin/Dashboard.php:628
+msgid "GSC"
+msgstr ""
+
+#: src/Admin/Dashboard.php:642
+msgid "Configure"
+msgstr ""
+
+#: src/Admin/Dashboard.php:645
+msgid "No settings needed"
+msgstr ""
+
+#: src/Admin/Dashboard.php:648
+msgid "Documentation"
+msgstr ""
+
+#: src/Admin/Dashboard.php:657
+msgid "No modules match the current filter."
+msgstr ""
+
+#: src/Admin/Dashboard.php:661
+msgid "Save Module Settings"
+msgstr ""
+
+#: src/Admin/Dashboard.php:684
+msgid "Erased"
+msgstr ""
+
+#: src/Admin/Dashboard.php:684
+msgid "All Zehoro Toolkit data was erased."
+msgstr ""
+
+#: src/Admin/Dashboard.php:687
+msgid "Saved"
+msgstr ""
+
+#: src/Admin/Dashboard.php:687
+msgid "Saved."
+msgstr ""
+
+#: src/Admin/Dashboard.php:690
+msgid "Danger Zone"
+msgstr ""
+
+#: src/Admin/Dashboard.php:692
+msgid "Zehoro keeps your settings when you deactivate or delete the plugin — so a temporary uninstall (e.g. to troubleshoot) never loses your data. Use the controls below only if you actually want to wipe everything."
+msgstr ""
+
+#: src/Admin/Dashboard.php:700
+msgid "Delete all Zehoro data when I delete this plugin. Off by default — your settings survive a delete and reinstall."
+msgstr ""
+
+#: src/Admin/Dashboard.php:702
+msgid "Save"
+msgstr ""
+
+#: src/Admin/Dashboard.php:707
+msgid "This permanently deletes ALL Zehoro Toolkit settings, options, and stored data on this site. It cannot be undone. Continue?"
+msgstr ""
+
+#: src/Admin/Dashboard.php:711
+msgid "Erase everything now — options, post/user meta, and cached data. The plugin keeps running with fresh defaults."
+msgstr ""
+
+#: src/Admin/Dashboard.php:712
+msgid "Erase all Zehoro data now"
+msgstr ""
+
+#: src/Admin/Dashboard.php:724
+#: src/Admin/SeoCoexistenceNotice.php:60
+msgid "Insufficient permissions."
+msgstr ""
+
+#: src/Admin/Dashboard.php:742
+msgid "Primary Brand Color"
+msgstr ""
+
+#: src/Admin/Dashboard.php:743
+msgid "Primary Contrast Color"
+msgstr ""
+
+#: src/Admin/Dashboard.php:744
+msgid "Secondary Brand Color"
+msgstr ""
+
+#: src/Admin/Dashboard.php:745
+msgid "Dark Background"
+msgstr ""
+
+#: src/Admin/Dashboard.php:746
+msgid "Light Background"
+msgstr ""
+
+#: src/Admin/Dashboard.php:755
+msgid "Customize the colors used across all toolkit modules."
+msgstr ""
+
+#: src/Admin/Dashboard.php:758
+#: src/Admin/Dashboard.php:794
+#: src/Modules/TableOfContents.php:277
+msgid "Back to Modules"
+msgstr ""
+
+#: src/Admin/Dashboard.php:763
+msgid "Brand colours"
+msgstr ""
+
+#: src/Admin/Dashboard.php:773
+#: src/Admin/Dashboard.php:819
+msgid "Save Changes"
+msgstr ""
+
+#: src/Admin/Dashboard.php:791
+msgid "The call-to-action buttons shown in the author box."
+msgstr ""
+
+#: src/Admin/Dashboard.php:799
+msgid "CTA Buttons"
+msgstr ""
+
+#: src/Admin/Dashboard.php:804
+msgid "Primary button label"
+msgstr ""
+
+#: src/Admin/Dashboard.php:808
+msgid "Primary button URL"
+msgstr ""
+
+#: src/Admin/Dashboard.php:812
+msgid "Secondary button label"
+msgstr ""
+
+#: src/Admin/Dashboard.php:816
+msgid "Secondary button URL"
+msgstr ""
+
+#. translators: %s: the detected SEO plugin name
+#: src/Admin/SeoCoexistenceNotice.php:49
+#, php-format
+msgid "Zehoro detected %s and is coexisting with it — Zehoro's structured-data (schema) output is paused to avoid duplicate markup. This is the recommended setup; Zehoro's loop, entity, ROI and reporting features are unaffected."
+msgstr ""
+
+#: src/Admin/SeoCoexistenceNotice.php:53
+msgid "Use Zehoro’s schema instead"
+msgstr ""
+
+#: src/Admin/SeoCoexistenceNotice.php:54
+msgid "Got it, dismiss"
+msgstr ""
 
 #: src/Core/Plugin.php:114
 msgid "Editorial Blocks"
-msgstr ""
-
-#: src/Core/Plugin.php:115
-msgid "Schema"
 msgstr ""
 
 #: src/Core/Plugin.php:116
@@ -35,6 +467,7 @@ msgid "SEO"
 msgstr ""
 
 #: src/Core/Plugin.php:118
+#: src/Core/Plugin.php:164
 msgid "Conversion"
 msgstr ""
 
@@ -54,593 +487,126 @@ msgstr ""
 msgid "Other"
 msgstr ""
 
-#: src/Core/Plugin.php:302 src/Admin/Dashboard.php:61
-msgid "Zehoro Toolkit"
+#: src/Core/Plugin.php:162
+msgid "The Loop"
 msgstr ""
 
-#: src/Admin/Dashboard.php:62
-msgid "Zehoro"
+#: src/Core/Plugin.php:165
+msgid "Utilities"
 msgstr ""
 
-#: src/Admin/Dashboard.php:72 src/Admin/Dashboard.php:73
-msgid "Start Here"
+#: src/Modules/ArticleSchema.php:248
+msgid "Schema output paused."
 msgstr ""
 
-#: src/Admin/Dashboard.php:72 src/Admin/Dashboard.php:73
-#: src/Admin/Dashboard.php:83 src/Admin/Dashboard.php:84
-msgid "Modules"
-msgstr ""
-
-#: src/Admin/Dashboard.php:96 src/Admin/Dashboard.php:551
-msgid "Author Box Settings"
-msgstr ""
-
-#: src/Admin/Dashboard.php:96
-msgid "Author Box"
-msgstr ""
-
-#: src/Admin/Dashboard.php:100
-msgid "Table of Contents"
-msgstr ""
-
-#: src/Admin/Dashboard.php:106
-msgid "RSS Feed Settings"
-msgstr ""
-
-#: src/Admin/Dashboard.php:106
-msgid "RSS Feed"
-msgstr ""
-
-#: src/Admin/Dashboard.php:110 src/Admin/Dashboard.php:495
-msgid "Visual Styles"
-msgstr ""
-
-#: src/Admin/Dashboard.php:139
-msgid "Could not save — check your connection and try again."
-msgstr ""
-
-#: src/Admin/Dashboard.php:141
-msgid "Enable {scope}?"
-msgstr ""
-
-#: src/Admin/Dashboard.php:142
-msgid "Disable {scope}? Their features stop working until re-enabled."
-msgstr ""
-
-#: src/Admin/Dashboard.php:143
-msgid "all modules"
-msgstr ""
-
-#: src/Admin/Dashboard.php:145
-msgid "all modules in “{group}”"
-msgstr ""
-
-#: src/Admin/Dashboard.php:147
-msgid "Enable the {count} modules in “{title}”? Nothing will be disabled."
-msgstr ""
-
-#: src/Admin/Dashboard.php:171
-msgid "Affiliate marketer"
-msgstr ""
-
-#: src/Admin/Dashboard.php:172
-msgid "Product boxes, comparisons, verdicts and disclosure for monetised reviews — plus the GSC loop with affiliate-click conversion tracking, so you see which post earns."
-msgstr ""
-
-#: src/Admin/Dashboard.php:183
-msgid "Content publisher / blogger"
-msgstr ""
-
-#: src/Admin/Dashboard.php:184
-msgid "E-E-A-T signals (author box, freshness, FAQ, schema), editorial blocks, the rewrite workflow and the full GSC loop — which post to fix next, and proof the fix worked."
-msgstr ""
-
-#: src/Admin/Dashboard.php:194
-msgid "Local service business"
-msgstr ""
-
-#: src/Admin/Dashboard.php:195
-msgid "Content that converts to enquiries: sticky CTA, WhatsApp/form conversion tracking via the stream, trust blocks — and the GSC loop tuned to service pages."
-msgstr ""
-
-#: src/Admin/Dashboard.php:227
-msgid "Recommended setups — enable a curated module set for your kind of site"
-msgstr ""
-
-#: src/Admin/Dashboard.php:238
+#. translators: %s: SEO plugin name
+#: src/Modules/ArticleSchema.php:251
 #, php-format
-msgid "Enable these %d modules"
+msgid "%s is active and already emits structured data — Zehoro won't duplicate it."
 msgstr ""
 
-#: src/Admin/Dashboard.php:244
-msgid "Presets only enable modules — nothing you already use gets turned off. You can fine-tune with the switches below afterwards."
+#. translators: %s: SEO plugin name
+#: src/Modules/ArticleSchema.php:252
+msgid "An SEO plugin is active and already emits structured data — Zehoro won't duplicate it."
 msgstr ""
 
-#: src/Admin/Dashboard.php:293
-msgid "Modules updated successfully."
+#: src/Modules/ArticleSchema.php:255
+msgid "To keep Zehoro's schema instead, set Zehoro → Settings → Schema output to “Always”, or:"
 msgstr ""
 
-#: src/Admin/Dashboard.php:346
-msgid "Zehoro Toolkit — Modules"
+#: src/Modules/AuthorBox.php:172
+msgid "Author social profiles"
 msgstr ""
 
-#: src/Admin/Dashboard.php:347
-msgid "Enable or disable specific features of the toolkit. Only active modules load their code."
-msgstr ""
-
-#: src/Admin/Dashboard.php:350
-msgid "Module groups"
-msgstr ""
-
-#: src/Admin/Dashboard.php:354
-msgid "All modules"
-msgstr ""
-
-#: src/Admin/Dashboard.php:377
-msgid "Search modules…"
-msgstr ""
-
-#: src/Admin/Dashboard.php:379
-msgid "Search modules"
-msgstr ""
-
-#: src/Admin/Dashboard.php:381
-msgid "Clear search"
-msgstr ""
-
-#: src/Admin/Dashboard.php:383
-msgid "Filter by status"
-msgstr ""
-
-#: src/Admin/Dashboard.php:384
-msgid "All"
-msgstr ""
-
-#: src/Admin/Dashboard.php:385
-msgid "Active"
-msgstr ""
-
-#: src/Admin/Dashboard.php:386
-msgid "Inactive"
-msgstr ""
-
-#: src/Admin/Dashboard.php:387
-msgid "Free"
-msgstr ""
-
-#: src/Admin/Dashboard.php:388
-msgid "Pro"
-msgstr ""
-
-#: src/Admin/Dashboard.php:390
-msgid "Bulk actions"
-msgstr ""
-
-#: src/Admin/Dashboard.php:391
-msgid "Enable all"
-msgstr ""
-
-#: src/Admin/Dashboard.php:392
-msgid "Disable all"
-msgstr ""
-
-#: src/Admin/Dashboard.php:394 src/Modules/ContentBox.php:143
-msgid "Layout"
-msgstr ""
-
-#: src/Admin/Dashboard.php:395
-msgid "Grid layout"
-msgstr ""
-
-#: src/Admin/Dashboard.php:395
-msgid "Grid"
-msgstr ""
-
-#: src/Admin/Dashboard.php:398
-msgid "List layout"
-msgstr ""
-
-#: src/Admin/Dashboard.php:398
-msgid "List"
-msgstr ""
-
-#: src/Admin/Dashboard.php:406
+#. translators: %s: the averaged criteria score, e.g. "4.5"
+#: src/Modules/Evaluation.php:100
 #, php-format
-msgid "Showing %1$s of %2$s"
+msgid "Overall score: %s out of 5"
 msgstr ""
 
-#: src/Admin/Dashboard.php:443
-msgid "Block"
+#: src/Modules/Evaluation.php:108
+#: build/evaluation/index.js:2
+#: src/blocks/evaluation/edit.js:278
+msgid "How we tested"
 msgstr ""
 
-#: src/Admin/Dashboard.php:443
-msgid "Tool"
+#: src/Modules/Evaluation.php:120
+msgid "Our verdict"
 msgstr ""
 
-#: src/Admin/Dashboard.php:446
-msgid "AI"
-msgstr ""
-
-#: src/Admin/Dashboard.php:446
-msgid "GSC"
-msgstr ""
-
-#: src/Admin/Dashboard.php:460
-msgid "Configure"
-msgstr ""
-
-#: src/Admin/Dashboard.php:463
-msgid "No settings needed"
-msgstr ""
-
-#: src/Admin/Dashboard.php:466
-msgid "Documentation"
-msgstr ""
-
-#: src/Admin/Dashboard.php:475
-msgid "No modules match the current filter."
-msgstr ""
-
-#: src/Admin/Dashboard.php:479
-msgid "Save Module Settings"
-msgstr ""
-
-#: src/Admin/Dashboard.php:494 src/Admin/Dashboard.php:522
-#: src/Admin/Dashboard.php:550 src/Modules/TableOfContents.php:277
-msgid "Back to Modules"
-msgstr ""
-
-#: src/Admin/Dashboard.php:496
-msgid "Customize the colors used across all toolkit modules."
-msgstr ""
-
-#: src/Admin/Dashboard.php:500
-msgid "Primary Brand Color"
-msgstr ""
-
-#: src/Admin/Dashboard.php:502
-msgid "Primary Contrast Color"
-msgstr ""
-
-#: src/Admin/Dashboard.php:504
-msgid "Secondary Brand Color"
-msgstr ""
-
-#: src/Admin/Dashboard.php:506
-msgid "Dark Background"
-msgstr ""
-
-#: src/Admin/Dashboard.php:508
-msgid "Light Background"
-msgstr ""
-
-#: src/Admin/Dashboard.php:523
-msgid "RSS Feed Support"
-msgstr ""
-
-#: src/Admin/Dashboard.php:527
-msgid "Include Post Types"
-msgstr ""
-
-#: src/Admin/Dashboard.php:554
-msgid "CTA Buttons"
-msgstr ""
-
-#: src/Admin/Dashboard.php:556
-msgid "Primary button label"
-msgstr ""
-
-#: src/Admin/Dashboard.php:558
-msgid "Primary button URL"
-msgstr ""
-
-#: src/Admin/Dashboard.php:560
-msgid "Secondary button label"
-msgstr ""
-
-#: src/Admin/Dashboard.php:562
-msgid "Secondary button URL"
-msgstr ""
-
-#: src/Admin/SeoCoexistenceNotice.php:49
+#. translators: 1: the criterion name, e.g. "Build quality"; 2: its score, e.g. "4.0"
+#: src/Modules/Evaluation.php:157
 #, php-format
-msgid "Zehoro detected %s and is coexisting with it — Zehoro's structured-data (schema) output is paused to avoid duplicate markup. This is the recommended setup; Zehoro's loop, entity, ROI and reporting features are unaffected."
+msgid "%1$s: %2$s out of 5"
 msgstr ""
 
-#: src/Admin/SeoCoexistenceNotice.php:53
-msgid "Use Zehoro’s schema instead"
+#. translators: %s: the criterion score, e.g. "4.0"
+#: src/Modules/Evaluation.php:159
+#, php-format
+msgid "%s out of 5"
 msgstr ""
 
-#: src/Admin/SeoCoexistenceNotice.php:54
-msgid "Got it, dismiss"
+#: src/Modules/Evaluation.php:194
+#: src/Modules/ProsCons.php:103
+#: build/evaluation/index.js:2
+#: build/pros-cons/index.js:1
+#: build/pros-cons/index.js:2
+#: src/blocks/evaluation/edit.js:289
+#: src/blocks/pros-cons/index.js:61
+#: src/blocks/pros-cons/index.js:105
+#: src/blocks/pros-cons/index.js:301
+msgid "Pros"
 msgstr ""
 
-#: src/Admin/SeoCoexistenceNotice.php:60
-msgid "Insufficient permissions."
+#: src/Modules/Evaluation.php:202
+#: src/Modules/ProsCons.php:104
+#: build/evaluation/index.js:2
+#: build/pros-cons/index.js:1
+#: build/pros-cons/index.js:2
+#: src/blocks/evaluation/edit.js:295
+#: src/blocks/pros-cons/index.js:62
+#: src/blocks/pros-cons/index.js:112
+#: src/blocks/pros-cons/index.js:302
+msgid "Cons"
 msgstr ""
 
-#: src/Modules/Disclaimer.php:55
-msgid "This article is for informational purposes only and does not constitute medical advice. Consult a qualified ophthalmologist for diagnosis and treatment."
-msgstr ""
-
-#: src/Modules/Disclaimer.php:57
-msgid "This article provides general legal information, not legal advice. For advice specific to your situation, consult a qualified Malaysian lawyer."
-msgstr ""
-
-#: src/Modules/Disclaimer.php:100
-msgid "Disclaimer Settings"
-msgstr ""
-
-#: src/Modules/Disclaimer.php:105
-msgid "Disclaimer Type"
-msgstr ""
-
-#: src/Modules/Disclaimer.php:108
-msgid "Off"
-msgstr ""
-
-#: src/Modules/Disclaimer.php:109
-msgid "Medical (Standard)"
-msgstr ""
-
-#: src/Modules/Disclaimer.php:110
-msgid "Legal (Standard)"
-msgstr ""
-
-#: src/Modules/Disclaimer.php:111
-msgid "Custom"
-msgstr ""
-
-#: src/Modules/Disclaimer.php:116
-msgid "Custom Text"
-msgstr ""
-
-#: src/Modules/Disclaimer.php:125
-msgid "Only used if \"Custom\" is selected above."
-msgstr ""
-
-#: src/Modules/Disclaimer.php:129 src/Modules/TableOfContents.php:298
-msgid "Active Post Types"
-msgstr ""
-
-#: src/Modules/HomeFilterPills.php:68
-msgid "Filter by topic"
-msgstr ""
-
-#: src/Modules/LastUpdated.php:45
-msgid "Last Updated Badge"
-msgstr ""
-
-#: src/Modules/LastUpdated.php:50
-msgid "Auto Inject (Top of content)"
-msgstr ""
-
-#: src/Modules/LastUpdated.php:54
-msgid "Threshold (Days)"
-msgstr ""
-
-#: src/Modules/LastUpdated.php:57
-msgid "Only show the badge if the post was updated more than X days after it was published."
-msgstr ""
-
-#: src/Modules/LastUpdated.php:61
-msgid "Output dateModified Schema"
-msgstr ""
-
-#: src/Modules/LastUpdated.php:64
-msgid "Injects structured data into the <head> to alert Google to the fresh content."
-msgstr ""
-
-#: src/Modules/FAQ.php:53 src/Modules/FAQ.php:54
+#: src/Modules/FAQ.php:106
+#: src/Modules/FAQ.php:107
 msgid "FAQ Settings"
 msgstr ""
 
-#: src/Modules/FAQ.php:66
+#: src/Modules/FAQ.php:119
 msgid "FAQ Accordion Settings"
 msgstr ""
 
-#: src/Modules/FAQ.php:67
+#: src/Modules/FAQ.php:120
 msgid "Use the shortcode to output styled FAQs in your content:"
 msgstr ""
 
-#: src/Modules/FAQ.php:74
+#: src/Modules/FAQ.php:127
 msgid "FAQPage Schema (JSON-LD)"
 msgstr ""
 
-#: src/Modules/FAQ.php:77
+#: src/Modules/FAQ.php:130
 msgid "Auto (Disable if SEO plugin detected)"
 msgstr ""
 
-#: src/Modules/FAQ.php:78
+#: src/Modules/FAQ.php:131
 msgid "Always Output Schema"
 msgstr ""
 
-#: src/Modules/FAQ.php:79
+#: src/Modules/FAQ.php:132
 msgid "Never Output Schema"
 msgstr ""
 
-#: src/Modules/FAQ.php:81
+#: src/Modules/FAQ.php:134
 msgid "To prevent Google Search Console errors, we recommend Auto. We will safely step aside and let your SEO plugin handle schema if we detect Yoast, RankMath, or SureRank are active."
 msgstr ""
 
-#: src/Modules/ContentBox.php:87 src/Modules/ContentBox.php:107
-msgid "Content Box Settings"
-msgstr ""
-
-#: src/Modules/ContentBox.php:88
-msgid "Content Box"
-msgstr ""
-
-#: src/Modules/ContentBox.php:108
-msgid "These are the site-wide defaults. Override any field directly in the shortcode: "
-msgstr ""
-
-#: src/Modules/ContentBox.php:117
-msgid "Box Type"
-msgstr ""
-
-#: src/Modules/ContentBox.php:120
-msgid "Newsletter CTA (external form)"
-msgstr ""
-
-#: src/Modules/ContentBox.php:121
-msgid "File Download (built-in form + webhook)"
-msgstr ""
-
-#: src/Modules/ContentBox.php:123
-msgid "Override per shortcode with type=\"cta\" or type=\"email\"."
-msgstr ""
-
-#: src/Modules/ContentBox.php:128
-msgid "Eyebrow"
-msgstr ""
-
-#: src/Modules/ContentBox.php:129
-msgid "e.g. Free Resource"
-msgstr ""
-
-#: src/Modules/ContentBox.php:133
-msgid "Heading"
-msgstr ""
-
-#: src/Modules/ContentBox.php:138
-msgid "Description"
-msgstr ""
-
-#: src/Modules/ContentBox.php:146
-msgid "Text Only"
-msgstr ""
-
-#: src/Modules/ContentBox.php:147
-msgid "Image Left"
-msgstr ""
-
-#: src/Modules/ContentBox.php:148
-msgid "Image Right"
-msgstr ""
-
-#: src/Modules/ContentBox.php:149
-msgid "Image Top"
-msgstr ""
-
-#: src/Modules/ContentBox.php:155
-msgid "Image URL"
-msgstr ""
-
-#: src/Modules/ContentBox.php:161
-msgid "Form Shortcode"
-msgstr ""
-
-#: src/Modules/ContentBox.php:164
-msgid "Paste your opt-in form shortcode. Accepts any shortcode-based form plugin."
-msgstr ""
-
-#: src/Modules/ContentBox.php:170
-msgid "Webhook URL"
-msgstr ""
-
-#: src/Modules/ContentBox.php:173
-msgid "POSTs name, email, file_url, post_id, and source to this URL. Works with Make.com, Zapier, or n8n."
-msgstr ""
-
-#: src/Modules/ContentBox.php:177
-msgid "Button Text"
-msgstr ""
-
-#: src/Modules/ContentBox.php:187
-msgid "Shortcode Reference"
-msgstr ""
-
-#: src/Modules/ContentBox.php:189
-msgid "Attribute"
-msgstr ""
-
-#: src/Modules/ContentBox.php:189
-msgid "Default"
-msgstr ""
-
-#: src/Modules/ContentBox.php:189
-msgid "Notes"
-msgstr ""
-
-#: src/Modules/ContentBox.php:191
-msgid "\"cta\" or \"email\""
-msgstr ""
-
-#: src/Modules/ContentBox.php:192
-msgid "Small label above the heading"
-msgstr ""
-
-#: src/Modules/ContentBox.php:193
-msgid "Main headline"
-msgstr ""
-
-#: src/Modules/ContentBox.php:194
-msgid "Body copy (HTML allowed)"
-msgstr ""
-
-#: src/Modules/ContentBox.php:195
-msgid "text / image-left / image-right / image-top"
-msgstr ""
-
-#: src/Modules/ContentBox.php:196
-msgid "Image URL (required for image layouts)"
-msgstr ""
-
-#: src/Modules/ContentBox.php:197
-msgid "type=\"cta\" only — form shortcode"
-msgstr ""
-
-#: src/Modules/ContentBox.php:198
-msgid "none"
-msgstr ""
-
-#: src/Modules/ContentBox.php:198
-msgid "type=\"email\" only — the download URL passed to the webhook"
-msgstr ""
-
-#: src/Modules/ContentBox.php:199
-msgid "type=\"email\" only — override the global webhook per article"
-msgstr ""
-
-#: src/Modules/ContentBox.php:200
-msgid "type=\"email\" only — submit button label"
-msgstr ""
-
-#: src/Modules/ContentBox.php:334
-msgid "Your Name"
-msgstr ""
-
-#: src/Modules/ContentBox.php:339
-msgid "Your Email"
-msgstr ""
-
-#: src/Modules/ContentBox.php:374
-msgid "Sending…"
-msgstr ""
-
-#: src/Modules/ContentBox.php:387 src/Modules/ContentBox.php:466
-msgid "Success! Check your email for the download link."
-msgstr ""
-
-#: src/Modules/ContentBox.php:395
-msgid "An error occurred. Please try again."
-msgstr ""
-
-#: src/Modules/ContentBox.php:405
-msgid "Network error. Please try again."
-msgstr ""
-
-#: src/Modules/ContentBox.php:445
-msgid "Please enter a valid email address."
-msgstr ""
-
-#: src/Modules/ContentBox.php:448
-msgid "This form is not configured yet. Please contact the site owner."
-msgstr ""
-
-#: src/Modules/ContentBox.php:463
-msgid "Could not reach the delivery server. Please try again shortly."
+#: src/Modules/KeyTakeaways.php:180
+#: build/key-takeaways/index.js:1
+#: src/blocks/key-takeaways/index.js:122
+msgid "Key takeaways"
 msgstr ""
 
 #: src/Modules/TableOfContents.php:278
@@ -667,6 +633,10 @@ msgstr ""
 msgid "(Only renders where you place the [zehoro_toc] shortcode)"
 msgstr ""
 
+#: src/Modules/TableOfContents.php:298
+msgid "Active Post Types"
+msgstr ""
+
 #: src/Modules/TableOfContents.php:311
 msgid "Select which post types the TOC should be generated for."
 msgstr ""
@@ -675,23 +645,590 @@ msgstr ""
 msgid "Save Settings"
 msgstr ""
 
-#: src/Modules/ArticleSchema.php:214
-msgid "Schema output paused."
+#: build/author-box/index.js:1
+#: build/pros-cons/index.js:2
+#: src/blocks/author-box/index.js:31
+#: src/blocks/pros-cons/index.js:123
+msgid "Show"
 msgstr ""
 
-#: src/Modules/ArticleSchema.php:217
-#, php-format
-msgid "%s is active and already emits structured data — Zehoro won't duplicate it."
+#: build/author-box/index.js:1
+#: src/blocks/author-box/index.js:35
+msgid "Post author (Person)"
 msgstr ""
 
-#: src/Modules/ArticleSchema.php:218
-msgid "An SEO plugin is active and already emits structured data — Zehoro won't duplicate it."
+#: build/author-box/index.js:1
+#: src/blocks/author-box/index.js:42
+msgid "Organization"
 msgstr ""
 
-#: src/Modules/ArticleSchema.php:221
-msgid "To keep Zehoro's schema instead, set Zehoro → Settings → Schema output to “Always”, or:"
+#: build/author-box/index.js:1
+#: src/blocks/author-box/index.js:49
+msgid "Person auto-fills from the post author profile."
 msgstr ""
 
-#: zehoro-toolkit.php:91
-msgid "Settings"
+#: build/author-box/index.js:1
+#: src/blocks/author-box/index.js:57
+msgid "Show bio"
+msgstr ""
+
+#: build/author-box/index.js:1
+#: src/blocks/author-box/index.js:67
+msgid "Show credentials"
+msgstr ""
+
+#: build/author-box/index.js:1
+#: src/blocks/author-box/index.js:78
+msgid "Show social links"
+msgstr ""
+
+#. translators: %d: the star rating value (1–5)
+#: build/evaluation/index.js:2
+#: src/blocks/evaluation/edit.js:33
+#, js-format
+msgid "%d star"
+msgid_plural "%d stars"
+msgstr[0] ""
+msgstr[1] ""
+
+#: build/evaluation/index.js:2
+#: src/blocks/evaluation/edit.js:70
+msgid "Remove"
+msgstr ""
+
+#: build/evaluation/index.js:2
+#: src/blocks/evaluation/edit.js:76
+msgid "Add item"
+msgstr ""
+
+#: build/evaluation/index.js:2
+#: src/blocks/evaluation/edit.js:166
+msgid "Subject"
+msgstr ""
+
+#: build/evaluation/index.js:2
+#: src/blocks/evaluation/edit.js:168
+msgid "What you tested"
+msgstr ""
+
+#: build/evaluation/index.js:2
+#: src/blocks/evaluation/edit.js:174
+msgid "Subject link (optional)"
+msgstr ""
+
+#: build/evaluation/index.js:2
+#: src/blocks/evaluation/edit.js:175
+msgid "The third-party product/service page. Used for schema."
+msgstr ""
+
+#: build/evaluation/index.js:2
+#: src/blocks/evaluation/edit.js:182
+msgid "Subject heading level"
+msgstr ""
+
+#: build/evaluation/index.js:2
+#: src/blocks/evaluation/edit.js:195
+msgid "Review schema"
+msgstr ""
+
+#: build/evaluation/index.js:2
+#: src/blocks/evaluation/edit.js:197
+msgid "Emit Review JSON-LD"
+msgstr ""
+
+#: build/evaluation/index.js:2
+#: src/blocks/evaluation/edit.js:198
+msgid "Structured data for a genuine third-party review. Auto-suppressed for a review of your own site."
+msgstr ""
+
+#: build/evaluation/index.js:2
+#: src/blocks/evaluation/edit.js:205
+msgid "Item type (schema.org)"
+msgstr ""
+
+#: build/evaluation/index.js:2
+#: src/blocks/evaluation/edit.js:208
+msgid "Product"
+msgstr ""
+
+#: build/evaluation/index.js:2
+#: src/blocks/evaluation/edit.js:209
+msgid "Book"
+msgstr ""
+
+#: build/evaluation/index.js:2
+#: src/blocks/evaluation/edit.js:210
+msgid "Software / App"
+msgstr ""
+
+#: build/evaluation/index.js:2
+#: src/blocks/evaluation/edit.js:211
+msgid "Movie"
+msgstr ""
+
+#: build/evaluation/index.js:2
+#: src/blocks/evaluation/edit.js:212
+msgid "Music Album"
+msgstr ""
+
+#: build/evaluation/index.js:2
+#: src/blocks/evaluation/edit.js:213
+msgid "Local Business"
+msgstr ""
+
+#: build/evaluation/index.js:2
+#: src/blocks/evaluation/edit.js:214
+msgid "Course"
+msgstr ""
+
+#: build/evaluation/index.js:2
+#: src/blocks/evaluation/edit.js:215
+msgid "Recipe"
+msgstr ""
+
+#: build/evaluation/index.js:2
+#: src/blocks/evaluation/edit.js:216
+msgid "Game"
+msgstr ""
+
+#: build/evaluation/index.js:2
+#: src/blocks/evaluation/edit.js:225
+msgid "This looks like a review of your own site or brand. Review schema will be suppressed to stay within Google’s guidelines — the visible card still shows."
+msgstr ""
+
+#: build/evaluation/index.js:2
+#: src/blocks/evaluation/edit.js:235
+msgid "What you tested…"
+msgstr ""
+
+#: build/evaluation/index.js:2
+#: src/blocks/evaluation/edit.js:249
+msgid "Rating criteria"
+msgstr ""
+
+#: build/evaluation/index.js:2
+#: src/blocks/evaluation/edit.js:253
+msgid "Criterion…"
+msgstr ""
+
+#: build/evaluation/index.js:2
+#: src/blocks/evaluation/edit.js:266
+msgid "Remove criterion"
+msgstr ""
+
+#: build/evaluation/index.js:2
+#: src/blocks/evaluation/edit.js:272
+msgid "Add criterion"
+msgstr ""
+
+#: build/evaluation/index.js:2
+#: src/blocks/evaluation/edit.js:279
+msgid "What you did, for how long, against what…"
+msgstr ""
+
+#: build/evaluation/index.js:2
+#: src/blocks/evaluation/edit.js:292
+msgid "A pro…"
+msgstr ""
+
+#: build/evaluation/index.js:2
+#: src/blocks/evaluation/edit.js:298
+msgid "A con…"
+msgstr ""
+
+#: build/evaluation/index.js:2
+#: src/blocks/evaluation/edit.js:304
+msgid "Verdict"
+msgstr ""
+
+#: build/evaluation/index.js:2
+#: src/blocks/evaluation/edit.js:305
+msgid "The bottom line…"
+msgstr ""
+
+#: build/faq-item/index.js:1
+#: src/blocks/faq-item/index.js:33
+msgid "Answer…"
+msgstr ""
+
+#: build/faq-item/index.js:1
+#: src/blocks/faq-item/index.js:43
+msgid "FAQ item"
+msgstr ""
+
+#: build/faq-item/index.js:1
+#: src/blocks/faq-item/index.js:45
+msgid "Open by default"
+msgstr ""
+
+#: build/faq-item/index.js:1
+#: src/blocks/faq-item/index.js:64
+msgid "Question?"
+msgstr ""
+
+#: build/key-takeaways/index.js:1
+#: src/blocks/key-takeaways/index.js:46
+#: src/blocks/key-takeaways/index.js:69
+msgid "Bulleted list"
+msgstr ""
+
+#: build/key-takeaways/index.js:1
+#: src/blocks/key-takeaways/index.js:52
+msgid "Paragraph (TL;DR)"
+msgstr ""
+
+#: build/key-takeaways/index.js:1
+#: src/blocks/key-takeaways/index.js:61
+#: src/blocks/key-takeaways/index.js:190
+msgid "Key Takeaways"
+msgstr ""
+
+#: build/key-takeaways/index.js:1
+#: src/blocks/key-takeaways/index.js:65
+msgid "Format"
+msgstr ""
+
+#: build/key-takeaways/index.js:1
+#: src/blocks/key-takeaways/index.js:73
+msgid "Short paragraph (TL;DR)"
+msgstr ""
+
+#: build/key-takeaways/index.js:1
+#: src/blocks/key-takeaways/index.js:83
+msgid "Best placed right after your introduction."
+msgstr ""
+
+#: build/key-takeaways/index.js:1
+#: build/pros-cons/index.js:2
+#: src/blocks/key-takeaways/index.js:91
+#: src/blocks/pros-cons/index.js:146
+msgid "Heading level"
+msgstr ""
+
+#: build/key-takeaways/index.js:1
+#: build/pros-cons/index.js:2
+#: src/blocks/key-takeaways/index.js:102
+#: src/blocks/pros-cons/index.js:157
+msgid "Keep it below your post title (H1)."
+msgstr ""
+
+#: build/key-takeaways/index.js:1
+#: src/blocks/key-takeaways/index.js:133
+msgid "Write a short, answer-first summary a reader — or an AI — can quote…"
+msgstr ""
+
+#: build/key-takeaways/index.js:1
+#: src/blocks/key-takeaways/index.js:152
+msgid "Add a key takeaway…"
+msgstr ""
+
+#: build/key-takeaways/index.js:1
+#: src/blocks/key-takeaways/index.js:232
+msgid "TL;DR (legacy)"
+msgstr ""
+
+#: build/key-takeaways/index.js:1
+#: src/blocks/key-takeaways/index.js:235
+msgid "Retired block — transform to Key Takeaways."
+msgstr ""
+
+#: build/key-takeaways/index.js:1
+#: src/blocks/key-takeaways/index.js:198
+msgid "Summary…"
+msgstr ""
+
+#: build/pros-cons/index.js:1
+#: src/blocks/pros-cons/index.js:47
+msgid "Add a pro…"
+msgstr ""
+
+#: build/pros-cons/index.js:1
+#: src/blocks/pros-cons/index.js:48
+msgid "Add a con…"
+msgstr ""
+
+#. translators: %s: the block label, e.g. "Pros".
+#: build/pros-cons/index.js:2
+#: src/blocks/pros-cons/index.js:264
+#, js-format
+msgid "%s (legacy)"
+msgstr ""
+
+#: build/pros-cons/index.js:2
+#: src/blocks/pros-cons/index.js:269
+msgid "Retired block — transform to Pros & Cons."
+msgstr ""
+
+#: build/pros-cons/index.js:2
+#: src/blocks/pros-cons/index.js:94
+#: src/blocks/pros-cons/index.js:127
+msgid "Pros and cons"
+msgstr ""
+
+#: build/pros-cons/index.js:2
+#: src/blocks/pros-cons/index.js:98
+msgid "Both"
+msgstr ""
+
+#: build/pros-cons/index.js:2
+#: src/blocks/pros-cons/index.js:101
+#: src/blocks/pros-cons/index.js:131
+msgid "Pros only"
+msgstr ""
+
+#: build/pros-cons/index.js:2
+#: src/blocks/pros-cons/index.js:108
+#: src/blocks/pros-cons/index.js:135
+msgid "Cons only"
+msgstr ""
+
+#: build/pros-cons/index.js:2
+#: src/blocks/pros-cons/index.js:119
+msgid "Pros & Cons"
+msgstr ""
+
+#: build/pros-cons/index.js:2
+#: src/blocks/pros-cons/index.js:308
+msgid "Pros & Cons (legacy)"
+msgstr ""
+
+#: build/pros-cons/index.js:2
+#: src/blocks/pros-cons/index.js:311
+msgid "Retired container — transform to Pros & Cons."
+msgstr ""
+
+#: build/author-box/block.json
+#: src/blocks/author-box/block.json
+msgctxt "block title"
+msgid "Author Box"
+msgstr ""
+
+#: build/author-box/block.json
+#: src/blocks/author-box/block.json
+msgctxt "block description"
+msgid "An E-E-A-T trust card — the post author (or your organization) with bio, credentials and links. Auto-fills from the author profile."
+msgstr ""
+
+#: build/author-box/block.json
+#: src/blocks/author-box/block.json
+msgctxt "block keyword"
+msgid "author"
+msgstr ""
+
+#: build/author-box/block.json
+#: src/blocks/author-box/block.json
+msgctxt "block keyword"
+msgid "bio"
+msgstr ""
+
+#: build/author-box/block.json
+#: src/blocks/author-box/block.json
+msgctxt "block keyword"
+msgid "byline"
+msgstr ""
+
+#: build/author-box/block.json
+#: src/blocks/author-box/block.json
+msgctxt "block keyword"
+msgid "e-e-a-t"
+msgstr ""
+
+#: build/author-box/block.json
+#: src/blocks/author-box/block.json
+msgctxt "block keyword"
+msgid "about"
+msgstr ""
+
+#: build/evaluation/block.json
+#: src/blocks/evaluation/block.json
+msgctxt "block title"
+msgid "We Tested"
+msgstr ""
+
+#: build/evaluation/block.json
+#: src/blocks/evaluation/block.json
+msgctxt "block description"
+msgid "A hands-on evaluation scorecard: how you tested, per-criteria scores, pros/cons, and a verdict. Penalty-safe Review schema for third-party subjects only."
+msgstr ""
+
+#: build/evaluation/block.json
+#: src/blocks/evaluation/block.json
+msgctxt "block keyword"
+msgid "review"
+msgstr ""
+
+#: build/evaluation/block.json
+#: src/blocks/evaluation/block.json
+msgctxt "block keyword"
+msgid "rating"
+msgstr ""
+
+#: build/evaluation/block.json
+#: src/blocks/evaluation/block.json
+msgctxt "block keyword"
+msgid "tested"
+msgstr ""
+
+#: build/evaluation/block.json
+#: build/pros-cons/block.json
+#: src/blocks/evaluation/block.json
+#: src/blocks/pros-cons/block.json
+msgctxt "block keyword"
+msgid "verdict"
+msgstr ""
+
+#: build/evaluation/block.json
+#: src/blocks/evaluation/block.json
+msgctxt "block keyword"
+msgid "evaluation"
+msgstr ""
+
+#: build/evaluation/block.json
+#: src/blocks/evaluation/block.json
+msgctxt "block keyword"
+msgid "score"
+msgstr ""
+
+#: build/faq-item/block.json
+#: src/blocks/faq-item/block.json
+msgctxt "block title"
+msgid "FAQ Item"
+msgstr ""
+
+#: build/faq-item/block.json
+#: src/blocks/faq-item/block.json
+msgctxt "block description"
+msgid "A single question and answer in an FAQ."
+msgstr ""
+
+#: build/faq/block.json
+#: src/blocks/faq/block.json
+msgctxt "block title"
+msgid "FAQ"
+msgstr ""
+
+#: build/faq/block.json
+#: src/blocks/faq/block.json
+msgctxt "block description"
+msgid "A list of questions and answers as an accessible accordion — quotable, no schema baggage."
+msgstr ""
+
+#: build/faq/block.json
+#: src/blocks/faq/block.json
+msgctxt "block keyword"
+msgid "faq"
+msgstr ""
+
+#: build/faq/block.json
+#: src/blocks/faq/block.json
+msgctxt "block keyword"
+msgid "questions"
+msgstr ""
+
+#: build/faq/block.json
+#: src/blocks/faq/block.json
+msgctxt "block keyword"
+msgid "answers"
+msgstr ""
+
+#: build/faq/block.json
+#: src/blocks/faq/block.json
+msgctxt "block keyword"
+msgid "accordion"
+msgstr ""
+
+#: build/faq/block.json
+#: src/blocks/faq/block.json
+msgctxt "block keyword"
+msgid "q&a"
+msgstr ""
+
+#: build/key-takeaways/block.json
+#: src/blocks/key-takeaways/block.json
+msgctxt "block title"
+msgid "Key Takeaways"
+msgstr ""
+
+#: build/key-takeaways/block.json
+#: src/blocks/key-takeaways/block.json
+msgctxt "block description"
+msgid "An answer-first summary for the top of a post — scannable bullets or a short TL;DR that readers and AI answer engines can quote."
+msgstr ""
+
+#: build/key-takeaways/block.json
+#: src/blocks/key-takeaways/block.json
+msgctxt "block keyword"
+msgid "key takeaways"
+msgstr ""
+
+#: build/key-takeaways/block.json
+#: src/blocks/key-takeaways/block.json
+msgctxt "block keyword"
+msgid "tldr"
+msgstr ""
+
+#: build/key-takeaways/block.json
+#: src/blocks/key-takeaways/block.json
+msgctxt "block keyword"
+msgid "summary"
+msgstr ""
+
+#: build/key-takeaways/block.json
+#: src/blocks/key-takeaways/block.json
+msgctxt "block keyword"
+msgid "highlights"
+msgstr ""
+
+#: build/key-takeaways/block.json
+#: src/blocks/key-takeaways/block.json
+msgctxt "block keyword"
+msgid "in short"
+msgstr ""
+
+#: build/key-takeaways/block.json
+#: src/blocks/key-takeaways/block.json
+msgctxt "block keyword"
+msgid "at a glance"
+msgstr ""
+
+#: build/pros-cons/block.json
+#: src/blocks/pros-cons/block.json
+msgctxt "block title"
+msgid "Pros & Cons"
+msgstr ""
+
+#: build/pros-cons/block.json
+#: src/blocks/pros-cons/block.json
+msgctxt "block description"
+msgid "A scannable two-column Pros & Cons box for reviews and comparisons — or a single Pros or Cons list."
+msgstr ""
+
+#: build/pros-cons/block.json
+#: src/blocks/pros-cons/block.json
+msgctxt "block keyword"
+msgid "pros"
+msgstr ""
+
+#: build/pros-cons/block.json
+#: src/blocks/pros-cons/block.json
+msgctxt "block keyword"
+msgid "cons"
+msgstr ""
+
+#: build/pros-cons/block.json
+#: src/blocks/pros-cons/block.json
+msgctxt "block keyword"
+msgid "pros and cons"
+msgstr ""
+
+#: build/pros-cons/block.json
+#: src/blocks/pros-cons/block.json
+msgctxt "block keyword"
+msgid "advantages"
+msgstr ""
+
+#: build/pros-cons/block.json
+#: src/blocks/pros-cons/block.json
+msgctxt "block keyword"
+msgid "disadvantages"
 msgstr ""
