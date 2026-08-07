@@ -38,8 +38,14 @@ final class DataEraser {
 	 * them: erasing Free on a Free+Pro site must not destroy Pro's Content Box
 	 * config, RSS post-type selection, Last Updated or Disclaimer settings.
 	 * When Pro is ABSENT they are true orphans and get erased as before.
+	 *
+	 * PUBLIC because this is the single declaration of the Free/Pro ownership
+	 * boundary and BOTH plugins need it: Free skips these when Pro is active,
+	 * and Pro's own eraser sweeps exactly these prefixes so the options aren't
+	 * orphaned by both erasers. Two hand-maintained copies would drift — and
+	 * that drift is precisely how they came to be erased by neither.
 	 */
-	private const MOVED_TO_PRO_OPTION_PREFIXES = [
+	public const MOVED_TO_PRO_OPTION_PREFIXES = [
 		'zehoro_box_',        'lkst_box_',
 		'zehoro_lu_',         'lkst_lu_',
 		'zehoro_disclaimer_', 'lkst_disclaimer_',

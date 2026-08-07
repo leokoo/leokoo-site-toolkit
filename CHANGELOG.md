@@ -18,6 +18,9 @@ Remediations from a wp.org submission audit, none of which change how content re
 - **Logging:** the `lkst_*` → `zehoro_*` rename-migrator log line is now gated behind `WP_DEBUG`.
 - Minor: null-safe `the_content` handling in the TOC filter; `phpcs:ignore` annotations on the deactivation
   transient sweep; readme install step points at the Free "Modules" screen.
+- Internal: `DataEraser::MOVED_TO_PRO_OPTION_PREFIXES` is now public. It is the single declaration of the
+  Free/Pro ownership boundary and both plugins need it — Free skips those option families when Pro is active,
+  and Pro's eraser sweeps exactly the same list so they aren't orphaned by both. No behaviour change here.
 
 ## [1.36.1] - 2026-07-17
 
