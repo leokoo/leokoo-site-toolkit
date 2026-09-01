@@ -1,0 +1,24 @@
+{
+  "$schema": "https://schemas.wp.org/trunk/block.json",
+  "apiVersion": 3,
+  "name": "zehoro/faq",
+  "title": "FAQ",
+  "category": "zehoro-toolkit",
+  "icon": "editor-help",
+  "description": "A list of questions and answers as an accessible accordion — quotable, no schema baggage.",
+  "keywords": [
+    "faq",
+    "questions",
+    "answers",
+    "accordion",
+    "q&a"
+  ],
+  "textdomain": "zehoro-toolkit",
+  "supports": {
+    "html": false
+  },
+  "editorScript": "file:./index.js",
+  "editorStyle": "file:./index.css",
+  "style": "file:./style-index.css",
+  "render": "file:./render.php"
+}

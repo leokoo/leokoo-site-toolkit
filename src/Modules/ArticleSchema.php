@@ -91,7 +91,7 @@ class ArticleSchema implements ModuleInterface {
 
         $custom_url = get_the_author_meta( 'user_url', $author_id );
         if ( ! empty( $custom_url ) ) {
-            $author_schema['url'] = esc_url( $custom_url );
+            $author_schema['url'] = esc_url_raw( $custom_url );
         }
 
         // Read the canonical post-rename key first, falling back to the legacy one for installs
@@ -101,10 +101,34 @@ class ArticleSchema implements ModuleInterface {
         // RENAME-DRIFT-1 — an E-E-A-T signal loss).
         $linkedin = get_the_author_meta( 'zehoro_author_linkedin', $author_id ) ?: get_the_author_meta( 'lkst_author_linkedin', $author_id );
         $twitter  = get_the_author_meta( 'zehoro_author_twitter', $author_id ) ?: get_the_author_meta( 'lkst_author_twitter', $author_id );
-        $same_as  = array_values( array_filter( [ $linkedin, $twitter ] ) );
-        if ( ! empty( $same_as ) ) {
-            $author_schema['sameAs'] = array_map( 'esc_url', $same_as );
+        $same_as  = [ $linkedin, $twitter ];
+        // Enrich sameAs with the Author Box social profiles — the SAME links the
+        // visual card renders, so schema + card agree (a stronger E-E-A-T
+        // identity signal). Author Box: block #4.
+        foreach ( [ 'facebook', 'linkedin', 'x', 'youtube' ] as $net ) {
+            $url = get_the_author_meta( 'zehoro_social_' . $net, $author_id ) ?: get_the_author_meta( 'lkst_social_' . $net, $author_id );
+            if ( $url ) {
+                $same_as[] = $url;
+            }
         }
+        // esc_url_raw (NOT esc_url): these are JSON-LD data values, not HTML output.
+        // esc_url's default 'display' context rewrites `&` → `&#038;`, which would
+        // corrupt any query-string profile URL for the crawler (JSON has no entity
+        // decoding). Sanitise first, THEN filter, so a rejected scheme (e.g.
+        // javascript:) collapsed to '' cannot leave a blank entry in sameAs.
+        $same_as = array_values( array_unique( array_filter( array_map( 'esc_url_raw', $same_as ) ) ) );
+        if ( ! empty( $same_as ) ) {
+            $author_schema['sameAs'] = $same_as;
+        }
+
+        // The author works for the publisher Organization. Reference it by @id
+        // (set on the publisher node below) instead of inlining a second
+        // Organization — one canonical Org node, penalty-safe. NOTE: the schema
+        // author is ALWAYS the post's post_author Person, independent of the Author
+        // Box card's visual mode (person/organization) — the card is presentation;
+        // this JSON-LD is the canonical machine-readable identity.
+        $org_id = home_url() . '#organization';
+        $author_schema['worksFor'] = [ '@id' => $org_id ];
 
         // Core schema. @type already resolved above via get_schema_type() — the filterable
         // post-type → schema-type map (zehoro_article_schema_type_map). A stray hardcoded
@@ -123,6 +147,7 @@ class ArticleSchema implements ModuleInterface {
             'author'        => $author_schema,
             'publisher'     => [
                 '@type' => 'Organization',
+                '@id'   => $org_id,
                 'name'  => get_bloginfo( 'name' ),
                 'url'   => home_url(),
             ],
@@ -135,7 +160,7 @@ class ArticleSchema implements ModuleInterface {
             if ( $logo_url ) {
                 $schema['publisher']['logo'] = [
                     '@type' => 'ImageObject',
-                    'url'   => esc_url( $logo_url ),
+                    'url'   => esc_url_raw( $logo_url ),
                 ];
             }
         }
@@ -145,7 +170,7 @@ class ArticleSchema implements ModuleInterface {
         if ( $thumbnail_id ) {
             $image_url = wp_get_attachment_image_url( $thumbnail_id, 'full' );
             if ( $image_url ) {
-                $schema['image'] = esc_url( $image_url );
+                $schema['image'] = esc_url_raw( $image_url );
             }
         }
 

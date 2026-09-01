@@ -1,0 +1,71 @@
+{
+  "$schema": "https://schemas.wp.org/trunk/block.json",
+  "apiVersion": 3,
+  "name": "zehoro/evaluation",
+  "title": "We Tested",
+  "category": "zehoro-toolkit",
+  "icon": "chart-bar",
+  "description": "A hands-on evaluation scorecard: how you tested, per-criteria scores, pros/cons, and a verdict. Penalty-safe Review schema for third-party subjects only.",
+  "keywords": [
+    "review",
+    "rating",
+    "tested",
+    "verdict",
+    "evaluation",
+    "score"
+  ],
+  "textdomain": "zehoro-toolkit",
+  "supports": {
+    "html": false,
+    "anchor": true,
+    "align": [
+      "wide"
+    ]
+  },
+  "attributes": {
+    "subjectName": {
+      "type": "string",
+      "default": ""
+    },
+    "subjectUrl": {
+      "type": "string",
+      "default": ""
+    },
+    "itemType": {
+      "type": "string",
+      "default": "Product"
+    },
+    "criteria": {
+      "type": "array",
+      "default": []
+    },
+    "methodology": {
+      "type": "string",
+      "default": ""
+    },
+    "verdict": {
+      "type": "string",
+      "default": ""
+    },
+    "pros": {
+      "type": "array",
+      "default": []
+    },
+    "cons": {
+      "type": "array",
+      "default": []
+    },
+    "emitSchema": {
+      "type": "boolean",
+      "default": true
+    },
+    "headingLevel": {
+      "type": "number",
+      "default": 3
+    }
+  },
+  "editorScript": "file:./index.js",
+  "editorStyle": "file:./index.css",
+  "style": "file:./style-index.css",
+  "render": "file:./render.php"
+}

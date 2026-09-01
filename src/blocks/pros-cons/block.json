@@ -1,0 +1,45 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "zehoro/pros-cons",
+	"title": "Pros & Cons",
+	"category": "zehoro-toolkit",
+	"icon": "editor-ul",
+	"description": "A scannable two-column Pros & Cons box for reviews and comparisons — or a single Pros or Cons list.",
+	"keywords": [ "pros", "cons", "pros and cons", "advantages", "disadvantages", "verdict" ],
+	"textdomain": "zehoro-toolkit",
+	"supports": {
+		"html": false,
+		"anchor": true
+	},
+	"attributes": {
+		"prosTitle": {
+			"type": "string",
+			"default": ""
+		},
+		"consTitle": {
+			"type": "string",
+			"default": ""
+		},
+		"pros": {
+			"type": "string",
+			"default": ""
+		},
+		"cons": {
+			"type": "string",
+			"default": ""
+		},
+		"show": {
+			"type": "string",
+			"default": "both"
+		},
+		"headingLevel": {
+			"type": "number",
+			"default": 3
+		}
+	},
+	"editorScript": "file:./index.js",
+	"editorStyle": "file:./index.css",
+	"style": "file:./style-index.css",
+	"render": "file:./render.php"
+}

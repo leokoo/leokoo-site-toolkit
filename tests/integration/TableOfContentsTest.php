@@ -351,4 +351,46 @@ class TableOfContentsTest extends WP_UnitTestCase {
         $this->assertStringContainsString( 'href="#a"', $output );
         $this->assertStringContainsString( 'href="#b"', $output );
     }
+
+    // -------------------------------------------------------------------------
+    // Security + robustness regression guards
+    // -------------------------------------------------------------------------
+
+    public function test_toc_js_never_reintroduces_innerhtml() {
+        // Stored DOM-XSS guard: the scroll-spy must build its label with
+        // textContent / createElement, never innerHTML — an entity-encoded
+        // heading ("&lt;img onerror=…&gt;") would otherwise round-trip back
+        // into live markup when the marquee re-renders the active label.
+        $js = file_get_contents( dirname( __DIR__, 2 ) . '/assets/toc.js' );
+        $this->assertIsString( $js );
+        // Guard the sink, not the token: assignment TO innerHTML is the DOM-XSS
+        // vector (reading it, or naming it in a comment, is harmless).
+        $this->assertDoesNotMatchRegularExpression(
+            '/\.innerHTML\s*\+?=/',
+            $js,
+            'toc.js must not assign to innerHTML — heading text is untrusted (stored DOM-XSS).'
+        );
+    }
+
+    public function test_process_content_is_null_safe() {
+        // the_content can hand a filter null (an upstream filter returning
+        // null, an empty draft). The strict return type must not fatal —
+        // process_content coerces to string before touching it.
+        $this->post_with_headings( 1 );
+        $output = $this->toc->process_content( null );
+        $this->assertIsString( $output );
+    }
+
+    public function test_toc_markup_uses_translatable_default_label() {
+        // The front-end label is now translatable; the English source string
+        // must still render by default so untranslated sites are unchanged.
+        global $lkst_toc_items;
+        $lkst_toc_items = [
+            [ 'level' => '2', 'id' => 'a', 'text' => 'A' ],
+            [ 'level' => '2', 'id' => 'b', 'text' => 'B' ],
+        ];
+        $output = $this->toc->render_shortcode();
+        $this->assertStringContainsString( 'Sections in this article', $output );
+        $this->assertStringContainsString( 'BROWSE', $output );
+    }
 }

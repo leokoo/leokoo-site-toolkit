@@ -2,6 +2,180 @@
 
 All notable changes to the **Zehoro Toolkit** will be documented in this file.
 
+## [1.36.2] - 2026-07-21
+
+### Fixed — wp.org review-readiness hardening
+Remediations from a wp.org submission audit, none of which change how content renders:
+- **Table of Contents scroll-spy (security):** the active-section label is now built with `textContent` /
+  `document.createElement` instead of `innerHTML`, closing a stored DOM-XSS path where an entity-encoded
+  heading (e.g. `&lt;img onerror=…&gt;`) could round-trip back into live markup in the marquee label.
+- **Noscript module-save:** the no-JS save fallback moved off the render callback onto `admin_init`, so its
+  POST-Redirect-GET redirect fires before headers are sent (previously silently dropped).
+- **PHP 8.1 deprecation:** hidden per-module settings pages register with `''` instead of `null` as the
+  parent slug, so `add_submenu_page()` no longer emits a deprecation notice.
+- **i18n:** front-end Table of Contents strings ("BROWSE", the default section label, the toggle aria-label)
+  are translatable, and the JS scroll-to-top reset label is localized in lockstep.
+- **Logging:** the `lkst_*` → `zehoro_*` rename-migrator log line is now gated behind `WP_DEBUG`.
+- Minor: null-safe `the_content` handling in the TOC filter; `phpcs:ignore` annotations on the deactivation
+  transient sweep; readme install step points at the Free "Modules" screen.
+- Internal: `DataEraser::MOVED_TO_PRO_OPTION_PREFIXES` is now public. It is the single declaration of the
+  Free/Pro ownership boundary and both plugins need it — Free skips those option families when Pro is active,
+  and Pro's eraser sweeps exactly the same list so they aren't orphaned by both. No behaviour change here.
+
+## [1.36.1] - 2026-07-17
+
+### Fixed — stylesheet down to Free-owned rules only
+Removed four dead CSS sections (`#lkst-sticky-bar`, `.lkst-freshness-log`, `.lkst-affiliate-disclosure`,
+`.lkst-inline-post`) whose emitters were renamed to `zehoro-*` inline-styled markup in Pro long ago — the
+class strings no longer exist anywhere outside this stylesheet. The remaining sections all have a live
+consumer, except the ticker/post-nav rules, which stay deliberately until leokoo.com migrates off the placed
+markup of those retired modules.
+
+## [1.36.0] - 2026-07-17
+
+### Changed — lean Free reorg stage C (final): the last four modules relocate to Pro
+**Moves `content_box`, `cta_swap`, `rss_support`, `last_updated`** to Zehoro Toolkit Pro 1.220.0, completing
+the reorg: Free now ships exactly its wordpress.org funnel — the 5 launch blocks + Table of Contents + Article
+schema + Visual Styles. The mid-post CTA styles (shared with Pro's ContentStream), the last-updated pill
+styles, and the CTA-swap assets all travel to Pro; the RSS Feed settings page (previously rendered by Free's
+Dashboard) moves into the Pro module itself — same option keys and page slug, so existing sites keep their
+settings. Shortcode aliases (`[lkst_box]`, `[lkst_last_updated]`) and the AJAX email-capture contract are
+unchanged.
+
+## [1.35.0] - 2026-07-17
+
+### Changed — lean Free reorg stage B: five more modules relocate to Pro
+**Moves `callout`, `steps`, `disclosure` (Disclaimer), `category_pills`, `home_filter_pills`** to Zehoro
+Toolkit Pro 1.219.0. Block names stay `lkst/*` (existing content renders identically on Free+Pro sites); the
+steps + callout CSS travels with the blocks, and the pill styles ship as Pro's own `assets/pills.css` (loaded
+on the archive/home views the pills render on — the modules no longer force Free's global stylesheet). On
+sites running Pro everything keeps working via the shared module registry + `ModuleSeeder`; Free-only sites no
+longer ship these (a static callout's saved content still renders, unstyled).
+
+## [1.34.0] - 2026-07-17
+
+### Changed — lean Free: editorial/utility modules moving to Pro (reorg stage A)
+Free is being curated down to its wordpress.org funnel — the 5 launch blocks (Key Takeaways, Pros & Cons, FAQ,
+Author Box, "We Tested") + Table of Contents + Article schema + Styles. Modules with no high-intent-install
+keyword are relocating to Zehoro Toolkit Pro. **Stage A moves `archive_cleanup`, `stat_callout`,
+`inline_product`, `testimonial`** (block names `lkst/*` unchanged, so existing content renders identically; the
+blocks' CSS travels with them). On sites running Pro these modules keep working (Pro re-registers them into the
+shared module registry and activates them once via `ModuleSeeder`); Free-only sites no longer ship them.
+
+## [1.33.0] - 2026-07-16
+
+### Added — "We Tested" evaluation block (launch block #5)
+`zehoro/evaluation`: an editorial evaluation scorecard — a "how we tested" methodology note, per-criteria
+scores (auto-averaged into an overall score), pros/cons, and a verdict. Theme-neutral, server-rendered through
+one seam. It's the trust-signal counterpart to Pro's affiliate Review Box — no price, no buy-buttons (those
+stay in Pro).
+
+Unlike the other launch blocks (which emit no schema), this one **can** emit `Review` JSON-LD — but behind a
+hard, code-level **self-serving guardrail**: a "review" of your own site/brand is exactly what Google's spam
+policy penalises, so schema is suppressed automatically when the reviewed subject is this site — a link to the
+same host (including `www.`, subdomains, and root-relative URLs) or a name matching the site name. Only genuine
+third-party subjects get structured data — one Review per
+URL, `itemReviewed` restricted to an allowlist of schema.org types, `</script>` breakout neutralised, and WP
+Review Pro wins if active. The editor shows a live warning when a subject looks self-serving.
+
+### Fixed — a new default module no longer ships dark on existing sites
+`zehoro_active_modules` is a stored positive allowlist with no default-merge (so a deactivated module stays
+off). The side-effect: a brand-new default module was absent from every existing site's stored list and would
+never activate. The rename migrator now introduces each new default module **once** (opt-out model — it lights
+up on upgrade, but a later user deactivation sticks), tracked in `zehoro_seen_new_modules`.
+
+## [1.32.0] - 2026-07-16
+
+### Added — Author Box block (E-E-A-T trust card; launch block #4)
+`zehoro/author-box`: a theme-neutral author trust card that **auto-fills from the post author** — avatar,
+name, tagline, bio, credential chips, and social links — with a one-click **Organization mode** (site name,
+logo, description) for company-authored posts. Per-section toggles (bio / credentials / socials). Server-rendered
+through one seam; the editor preview is a real `ServerSideRender` of that seam, so what you see is what ships.
+The block emits **no schema of its own** — it is the visible card only.
+
+### Changed — richer author E-E-A-T in Article schema (no duplicate nodes)
+`ArticleSchema` now models the author as a real person *inside your organization*: the author `Person` gains
+`worksFor` referencing the publisher `Organization` **by the same `@id`** (one canonical Org node, never a
+duplicate), and the author's `sameAs` is enriched with their configured social profiles. This is where the
+author's structured identity lives — the card renders, the schema attests, with no overlap between them.
+Non-duplication with a dedicated SEO plugin's schema is preserved (Article schema stays opt-in / off when a
+schema plugin owns it).
+
+### Fixed — JSON-LD URL escaping + safer author resolution (Refuter audit)
+Article schema URLs (`sameAs`, author `url`, publisher `logo`, `image`) now use `esc_url_raw` instead of
+`esc_url` — the display-context escaper turned `&` into `&#038;`, corrupting any query-string profile URL for
+the crawler; a rejected scheme is dropped rather than leaving a blank `sameAs` entry. The Author Box author
+resolver now falls back to the queried object **only when it is a post**, so a Person card placed on a
+category/author archive can no longer misread a term/user id as a post id and render an unrelated author.
+
+## [1.31.0] - 2026-07-12
+
+### Added — FAQ block (accessible accordion, no schema; launch block #3)
+`zehoro/faq` + `zehoro/faq-item`: a question-and-answer accordion built on native `<details>`/`<summary>`
+(keyboard- and screen-reader-accessible), with **rich answers** (inner blocks — paragraphs, lists) and an
+"open by default" toggle per item. Server-rendered through one seam; theme-neutral. **No FAQPage JSON-LD** —
+Google retired FAQ rich results on 7 May 2026, so the block leads on the visible, quotable accordion rather
+than penalty-adjacent markup. The existing `[zehoro_faq]` shortcode is unchanged for backward-compat.
+
+### Fixed — heading/title/question no longer double-HTML-encoded
+RichText serializes its value entity-encoded, so a naive `wp_strip_all_tags()` + `esc_html()` double-encoded
+the Key Takeaways heading, the Pros/Cons titles, and the FAQ question — `Terms & Conditions` rendered as
+literal `Terms &amp; Conditions`. A shared `BlockSanitize::plain_text()` now decodes entities before the single
+`esc_html()` at the output site (caught by the FAQ audit's cross-block lens).
+
+## [1.30.0] - 2026-07-12
+
+### Added — Pros & Cons block (consolidated, launch block #2)
+A single dynamic `zehoro/pros-cons` block: a scannable two-column Pros & Cons box (semantic ✓/✕ list markers,
+theme-neutral, CSS-variable accents you can override) with a **show** toggle (both | pros | cons) that also
+covers a single Pros or Cons list. Server-rendered through one seam, heading level H2–H4, i18n, zero outbound
+HTTP, **no schema** (a standalone pros/cons list has no valid type — penalty-safe), empty renders nothing.
+
+### Changed — retired the 3-block `lkst/*` set; consolidated into one
+Replaces the retired `lkst/pros-cons` (an InnerBlocks container), `lkst/pros`, and `lkst/cons`. Backward-compat
+mirrors Key Takeaways: a `render_block` **safety net** renders any un-migrated legacy block through the seam
+(the container's dead wrapper stripped — no `lkst-*` leak); **editor bridges** keep all three valid in Gutenberg
+(no invalid-content warning) with a one-click transform to the consolidated block; and `wp zehoro migrate-blocks`
+converts them, **unpacking the container's inner pros/cons into one block**. The migrator is now a generalized
+**rename registry** (the `zehoro/block_migrations` filter) shared by every block rename.
+
+## [1.29.0] - 2026-07-12
+
+### Added — Key Takeaways block (first launch block; supersedes `lkst/tldr`)
+A dynamic, server-rendered **Key Takeaways** block (`zehoro/key-takeaways`) for the answer-first summary at
+the top of a post — scannable bullets *or* a short TL;DR paragraph, a quote-ready passage readers and AI
+answer engines can lift verbatim. WYSIWYG editor (heading + list/paragraph via a block-toolbar toggle),
+configurable heading level (H2–H4), theme-neutral in light + dark, semantic `<section>`/`<h*>`/`<ul>`, fully
+translatable, zero outbound HTTP, and **no schema markup** (there is no valid type — the value is the visible
+passage). Empty blocks render nothing rather than an empty box. All output flows through **one** server-side
+render seam (`Zehoro\Modules\KeyTakeaways::render_html()`) — the single interception point the future
+connected/smart version hooks without a block deprecation.
+
+### Changed — retired the legacy `lkst/tldr` block; renamed to `zehoro/key-takeaways`
+The brand-correct name + reframe. Existing content is preserved several ways:
+- The module slug `tldr` → `key_takeaways`. Because the active-module allowlist stores slugs **by value**, the
+  rename migrator now rewrites `tldr` → `key_takeaways` inside the stored `zehoro_active_modules` (own
+  idempotency flag, runs before module bootstrap) — without it the module would ship **dark** on every
+  upgrading site (block unregistered, safety net + CLI never hooked). Group/curation references updated.
+- A `render_block` **safety net** re-renders any un-migrated `lkst/tldr` through the seam **losslessly** —
+  multiple paragraphs, lists and inline images keep their structure instead of collapsing to a run-on line.
+- An **editor bridge** keeps un-migrated `lkst/tldr` blocks valid in Gutenberg (no "invalid content" warning,
+  no Block-Recovery data loss) and offers a one-click **transform to Key Takeaways**. Legacy content that used
+  the old default heading keeps its "Key Takeaways" title-case (no silent casing change on upgrade).
+- **`wp zehoro migrate-blocks`** (dry run by default; `--execute` to write) permanently rewrites clean inline
+  `lkst/tldr` into `zehoro/key-takeaways`. Block-structured legacy content (multi-paragraph / lists) is **left
+  as-is and reported**, never silently flattened — the safety net displays it; hand-convert if desired.
+
+The old pre-built `build/tldr` assets are removed. Block-name stability otherwise remains sacred — this is the
+sanctioned, non-breaking rename pattern for the wider `lkst-*` → `zehoro-*` cleanup.
+
+### Known limitations (deliberate, documented trade-offs)
+- The Key Takeaways editor uses `RichText multiline="li"` for the bullet list — soft-deprecated by WordPress
+  but fully functional through 6.9; a future migration to InnerBlocks would break the single attribute-driven
+  render seam, so it is a deliberate deferral (tracked for a pre-wp.org decision).
+- The block's dark styling keys off `prefers-color-scheme` (the OS setting, not the theme's); the
+  `currentColor` border keeps the box visible on a dark theme under a light OS regardless.
+
 ## [1.28.0] - 2026-07-07
 
 ### Changed — Modules page re-cut along Core vs Surface (the loop is one engine, not 34 toggles)

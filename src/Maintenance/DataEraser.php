@@ -31,6 +31,27 @@ final class DataEraser {
 		self::DELETE_ON_UNINSTALL_OPTION,
 	];
 
+	/**
+	 * Options whose OWNING MODULE moved to Pro in the lean-Free reorg. The
+	 * rename-migrator map still lists them (the lkst_→zehoro_ copy is
+	 * plugin-agnostic and must keep running), but Free's eraser no longer owns
+	 * them: erasing Free on a Free+Pro site must not destroy Pro's Content Box
+	 * config, RSS post-type selection, Last Updated or Disclaimer settings.
+	 * When Pro is ABSENT they are true orphans and get erased as before.
+	 *
+	 * PUBLIC because this is the single declaration of the Free/Pro ownership
+	 * boundary and BOTH plugins need it: Free skips these when Pro is active,
+	 * and Pro's own eraser sweeps exactly these prefixes so the options aren't
+	 * orphaned by both erasers. Two hand-maintained copies would drift — and
+	 * that drift is precisely how they came to be erased by neither.
+	 */
+	public const MOVED_TO_PRO_OPTION_PREFIXES = [
+		'zehoro_box_',        'lkst_box_',
+		'zehoro_lu_',         'lkst_lu_',
+		'zehoro_disclaimer_', 'lkst_disclaimer_',
+		'zehoro_rss_',        'lkst_rss_',
+	];
+
 	/** Author-box + dismissed-notice user meta (both prefixes; all users). */
 	private const USER_META = [
 		'lkst_social_facebook',  'zehoro_social_facebook',
@@ -62,7 +83,13 @@ final class DataEraser {
 				$options[] = $new;
 			}
 		}
+		// Pro present → keep the moved modules' settings (Pro owns them now).
+		// Pro absent → they're orphans; erase as before.
+		$pro_active = class_exists( '\\Zehoro\\Pro\\Modules\\ContentBox' );
 		foreach ( array_unique( $options ) as $opt ) {
+			if ( $pro_active && self::moved_to_pro( $opt ) ) {
+				continue;
+			}
 			delete_option( $opt );
 		}
 
@@ -89,5 +116,15 @@ final class DataEraser {
 		// serving the now-deleted rows. Fine here: this is a one-time wipe, not a
 		// hot path.
 		wp_cache_flush();
+	}
+
+	/** True when an option belongs to a module that moved to Pro. */
+	private static function moved_to_pro( string $option ): bool {
+		foreach ( self::MOVED_TO_PRO_OPTION_PREFIXES as $prefix ) {
+			if ( strpos( $option, $prefix ) === 0 ) {
+				return true;
+			}
+		}
+		return false;
 	}
 }

@@ -17,17 +17,19 @@ class ShortcodeFilterAliasesTest extends WP_UnitTestCase {
 
 	// ── Shortcode aliases ───────────────────────────────────────────────────
 
-	/** @return array<int, array{0: string, 1: string}> */
+	/**
+	 * The pills pairs moved to Pro in the lean-Free reorg stage B; the
+	 * ContentBox (lkst_box) + LastUpdated pairs moved in stage C — all now
+	 * covered by Pro's MovedStageBModulesTest / MovedStageCModulesTest.
+	 *
+	 * @return array<int, array{0: string, 1: string}>
+	 */
 	public static function shortcode_pairs(): array {
 		return [
 			[ 'lkst_author_box',         'zehoro_author_box' ],
 			[ 'lkst_author_socials',     'zehoro_author_socials' ],
-			[ 'lkst_box',                'zehoro_box' ],
 			[ 'lkst_faq',                'zehoro_faq' ],
-			[ 'lkst_home_filter_pills',  'zehoro_home_filter_pills' ],
-			[ 'lkst_last_updated',       'zehoro_last_updated' ],
 			[ 'lkst_toc',                'zehoro_toc' ],
-			[ 'lkst_top_category_pills', 'zehoro_top_category_pills' ],
 		];
 	}
 
@@ -71,24 +73,6 @@ class ShortcodeFilterAliasesTest extends WP_UnitTestCase {
 				'legacy'       => 'lkst/author_box/cta_secondary',
 				'trigger_path' => 'render_author_box',
 			],
-			[
-				'class'        => \Zehoro\Modules\CategoryPills::class,
-				'canonical'    => 'zehoro/category_pills/post_type',
-				'legacy'       => 'lkst/category_pills/post_type',
-				'trigger_path' => 'render_category_pills',
-			],
-			[
-				'class'        => \Zehoro\Modules\CategoryPills::class,
-				'canonical'    => 'zehoro/category_pills/taxonomy',
-				'legacy'       => 'lkst/category_pills/taxonomy',
-				'trigger_path' => 'render_category_pills',
-			],
-			[
-				'class'        => \Zehoro\Modules\HomeFilterPills::class,
-				'canonical'    => 'zehoro/home_filter_pills/items',
-				'legacy'       => 'lkst/home_filter_pills/items',
-				'trigger_path' => 'render_home_filter_pills',
-			],
 		];
 	}
 
@@ -122,14 +106,10 @@ class ShortcodeFilterAliasesTest extends WP_UnitTestCase {
 		static $booted = [];
 
 		$map = [
-			'lkst_author_box'         => \Zehoro\Modules\AuthorBox::class,
-			'lkst_author_socials'     => \Zehoro\Modules\AuthorBox::class,
-			'lkst_box'                => \Zehoro\Modules\ContentBox::class,
-			'lkst_faq'                => \Zehoro\Modules\FAQ::class,
-			'lkst_home_filter_pills'  => \Zehoro\Modules\HomeFilterPills::class,
-			'lkst_last_updated'       => \Zehoro\Modules\LastUpdated::class,
-			'lkst_toc'                => \Zehoro\Modules\TableOfContents::class,
-			'lkst_top_category_pills' => \Zehoro\Modules\CategoryPills::class,
+			'lkst_author_box'     => \Zehoro\Modules\AuthorBox::class,
+			'lkst_author_socials' => \Zehoro\Modules\AuthorBox::class,
+			'lkst_faq'            => \Zehoro\Modules\FAQ::class,
+			'lkst_toc'            => \Zehoro\Modules\TableOfContents::class,
 		];
 		$class = $map[ $legacy_name ] ?? null;
 		if ( $class === null || isset( $booted[ $class ] ) ) return;
@@ -149,17 +129,6 @@ class ShortcodeFilterAliasesTest extends WP_UnitTestCase {
 				global $wp_query;
 				$wp_query->queried_object_id = $post->ID;
 				$module->render_box( [ 'author_id' => $uid ] );
-				break;
-
-			case 'render_category_pills':
-				( new \Zehoro\Modules\CategoryPills() )->init();
-				( new \Zehoro\Modules\CategoryPills() )->render( [] );
-				break;
-
-			case 'render_home_filter_pills':
-				$mod = new \Zehoro\Modules\HomeFilterPills();
-				$mod->init();
-				$mod->render( [] );
 				break;
 		}
 	}

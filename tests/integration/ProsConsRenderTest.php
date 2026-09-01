@@ -1,0 +1,148 @@
+<?php
+/**
+ * Pros & Cons — the single render seam (ProsCons::render_html) + registration.
+ *
+ * Covers show modes (both/pros/cons), the empty contract, heading level,
+ * custom titles, XSS, wrapper passthrough, and end-to-end do_blocks render.
+ *
+ * @package Zehoro\Tests\Integration
+ */
+
+use Zehoro\Modules\ProsCons;
+
+class ProsConsRenderTest extends WP_UnitTestCase {
+
+	public function test_both_columns_render() {
+		$html = ProsCons::render_html( [
+			'show' => 'both',
+			'pros' => '<li>Fast</li><li>Cheap</li>',
+			'cons' => '<li>Loud</li>',
+		] );
+
+		$this->assertStringContainsString( '<div class="zehoro-pros-cons zehoro-pros-cons--both">', $html );
+		$this->assertStringContainsString( 'zehoro-pros-cons__pros', $html );
+		$this->assertStringContainsString( 'zehoro-pros-cons__cons', $html );
+		$this->assertStringContainsString( '<li>Fast</li>', $html );
+		$this->assertStringContainsString( '<li>Loud</li>', $html );
+		$this->assertStringContainsString( '>Pros</h3>', $html );
+		$this->assertStringContainsString( '>Cons</h3>', $html );
+	}
+
+	public function test_pros_only() {
+		$html = ProsCons::render_html( [ 'show' => 'pros', 'pros' => '<li>Good</li>', 'cons' => '<li>Bad</li>' ] );
+		$this->assertStringContainsString( 'zehoro-pros-cons--pros', $html );
+		$this->assertStringContainsString( 'zehoro-pros-cons__pros', $html );
+		$this->assertStringNotContainsString( 'zehoro-pros-cons__cons', $html );
+		$this->assertStringNotContainsString( '<li>Bad</li>', $html );
+	}
+
+	public function test_cons_only() {
+		$html = ProsCons::render_html( [ 'show' => 'cons', 'pros' => '<li>Good</li>', 'cons' => '<li>Bad</li>' ] );
+		$this->assertStringContainsString( 'zehoro-pros-cons--cons', $html );
+		$this->assertStringContainsString( 'zehoro-pros-cons__cons', $html );
+		$this->assertStringNotContainsString( 'zehoro-pros-cons__pros', $html );
+	}
+
+	public function test_empty_renders_nothing() {
+		$this->assertSame( '', ProsCons::render_html( [ 'show' => 'both' ] ) );
+		$this->assertSame( '', ProsCons::render_html( [ 'show' => 'both', 'pros' => '<li></li>', 'cons' => '' ] ) );
+	}
+
+	public function test_custom_titles() {
+		$html = ProsCons::render_html( [
+			'show'      => 'both',
+			'prosTitle' => 'Upsides',
+			'consTitle' => 'Downsides',
+			'pros'      => '<li>x</li>',
+			'cons'      => '<li>y</li>',
+		] );
+		$this->assertStringContainsString( '>Upsides</h3>', $html );
+		$this->assertStringContainsString( '>Downsides</h3>', $html );
+	}
+
+	public function test_heading_level_clamps() {
+		foreach ( [ 1, 5, 9 ] as $bad ) {
+			$html = ProsCons::render_html( [ 'show' => 'pros', 'headingLevel' => $bad, 'pros' => '<li>x</li>' ] );
+			$this->assertStringContainsString( '<h3 class="zehoro-pros-cons__title">', $html, "level {$bad} clamps to h3" );
+		}
+		$html = ProsCons::render_html( [ 'show' => 'pros', 'headingLevel' => 2, 'pros' => '<li>x</li>' ] );
+		$this->assertStringContainsString( '<h2 class="zehoro-pros-cons__title">', $html );
+	}
+
+	public function test_dangerous_markup_is_stripped() {
+		// Pin the real wp_kses guarantees (not just the <script> tag): event
+		// handlers, <img>, and javascript: hrefs must all be removed.
+		$html = ProsCons::render_html( [
+			'show' => 'pros',
+			'pros' => '<li>ok<a href="javascript:alert(1)" onclick="x">y</a><img src=z onerror=alert(1)><script>alert(1)</script></li>',
+		] );
+
+		$this->assertStringContainsString( 'ok', $html );
+		foreach ( [ '<script', 'javascript:', 'onclick', 'onerror', '<img' ] as $needle ) {
+			$this->assertStringNotContainsString( $needle, $html, "'{$needle}' must be stripped" );
+		}
+	}
+
+	public function test_title_is_escaped() {
+		$html = ProsCons::render_html( [
+			'show'      => 'pros',
+			'prosTitle' => '</h3><script>alert(1)</script>"x',
+			'pros'      => '<li>x</li>',
+		] );
+
+		$this->assertStringNotContainsString( '<script', $html );
+		$this->assertStringNotContainsString( '</h3><script>', $html );
+	}
+
+	public function test_title_ampersand_is_encoded_exactly_once() {
+		$html = ProsCons::render_html( [ 'show' => 'pros', 'prosTitle' => 'Wins &amp; Perks', 'pros' => '<li>x</li>' ] );
+		$this->assertStringContainsString( 'Wins &amp; Perks</h3>', $html );
+		$this->assertStringNotContainsString( '&amp;amp;', $html );
+	}
+
+	public function test_entity_encoded_script_in_title_is_neutralized() {
+		$html = ProsCons::render_html( [ 'show' => 'pros', 'prosTitle' => '&lt;script&gt;alert(1)&lt;/script&gt;', 'pros' => '<li>x</li>' ] );
+		$this->assertStringNotContainsString( '<script', $html );
+		$this->assertStringContainsString( '&lt;script&gt;', $html );
+	}
+
+	public function test_blank_title_falls_back_to_i18n_default() {
+		// block.json no longer hardcodes 'Pros'/'Cons', so the __() fallback must fire.
+		$html = ProsCons::render_html( [ 'show' => 'both', 'pros' => '<li>x</li>', 'cons' => '<li>y</li>' ] );
+		$this->assertStringContainsString( '>Pros</h3>', $html );
+		$this->assertStringContainsString( '>Cons</h3>', $html );
+	}
+
+	public function test_default_titles_render_through_do_blocks() {
+		// The real block path (WP merges block.json defaults) must still show titles.
+		$out = do_blocks( '<!-- wp:zehoro/pros-cons {"show":"both","pros":"<li>a</li>","cons":"<li>b</li>"} /-->' );
+		$this->assertStringContainsString( '>Pros</h3>', $out );
+		$this->assertStringContainsString( '>Cons</h3>', $out );
+	}
+
+	public function test_wrapper_passthrough() {
+		$html = ProsCons::render_html(
+			[ 'show' => 'pros', 'pros' => '<li>x</li>' ],
+			'class="zehoro-pros-cons zehoro-pros-cons--pros wp-block-zehoro-pros-cons" id="pc-1"'
+		);
+		$this->assertStringContainsString( 'id="pc-1"', $html );
+		$this->assertStringContainsString( 'wp-block-zehoro-pros-cons', $html );
+	}
+
+	// -------------------------------------------------------------------------
+	// Registration + end-to-end
+	// -------------------------------------------------------------------------
+
+	public function test_block_type_is_registered() {
+		$this->assertTrue( WP_Block_Type_Registry::get_instance()->is_registered( 'zehoro/pros-cons' ) );
+	}
+
+	public function test_end_to_end_render_via_do_blocks() {
+		$content = '<!-- wp:zehoro/pros-cons {"show":"both","pros":"<li>Alpha</li>","cons":"<li>Beta</li>"} /-->';
+		$out     = do_blocks( $content );
+
+		$this->assertStringContainsString( 'wp-block-zehoro-pros-cons', $out );
+		$this->assertStringContainsString( '<li>Alpha</li>', $out );
+		$this->assertStringContainsString( '<li>Beta</li>', $out );
+	}
+}

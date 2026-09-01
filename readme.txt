@@ -4,7 +4,7 @@ Tags: table of contents, faq, schema, author box, structured data
 Requires at least: 6.0
 Tested up to: 7.0
 Requires PHP: 7.4
-Stable tag: 1.25.3
+Stable tag: 1.36.2
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -19,10 +19,14 @@ It is **plug-and-play**: no API keys, no external accounts, no heavy configurati
 = What you get =
 
 * **Table of Contents** — automatic, accessible, generated from your headings.
-* **FAQ block** — renders an accordion *and* the matching FAQ structured data.
-* **Article schema (E-E-A-T)** — Article / author / publisher JSON-LD that reflects real authorship and freshness signals.
+* **Key Takeaways** — a scannable summary box for the top of a post.
+* **FAQ** — an accessible question-and-answer accordion (native `details`/`summary`).
+* **Pros & Cons** — a two-column verdict box for reviews and comparisons.
+* **"We Tested" evaluation** — a hands-on scorecard (per-criteria scores, methodology, verdict) with penalty-safe Review schema for genuine third-party subjects.
 * **Author boxes** — surface the human behind the post (an E-E-A-T signal that AI answer engines increasingly weigh).
-* **Editorial content blocks** — Callout, Pros/Cons, Comparison Table, Review Box and more, for review- and guide-style content.
+* **Article schema (E-E-A-T)** — Article / author / publisher JSON-LD that reflects real authorship and freshness signals.
+
+(More editorial and conversion blocks — Callout, Stat Callout, Steps, Testimonial, product boxes and more — live in Zehoro Toolkit Pro.)
 
 = Works *alongside* your SEO plugin =
 
@@ -38,7 +42,7 @@ Zehoro Toolkit is the free base for **Zehoro Toolkit Pro**, which adds the conte
 
 1. In your WordPress admin, go to **Plugins → Add New**, search for "Zehoro Toolkit", and click **Install Now**.
 2. Activate the plugin.
-3. (Optional) Visit **Zehoro → Start Here** to see the available modules. Everything works with default settings — there is nothing you must configure.
+3. (Optional) Visit **Zehoro → Modules** to see the available modules. Everything works with default settings — there is nothing you must configure.
 
 That's it. No keys, no accounts.
 
@@ -66,12 +70,38 @@ The content features are native Gutenberg blocks. Page builders can use the shor
 
 == Screenshots ==
 
-1. The Start Here screen — every available module at a glance.
-2. Table of Contents rendered on a post.
-3. The FAQ block (accordion plus structured data).
-4. SEO-plugin coexistence: Zehoro detects your SEO plugin and stands its schema down, with a one-click override.
+1. The Modules screen — every feature at a glance, on/off per module.
+2. Key Takeaways — a scannable summary box for the top of a post.
+3. The "We Tested" evaluation scorecard — criteria scores, methodology, pros/cons, and a verdict.
+4. The FAQ accordion — accessible, native details/summary.
+5. Pros & Cons — a two-column verdict box.
+6. The Author Box — an E-E-A-T trust card auto-filled from the post author.
 
 == Changelog ==
+
+= 1.36.2 =
+* Hardening and wp.org review-readiness: the Table of Contents scroll-spy now builds its label with safe DOM APIs (no `innerHTML`); the noscript module-save fallback redirects correctly; hidden settings pages register without a PHP 8.1 deprecation notice; front-end Table of Contents strings are translatable; the rename-migrator log is `WP_DEBUG`-gated. No change to how your content renders.
+
+= 1.34.0 – 1.36.1 =
+* Free is now deliberately lean: the five launch blocks (Key Takeaways, Pros & Cons, FAQ, Author Box, "We Tested") plus Table of Contents, Article schema, and Visual Styles. Thirteen secondary modules (Callout, Stat Callout, Steps, Testimonial, Inline Product, Content Box, CTA Swap, Disclaimer, Last Updated, Category Pills, Home Filter Pills, RSS CPT Support, Archive Title Cleanup) moved to Zehoro Toolkit Pro — on sites running Pro nothing changes: block names, shortcodes, settings, and stored content all keep working.
+
+= 1.33.0 =
+* New **"We Tested" evaluation block** — a hands-on scorecard (per-criteria scores, methodology, pros/cons, verdict). Emits Review schema only for genuine third-party subjects; a review of your own site or brand is automatically suppressed to stay within search-engine guidelines.
+
+= 1.32.0 =
+* New **Author Box block** — auto-fills from the post author (bio, credentials, links), with an Organization mode. Also enriches the Article schema author with employer and social profiles, without creating duplicate schema nodes.
+
+= 1.31.0 =
+* New **FAQ block** — an accessible question-and-answer accordion built on native `details`/`summary`. It leads on the visible, quotable accordion rather than FAQ markup (Google retired FAQ rich results in May 2026).
+
+= 1.30.0 =
+* New consolidated **Pros & Cons block** — a scannable two-column (or single-list) box, replacing the older three-block set. Existing content migrates automatically.
+
+= 1.29.0 =
+* New **Key Takeaways block** — a summary box for the top of a post. Replaces the older TL;DR block, with automatic migration of existing content.
+
+= 1.26.0 – 1.28.0 =
+* Modules screen re-organised for clarity; verified audit remediations (schema override, module grouping, updater token). No change to how your content renders.
 
 = 1.24.4 =
 * Fixed: FAQ and "Last Updated" structured data now honor the central schema-coexistence setting. Setting schema output to "never" (or letting an SEO plugin handle schema under "auto") now silences FAQPage and dateModified JSON-LD too — not just Article schema — preventing duplicate markup.
@@ -105,6 +135,12 @@ The content features are native Gutenberg blocks. Page builders can use the shor
 * Internationalization: text-domain loading aligned for translation; bundled translation template.
 
 == Upgrade Notice ==
+
+= 1.36.2 =
+Security and review-readiness hardening (Table of Contents rendering, noscript save, i18n). Recommended update.
+
+= 1.33.0 =
+Adds the "We Tested" evaluation block (with penalty-safe review schema) — the fifth and final launch block. Recommended update.
 
 = 1.24.3 =
 Security hardening for the email-capture webhook. Safe to update.

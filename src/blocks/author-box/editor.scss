@@ -1,0 +1,7 @@
+/**
+ * Author Box — editor-only. The preview is a ServerSideRender of the real card;
+ * keep it from feeling clickable/interactive inside the canvas.
+ */
+.wp-block-zehoro-author-box .zehoro-author-box__social {
+	pointer-events: none;
+}

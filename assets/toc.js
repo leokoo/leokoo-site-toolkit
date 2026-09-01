@@ -2,6 +2,11 @@ document.addEventListener('DOMContentLoaded', function() {
     const tocWrappers = document.querySelectorAll('[data-zehoro-toc]');
     if (!tocWrappers.length) return;
 
+    // Translated default label, injected by wp_localize_script; falls back to
+    // English if the localization object isn't present.
+    const defaultLabel = (window.zehoroTocL10n && window.zehoroTocL10n.defaultLabel)
+        || 'Sections in this article';
+
     tocWrappers.forEach(wrapper => {
         const toggle = wrapper.querySelector('.zehoro-toc-toggle');
         const activeText = wrapper.querySelector('.zehoro-toc-active-text');
@@ -46,7 +51,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         function updateActiveHeading() {
             let currentId = '';
-            let currentText = 'Sections in this article';
+            let currentText = defaultLabel;
             let activeLink = null;
             
             // Offset for sticky headers
@@ -65,28 +70,39 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             }
 
-            // We use a custom attribute to track the actual plain text since innerHTML will contain duplicated spans
+            // Track the actual plain text on a data attribute since the marquee
+            // state fills the element with duplicated spans.
             const prevText = activeText.getAttribute('data-current-text') || '';
-            
+
             if (activeText && prevText !== currentText) {
                 activeText.setAttribute('data-current-text', currentText);
-                activeText.innerHTML = currentText; // Reset to plain text first
-                
+                // textContent (never innerHTML): heading text is untrusted, and a
+                // heading like "&lt;img onerror=…&gt;" decodes to live markup the
+                // moment it round-trips through innerHTML. Keep it inert.
+                activeText.textContent = currentText; // Reset to plain text first
+
                 activeText.classList.remove('is-marquee');
                 activeText.style.animation = 'none';
-                
+
                 setTimeout(() => {
                     const parent = activeText.parentElement;
                     if (activeText.scrollWidth > parent.clientWidth) {
-                        // It overflows! Let's duplicate it for continuous scrolling.
+                        // It overflows! Duplicate the text for continuous scrolling —
+                        // built with createElement/textContent so nothing is parsed as HTML.
                         const gap = 40; // 40px gap between the two copies
-                        activeText.innerHTML = `<span>${currentText}</span><span style="padding-left: ${gap}px" aria-hidden="true">${currentText}</span>`;
-                        
+                        activeText.textContent = '';
+                        const first = document.createElement('span');
+                        first.textContent = currentText;
+                        const second = document.createElement('span');
+                        second.textContent = currentText;
+                        second.style.paddingLeft = gap + 'px';
+                        second.setAttribute('aria-hidden', 'true');
+                        activeText.append(first, second);
+
                         // We need to translate by exactly the width of the first span + the gap
-                        const firstSpan = activeText.children[0];
-                        const dist = firstSpan.getBoundingClientRect().width + gap;
+                        const dist = first.getBoundingClientRect().width + gap;
                         activeText.style.setProperty('--scroll-dist', `-${dist}px`);
-                        
+
                         void activeText.offsetWidth; // Reflow
                         activeText.style.animation = '';
                         activeText.classList.add('is-marquee');

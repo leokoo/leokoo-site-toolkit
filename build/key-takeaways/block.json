@@ -1,0 +1,48 @@
+{
+  "$schema": "https://schemas.wp.org/trunk/block.json",
+  "apiVersion": 3,
+  "name": "zehoro/key-takeaways",
+  "title": "Key Takeaways",
+  "category": "zehoro-toolkit",
+  "icon": "list-view",
+  "description": "An answer-first summary for the top of a post — scannable bullets or a short TL;DR that readers and AI answer engines can quote.",
+  "keywords": [
+    "key takeaways",
+    "tldr",
+    "summary",
+    "highlights",
+    "in short",
+    "at a glance"
+  ],
+  "textdomain": "zehoro-toolkit",
+  "supports": {
+    "html": false,
+    "anchor": true
+  },
+  "attributes": {
+    "heading": {
+      "type": "string",
+      "default": "Key takeaways"
+    },
+    "headingLevel": {
+      "type": "number",
+      "default": 2
+    },
+    "mode": {
+      "type": "string",
+      "default": "list"
+    },
+    "items": {
+      "type": "string",
+      "default": ""
+    },
+    "text": {
+      "type": "string",
+      "default": ""
+    }
+  },
+  "editorScript": "file:./index.js",
+  "editorStyle": "file:./index.css",
+  "style": "file:./style-index.css",
+  "render": "file:./render.php"
+}

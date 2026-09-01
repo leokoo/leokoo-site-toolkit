@@ -3,7 +3,7 @@
  * Plugin Name:  Zehoro Toolkit
  * Plugin URI:   https://leokoo.com
  * Description:  Editorial toolkit for WordPress — Article schema (E-E-A-T), Table of Contents, FAQ, author boxes, and content blocks. The free base for Zehoro Toolkit Pro.
- * Version:      1.28.0
+ * Version:      1.36.2
  * Author:       Leo Koo
  * Author URI:   https://leokoo.com
  * License:      GPLv2 or later
@@ -21,7 +21,7 @@ if ( ! defined( 'ABSPATH' ) ) exit;
 // zehoro-toolkit/). The second copy returns immediately.
 if ( defined( 'ZEHORO_VERSION' ) ) return;
 
-define( 'ZEHORO_VERSION', '1.28.0' );
+define( 'ZEHORO_VERSION', '1.36.2' );
 define( 'ZEHORO_DIR',     plugin_dir_path( __FILE__ ) );
 define( 'ZEHORO_URL',     plugin_dir_url( __FILE__ ) );
 
@@ -70,7 +70,7 @@ if ( file_exists( __DIR__ . '/vendor/yahnis-elsts/plugin-update-checker/plugin-u
         if ( empty( $gh_token ) && defined( 'ZEHORO_GITHUB_TOKEN' ) ) {
             $gh_token = ZEHORO_GITHUB_TOKEN;
         }
-        if ( str_starts_with( (string) $gh_token, 'v1:' ) || str_starts_with( (string) $gh_token, 'b64:' ) ) {
+        if ( strncmp( (string) $gh_token, 'v1:', 3 ) === 0 || strncmp( (string) $gh_token, 'b64:', 4 ) === 0 ) {
             $gh_token = ''; // Pro's encrypted token — never send ciphertext as a credential.
         }
         if ( ! empty( $gh_token ) ) {

@@ -1,0 +1,75 @@
+/**
+ * Pros & Cons — shared front-end + editor styles.
+ *
+ * Green/red are SEMANTIC (universally understood for pros/cons), not brand
+ * colours, and are exposed as CSS custom properties so a theme can override
+ * them. Everything else is theme-neutral (low-alpha surfaces, currentColor
+ * text). Two columns collapse to one on narrow viewports and in single-list mode.
+ */
+.zehoro-pros-cons {
+	--zehoro-pros: #2e7d32;
+	--zehoro-cons: #c62828;
+
+	// Flex (not grid) so a single column fills the width and two columns split
+	// it — no lopsided half-width box when only one side has content.
+	display: flex;
+	flex-wrap: wrap;
+	gap: 1.25em;
+	margin-block: 1.5em;
+
+	&__col {
+		flex: 1 1 240px;
+		padding: 1em 1.25em;
+		border: 1px solid rgba( 0, 0, 0, 0.12 );
+		border-radius: 6px;
+	}
+
+	&__pros {
+		border-top: 3px solid var( --zehoro-pros );
+	}
+
+	&__cons {
+		border-top: 3px solid var( --zehoro-cons );
+	}
+
+	&__title {
+		margin-block: 0 0.5em;
+		font-size: 1.05em;
+		line-height: 1.3;
+	}
+
+	&__list {
+		margin: 0;
+		padding: 0;
+		list-style: none;
+
+		li {
+			position: relative;
+			padding-inline-start: 1.6em;
+			margin-block: 0.4em;
+			line-height: 1.5;
+
+			&::before {
+				position: absolute;
+				inset-inline-start: 0;
+				font-weight: 700;
+			}
+		}
+	}
+
+	&__pros &__list li::before {
+		content: "\2713"; // ✓
+		color: var( --zehoro-pros );
+	}
+
+	&__cons &__list li::before {
+		content: "\2715"; // ✕
+		color: var( --zehoro-cons );
+	}
+}
+
+@media ( prefers-color-scheme: dark ) {
+	.zehoro-pros-cons__col {
+		border-color: rgba( 255, 255, 255, 0.18 );
+	}
+}

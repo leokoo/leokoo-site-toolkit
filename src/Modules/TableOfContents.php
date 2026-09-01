@@ -79,6 +79,11 @@ class TableOfContents implements \Zehoro\Core\ModuleInterface {
     public function maybe_enqueue_toc_js(): void {
         if ( $this->toc_will_render() ) {
             wp_enqueue_script( 'zehoro-toc', ZEHORO_URL . 'assets/toc.js', [], ZEHORO_VERSION, true );
+            // Keep the JS scroll-to-top reset label in sync with the translated
+            // server-rendered label (build_toc_html uses the same string).
+            wp_localize_script( 'zehoro-toc', 'zehoroTocL10n', [
+                'defaultLabel' => __( 'Sections in this article', 'zehoro-toolkit' ),
+            ] );
         }
     }
 
@@ -182,7 +187,10 @@ class TableOfContents implements \Zehoro\Core\ModuleInterface {
         set_transient( $cache_key, [ 'time' => $post->post_modified, 'items' => $lkst_toc_items ], 7 * DAY_IN_SECONDS );
     }
 
-    public function process_content( string $content ): string {
+    public function process_content( $content ): string {
+        // the_content can hand a filter null (an upstream filter returning null,
+        // an empty draft) — coerce before the strict return type / string ops.
+        $content = (string) $content;
         if ( ! is_singular() ) return $content;
         if ( isset( $_GET['bricks'] ) || isset( $_GET['etchwp'] ) || isset( $_GET['elementor-preview'] ) ) return $content;
 
@@ -253,8 +261,8 @@ class TableOfContents implements \Zehoro\Core\ModuleInterface {
     private function build_toc_html( array $items ): string {
         $html  = '<div class="zehoro-toc-wrapper" data-zehoro-toc>';
         $html .= '<div class="zehoro-toc-header">';
-        $html .= '<div class="zehoro-toc-title"><strong>BROWSE</strong> <span class="zehoro-toc-sep">|</span> <div class="zehoro-toc-active-text-wrapper"><span class="zehoro-toc-active-text">Sections in this article</span></div></div>';
-        $html .= '<button class="zehoro-toc-toggle" aria-expanded="false" aria-label="Toggle table of contents">';
+        $html .= '<div class="zehoro-toc-title"><strong>' . esc_html_x( 'BROWSE', 'table of contents eyebrow label', 'zehoro-toolkit' ) . '</strong> <span class="zehoro-toc-sep">|</span> <div class="zehoro-toc-active-text-wrapper"><span class="zehoro-toc-active-text">' . esc_html__( 'Sections in this article', 'zehoro-toolkit' ) . '</span></div></div>';
+        $html .= '<button class="zehoro-toc-toggle" aria-expanded="false" aria-label="' . esc_attr__( 'Toggle table of contents', 'zehoro-toolkit' ) . '">';
         $html .= '<svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>';
         $html .= '</button>';
         $html .= '</div>';

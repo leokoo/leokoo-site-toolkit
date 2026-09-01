@@ -25,6 +25,10 @@ class Dashboard {
 		add_action( 'admin_menu',             [ $this, 'register_menus' ], 9 );
 		add_action( 'admin_enqueue_scripts',  [ $this, 'enqueue_assets' ] );
 		add_action( 'admin_init',             [ $this, 'register_settings' ] );
+		// The noscript module-save must be handled before any admin HTML is sent,
+		// so its POST-Redirect-GET redirect actually fires (a render callback runs
+		// after headers are already out).
+		add_action( 'admin_init',             [ $this, 'maybe_handle_module_save' ] );
 		add_action( 'admin_post_zehoro_danger', [ $this, 'handle_danger' ] );
 	}
 
@@ -33,14 +37,8 @@ class Dashboard {
 		register_setting( 'zehoro_author_box_group', 'zehoro_cta_primary_url',     [ 'default' => '/blog/',              'sanitize_callback' => 'esc_url_raw' ] );
 		register_setting( 'zehoro_author_box_group', 'zehoro_cta_secondary_label', [ 'default' => 'Get the newsletter',  'sanitize_callback' => 'sanitize_text_field' ] );
 		register_setting( 'zehoro_author_box_group', 'zehoro_cta_secondary_url',   [ 'default' => '#newsletter',         'sanitize_callback' => 'esc_url_raw' ] );
-		register_setting( 'zehoro_rss_group', 'zehoro_rss_post_types', [
-			'default'           => [ 'post' ],
-			'sanitize_callback' => function ( $input ) {
-				if ( ! is_array( $input ) ) return [ 'post' ];
-				$valid = array_keys( get_post_types( [ 'public' => true ] ) );
-				return array_values( array_filter( array_map( 'sanitize_key', $input ), fn( $pt ) => in_array( $pt, $valid, true ) ) );
-			},
-		] );
+		// (The zehoro_rss_group setting moved to Pro's RSSSupport module with
+		// the rss_support module in the lean-Free reorg, stage C.)
 
 		$sanitize_hex = fn( $value, $default ) => preg_match( '/^#[0-9a-fA-F]{3,8}$/', sanitize_text_field( $value ) ) ? sanitize_text_field( $value ) : $default;
 		register_setting( 'zehoro_styles_group', 'zehoro_color_primary',          [ 'default' => '#E8A020', 'sanitize_callback' => fn( $v ) => $sanitize_hex( $v, '#E8A020' ) ] );
@@ -94,21 +92,20 @@ class Dashboard {
 		// Discovery flows through the Modules grid's "Configure" links.
 		// Phase 0 module refactor — task #36.
 		if ( in_array( 'author_box', $this->active, true ) ) {
-			add_submenu_page( null, __( 'Author Box Settings', 'zehoro-toolkit' ), __( 'Author Box', 'zehoro-toolkit' ), 'manage_options', 'zehoro-author-box', [ $this, 'render_author_box_settings_page' ] );
+			add_submenu_page( '', __( 'Author Box Settings', 'zehoro-toolkit' ), __( 'Author Box', 'zehoro-toolkit' ), 'manage_options', 'zehoro-author-box', [ $this, 'render_author_box_settings_page' ] );
 		}
 
 		if ( in_array( 'table_of_contents', $this->active, true ) ) {
-			add_submenu_page( null, __( 'Table of Contents', 'zehoro-toolkit' ), __( 'Table of Contents', 'zehoro-toolkit' ), 'manage_options', 'zehoro-toc-settings',
+			add_submenu_page( '', __( 'Table of Contents', 'zehoro-toolkit' ), __( 'Table of Contents', 'zehoro-toolkit' ), 'manage_options', 'zehoro-toc-settings',
 				[ new \Zehoro\Modules\TableOfContents(), 'render_page' ]
 			);
 		}
 
-		if ( in_array( 'rss_support', $this->active, true ) ) {
-			add_submenu_page( null, __( 'RSS Feed Settings', 'zehoro-toolkit' ), __( 'RSS Feed', 'zehoro-toolkit' ), 'manage_options', 'zehoro-rss-feed', [ $this, 'render_rss_feed_settings_page' ] );
-		}
+		// (The RSS Feed settings page moved to Pro's RSSSupport module, which
+		// registers zehoro-rss-feed itself — lean-Free reorg, stage C.)
 
 		if ( in_array( 'styles', $this->active, true ) ) {
-			add_submenu_page( null, __( 'Visual Styles', 'zehoro-toolkit' ), __( 'Visual Styles', 'zehoro-toolkit' ), 'manage_options', 'zehoro-styles', [ $this, 'render_styles_settings_page' ] );
+			add_submenu_page( '', __( 'Visual Styles', 'zehoro-toolkit' ), __( 'Visual Styles', 'zehoro-toolkit' ), 'manage_options', 'zehoro-styles', [ $this, 'render_styles_settings_page' ] );
 		}
 	}
 
@@ -186,7 +183,7 @@ class Dashboard {
 				'title' => __( 'Content publisher / blogger', 'zehoro-toolkit' ),
 				'desc'  => __( 'E-E-A-T signals (author box, freshness, FAQ, schema), editorial blocks, the rewrite workflow and the full GSC loop — which post to fix next, and proof the fix worked.', 'zehoro-toolkit' ),
 				'slugs' => [
-					'author_box', 'table_of_contents', 'tldr', 'faq', 'callout', 'stat_callout',
+					'author_box', 'table_of_contents', 'key_takeaways', 'faq', 'callout', 'stat_callout',
 					'steps', 'testimonial', 'last_updated', 'freshness_log', 'article_schema',
 					'entity_map', 'rewrite_context', 'ai_visibility', 'inline_subscribe',
 					'category_pills', 'google_search_console', 'ctr_rescue',
@@ -286,15 +283,15 @@ class Dashboard {
 		return (array) apply_filters( 'zehoro/module_suites', [
 			'editorial_blocks' => [
 				'label' => __( 'Blocks', 'zehoro-toolkit' ),
-				'desc'  => __( 'Ready-made content blocks for your posts — callouts, FAQs, pros & cons, comparison and review boxes, and more. Turn the set on, then switch off any you do not use.', 'zehoro-toolkit' ),
+				'desc'  => __( 'Ready-made content blocks for your posts — Key Takeaways, Pros & Cons, FAQ accordions, and author boxes. Turn the set on, then switch off any you do not use.', 'zehoro-toolkit' ),
 			],
 			'schema' => [
 				'label' => __( 'Schema', 'zehoro-toolkit' ),
-				'desc'  => __( 'Structured data that helps Google show rich results for your articles, FAQs and how-tos. Pauses automatically if a dedicated SEO plugin already handles it.', 'zehoro-toolkit' ),
+				'desc'  => __( 'Structured data that helps Google show rich results for your articles. Pauses automatically if a dedicated SEO plugin already handles it.', 'zehoro-toolkit' ),
 			],
 			'reading_ux' => [
 				'label' => __( 'Reading & Trust', 'zehoro-toolkit' ),
-				'desc'  => __( 'Reader-facing touches that build trust — a table of contents, last-updated and freshness stamps, and disclosure notices.', 'zehoro-toolkit' ),
+				'desc'  => __( 'Reader-facing touches that build trust — starting with an automatic, accessible table of contents.', 'zehoro-toolkit' ),
 			],
 		] );
 	}
@@ -395,24 +392,32 @@ class Dashboard {
 		<?php
 	}
 
+	/**
+	 * Noscript module-save handler — POST-Redirect-GET.
+	 *
+	 * Hooked on admin_init (before any admin HTML is sent) so the redirect
+	 * actually fires; running it inside the render callback would attempt the
+	 * redirect after headers are already out. The JS path uses the REST bulk
+	 * route; this is the no-JS fallback behind the same nonce + capability.
+	 */
+	public function maybe_handle_module_save(): void {
+		if ( ! isset( $_POST['zehoro_save_modules'] ) ) return;
+		if ( ! current_user_can( 'manage_options' ) ) return;
+		check_admin_referer( 'zehoro_modules_action', 'zehoro_modules_nonce' );
+
+		// Sanitise + intersect against the real registry so junk keys can't be
+		// persisted (parity with the REST bulk route).
+		$posted     = ( isset( $_POST['modules'] ) && is_array( $_POST['modules'] ) )
+			? array_map( 'sanitize_key', array_keys( wp_unslash( $_POST['modules'] ) ) )
+			: [];
+		$new_active = array_values( array_intersect( $posted, array_keys( \Zehoro\Core\Plugin::get_registered_modules() ) ) );
+		update_option( 'zehoro_active_modules', $new_active );
+		wp_safe_redirect( add_query_arg( [ 'page' => 'zehoro-dashboard', 'updated' => '1' ], admin_url( 'admin.php' ) ) );
+		exit;
+	}
+
 	public function render_dashboard_page(): void {
 		if ( ! current_user_can( 'manage_options' ) ) return;
-
-		// POST handler: save modules, then redirect (POST-Redirect-GET pattern).
-		// Without a redirect the user can re-submit by refreshing, and the browser
-		// shows a "resubmit form?" warning.
-		if ( isset( $_POST['zehoro_save_modules'] ) && check_admin_referer( 'zehoro_modules_action', 'zehoro_modules_nonce' ) ) {
-			// Sanitise + intersect against the real registry so junk keys can't be
-			// persisted (parity with the REST bulk route). Nonce + capability are
-			// already enforced above; this is defence-in-depth for the noscript path.
-			$posted     = ( isset( $_POST['modules'] ) && is_array( $_POST['modules'] ) )
-				? array_map( 'sanitize_key', array_keys( wp_unslash( $_POST['modules'] ) ) )
-				: [];
-			$new_active = array_values( array_intersect( $posted, array_keys( \Zehoro\Core\Plugin::get_registered_modules() ) ) );
-			update_option( 'zehoro_active_modules', $new_active );
-			wp_safe_redirect( add_query_arg( [ 'page' => 'zehoro-dashboard', 'updated' => '1' ], admin_url( 'admin.php' ) ) );
-			exit;
-		}
 
 		$registered = Plugin::get_registered_modules();
 		$default_active = array_keys( array_filter( $registered, function($m) { return ! empty( $m['default'] ); } ) );
@@ -777,51 +782,6 @@ class Dashboard {
 										<input type="text" id="<?php echo esc_attr( $key ); ?>" name="<?php echo esc_attr( $key ); ?>" value="<?php echo esc_attr( \Zehoro\Utils\Option::get( $key, $default ) ); ?>" class="lkst-color-picker">
 									</div>
 								<?php endforeach; ?>
-								<button type="submit" class="zui-btn zui-btn--primary"><?php esc_html_e( 'Save Changes', 'zehoro-toolkit' ); ?></button>
-							</form>
-						</div>
-					</div>
-				</div>
-			</div>
-		</div>
-		<?php
-	}
-
-	public function render_rss_feed_settings_page(): void {
-		$post_types = get_post_types( [ 'public' => true ], 'objects' );
-		$exclude    = [ 'attachment', 'page', 'bricks_template', 'etch_template', 'elementor_library', 'ifso_triggers' ];
-		$selected   = \Zehoro\Utils\Option::get( 'zehoro_rss_post_types', [ 'post' ] );
-		?>
-		<div class="wrap">
-			<div class="zui">
-				<header class="zui-pagehead">
-					<div>
-						<div class="zui-pagehead__eyebrow"><?php esc_html_e( 'Zehoro Toolkit', 'zehoro-toolkit' ); ?></div>
-						<h1 class="zui-pagehead__title"><?php esc_html_e( 'RSS Feed Support', 'zehoro-toolkit' ); ?></h1>
-						<div class="zui-pagehead__sub"><?php esc_html_e( 'Choose which content types appear in your site feeds.', 'zehoro-toolkit' ); ?></div>
-					</div>
-					<div class="zui-pagehead__actions">
-						<a class="zui-btn zui-btn--secondary zui-btn--sm" href="<?php echo esc_url( admin_url( 'admin.php?page=zehoro-dashboard' ) ); ?>">&larr; <?php esc_html_e( 'Back to Modules', 'zehoro-toolkit' ); ?></a>
-					</div>
-				</header>
-				<div class="zui-body" style="padding:18px 0 0;">
-					<div class="zui-card zui-card--raised" style="max-width:560px;">
-						<div class="zui-card__head"><span><?php esc_html_e( 'Feed content types', 'zehoro-toolkit' ); ?></span></div>
-						<div class="zui-card__body">
-							<form method="post" action="options.php">
-								<?php settings_fields( 'zehoro_rss_group' ); ?>
-								<div class="zui-field">
-									<span class="zui-field__label"><?php esc_html_e( 'Include Post Types', 'zehoro-toolkit' ); ?></span>
-									<?php
-									foreach ( $post_types as $slug => $pt ) :
-										if ( in_array( $slug, $exclude, true ) ) continue;
-										?>
-										<label class="zui-inline" style="margin-bottom:2px;">
-											<input type="checkbox" name="zehoro_rss_post_types[]" value="<?php echo esc_attr( $slug ); ?>" <?php checked( in_array( $slug, $selected, true ) ); ?>>
-											<span><?php echo esc_html( $pt->label ); ?> <span class="zui-slug"><?php echo esc_html( $slug ); ?></span></span>
-										</label>
-									<?php endforeach; ?>
-								</div>
 								<button type="submit" class="zui-btn zui-btn--primary"><?php esc_html_e( 'Save Changes', 'zehoro-toolkit' ); ?></button>
 							</form>
 						</div>

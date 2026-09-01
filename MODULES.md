@@ -1,80 +1,59 @@
 # Zehoro Toolkit — Module Reference
 
 **Plugin:** Zehoro Toolkit (Free)
-**Version:** 1.24.3
 **Namespace:** `Zehoro\Modules`
 **Source:** `src/Modules/`
 
----
-
-## Native Gutenberg Blocks
-
-These modules register `block.json`-based Gutenberg blocks. Compiled blocks live in `build/` and use JSX/webpack. Server-side rendered (SSR) blocks use vanilla JS editor scripts in `assets/blocks/` — no build step needed.
-
-| Module file | Slug | Block name | Type | Description |
-|---|---|---|---|---|
-| `Callout.php` | `callout` | Callout Block | compiled | Visual callout / notice / alert for long-form content. Variants: info, warning, success, tip. |
-| `ProsCons.php` | `pros_cons` | Pros & Cons | compiled | Wirecutter-style pros/cons box. Registers three blocks: `pros-cons` (wrapper), `pros`, `cons`. |
-| `TLDR.php` | `tldr` | TL;DR / Key Takeaways | compiled | Styled summary box for the top of articles. Native Gutenberg block. |
-| `Steps.php` | `steps` | Steps / Process | SSR | Numbered how-to steps. Auto-emits `HowTo` JSON-LD schema. Editor: vanilla JS repeater with move up/down controls. |
-| `Testimonial.php` | `testimonial` | Testimonial | SSR | Static testimonial card: photo, name, role/company, quote. Three layout variants (card / minimal / highlight). |
-| `StatCallout.php` | `stat_callout` | Stat Callout | SSR | Large bold number + label for B2B/SaaS content marketing. Optional source citation. Three layout variants. |
-| `InlineProduct.php` | `inline_product` | Inline Product Mention | SSR | Compact horizontal product card for mid-content references: thumbnail, name, one-liner, CTA button. Configurable link rel. |
+Free is deliberately lean — the wordpress.org acquisition funnel: the five launch
+blocks plus Table of Contents, Article schema, and Visual Styles. Everything else
+lives in **Zehoro Toolkit Pro** (see "Moved to Pro" below).
 
 ---
 
-## Shortcode Modules
+## Launch blocks (native Gutenberg)
 
-These modules register shortcodes (canonical `[zehoro_*]`; the legacy `[lkst_*]` form shown below is still registered as a backward-compatible alias) and/or auto-inject into `the_content`.
+All five are dynamic blocks rendered through a single server-side seam
+(`save()` returns null; `render.php` delegates to the module's render method),
+so markup improvements never invalidate stored content.
 
-| Module file | Slug | Shortcode(s) | Description |
+| Module file | Slug | Block(s) | Description |
 |---|---|---|---|
-| `AuthorBox.php` | `author_box` | `[lkst_author_box]` `[lkst_author_socials]` | Full author card with biography, social icons, and CTA buttons. Resolves author outside the loop (safe for Bricks/Etch). Settings page: `lkst-author-box`. |
-| `CategoryPills.php` | `category_pills` | `[lkst_top_category_pills]` | Dynamic category/tag pill links for archives. Accepts `limit` attribute. |
-| `HomeFilterPills.php` | `home_filter_pills` | `[lkst_home_filter_pills]` | Cross-CPT topic navigation pills. Each pill links to a category or CPT archive (clean URL, no JS). Items configured per-site via `lkst/home_filter_pills/items` filter. Accepts `scheme="light\|dark"` attribute. |
-| `ContentBox.php` | `content_box` | `[lkst_box]` | Manual CTA or email-capture box. Types: `cta` (external form shortcode) or `email` (built-in AJAX form with webhook delivery). Migrates from legacy `basic_cta` slug. |
-| `Disclaimer.php` | `disclosure` | *(auto-inject)* | Legal/medical/custom disclaimer. Auto-appends styled box to post content. Configurable per post type. **Note:** internal slug is `disclosure` for backward compatibility. |
-| `FAQ.php` | `faq` | `[lkst_faq question="..."]` | Styled FAQ accordions with automatic `FAQPage` JSON-LD schema. Defers schema to Yoast/RankMath/SureRank when active. |
-| `LastUpdated.php` | `last_updated` | `[lkst_last_updated]` | Freshness badge showing last modified date. Optional auto-inject. Optionally emits structured data into `<head>`. |
-| `TableOfContents.php` | `table_of_contents` | `[lkst_toc]` | Wirecutter-style collapsible TOC. Parses H2/H3 from raw `post_content`, injects anchor IDs, auto-injects or manual via shortcode. Settings page: `lkst-toc-settings`. |
+| `KeyTakeaways.php` | `key_takeaways` | `zehoro/key-takeaways` | Scannable summary box for the top of a post. Supersedes the legacy `lkst/tldr` block (render safety-net + `wp zehoro migrate-blocks` migrator). |
+| `ProsCons.php` | `pros_cons` | `zehoro/pros-cons` | Two-column (or single-list) Pros & Cons box with a `show` toggle. Consolidates the retired `lkst/pros-cons` + `lkst/pros` + `lkst/cons` set. No schema. |
+| `FAQ.php` | `faq` | `zehoro/faq` + `zehoro/faq-item` | Accessible question-and-answer accordion on native `details`/`summary`, rich answers via inner blocks. No FAQPage JSON-LD (Google retired FAQ rich results 2026-05). Legacy `[zehoro_faq]` shortcode kept. |
+| `AuthorBox.php` | `author_box` | `zehoro/author-box` | E-E-A-T trust card auto-filled from the post author (avatar, bio, credential chips, socials) with an Organization mode. Emits no schema of its own — ArticleSchema owns the author Person. Legacy `[zehoro_author_box]` shortcode kept. |
+| `Evaluation.php` | `evaluation` | `zehoro/evaluation` | "We Tested" scorecard: methodology note, per-criteria scores (auto-averaged), pros/cons, verdict. Emits Review JSON-LD **only for third-party subjects** — a hard self-serving guardrail suppresses reviews of your own site/brand. |
 
 ---
 
-## Schema / SEO Modules
+## Content & schema
 
 | Module file | Slug | Description |
 |---|---|---|
-| `ArticleSchema.php` | `article_schema` | Post-type-aware JSON-LD schema. Maps post types to: `BlogPosting`, `Recipe`, `Review`, `Service`, `Product`, `WebPage`, `Article`. Auto-skips when Yoast / SEOPress / RankMath / AIOSEO / SureRank is active. Gutenberg sidebar meta box shows schema preview. |
+| `TableOfContents.php` | `table_of_contents` | Wirecutter-style collapsible TOC. Parses H2/H3 from `post_content`, injects anchor IDs, auto-inject or `[zehoro_toc]`. Settings page: `zehoro-toc-settings`. |
+| `ArticleSchema.php` | `article_schema` | Post-type-aware JSON-LD (`BlogPosting`, `Recipe`, `Review`, `Service`, `Product`, `WebPage`, `Article`). Author Person enriched with `worksFor` (publisher Org by `@id`) + social `sameAs`. Stands down automatically when a dedicated SEO plugin is active. |
+| `VisualStyles.php` | `styles` | Brand colour customisation via CSS custom properties (`--lkst-*`), inlined with the global stylesheet. |
 
 ---
 
-## UI / Display Modules
+## Moved to Pro (lean-Free reorg, 2026-07)
 
-| Module file | Slug | Description |
-|---|---|---|
-| `VisualStyles.php` | `styles` | Brand color customisation for Author Box, CTAs, and Category Pills via CSS custom properties. |
+Thirteen modules relocated to **Zehoro Toolkit Pro** across reorg stages A–C —
+block names, shortcodes, option keys, and stored data unchanged, so a Free+Pro
+site is unaffected:
 
----
+`callout`, `stat_callout`, `steps`, `testimonial`, `inline_product`,
+`content_box`, `cta_swap`, `disclosure` (Disclaimer), `last_updated`,
+`category_pills`, `home_filter_pills`, `rss_support`, `archive_cleanup`.
 
-## Interaction / Composition Modules
-
-These modules ship no markup of their own — they bind behaviour to standardised `data-*` attributes that *other* modules (or hand-written markup) emit. This is the composition pattern that lets Pro modules like Inline Subscribe layer on free behaviour without coupling.
-
-| Module file | Slug | Default | Description |
-|---|---|---|---|
-| `CtaSwap.php` | `cta_swap` | off | **Inline button-to-form swap behaviour.** Bind a trigger button to a target form via `data-lkst-swap-group` + `data-lkst-swap-target`. Clicking the trigger swaps it out for the target (e.g. "Sign up" button → reveals newsletter form inline). Handles focus, ESC-to-back, reduced-motion. ~50 lines of vanilla JS, zero deps. Composes with Pro Inline Subscribe (v1.4.1+) and any other module that opts in by rendering the right attributes. |
+See `zehoro-toolkit-pro/MODULES.md` for their reference entries.
 
 ---
 
-## Site Utility Modules
+## Cut modules (no longer anywhere)
 
-| Module file | Slug | Description |
-|---|---|---|
-| `ArchiveCleanup.php` | `archive_cleanup` | Removes "Category:", "Tag:", "Author:" prefixes from archive titles globally via `get_the_archive_title_prefix` filter. |
-| `RSSSupport.php` | `rss_support` | Includes custom post types in the main site RSS feed. |
-
----
-
-## Cut modules (no longer in Free)
-
-Four modules from earlier "Leokoo Site Toolkit" builds were **removed on 2026-06-06** — each is now covered by native Gutenberg core (a theme/user choice, not Zehoro's job): **Reading Time** (`core/post-time-to-read`), **Post Navigation** (`core/post-navigation-link`), **Reading Progress**, and **News Ticker**. Their old `[lkst_*]` shortcodes now render nothing; re-create the effect with the core blocks.
+Four modules from earlier "Leokoo Site Toolkit" builds were **removed on
+2026-06-06** — each is covered by native Gutenberg core: **Reading Time**
+(`core/post-time-to-read`), **Post Navigation** (`core/post-navigation-link`),
+**Reading Progress**, and **News Ticker**. Their old `[lkst_*]` shortcodes now
+render nothing; re-create the effect with the core blocks.

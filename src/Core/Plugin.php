@@ -214,7 +214,7 @@ class Plugin {
 	private static function detect_group( string $slug ): string {
 		static $map = [
 			// Editorial Blocks — content the author drops into posts.
-			'tldr'              => 'editorial_blocks',
+			'key_takeaways'     => 'editorial_blocks',
 			'faq'               => 'editorial_blocks',
 			'steps'             => 'editorial_blocks',
 			'pros_cons'         => 'editorial_blocks',
@@ -289,7 +289,7 @@ class Plugin {
 	private static function detect_type( string $slug ): string {
 		static $blocks = [
 			'callout', 'faq', 'pros_cons', 'stat_callout', 'steps', 'testimonial',
-			'tldr', 'inline_product', 'comparison_table', 'coupon_box', 'product_box',
+			'key_takeaways', 'inline_product', 'comparison_table', 'coupon_box', 'product_box',
 			'product_roundup', 'product_verdict', 'review_box', 'versus_box',
 		];
 		static $tools = [
@@ -456,7 +456,10 @@ class Plugin {
 	public static function deactivate(): void {
 		global $wpdb;
 		// Deactivation transient cleanup covers both legacy (lkst_) and
-		// canonical (zehoro_) prefixes during the rename transition.
+		// canonical (zehoro_) prefixes during the rename transition. The LIKE
+		// patterns are static literals (no user input) and this is a one-off
+		// deactivation sweep, so a direct query with no cache is correct here.
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		$wpdb->query( "DELETE FROM {$wpdb->options} WHERE option_name LIKE '_transient_lkst_%' OR option_name LIKE '_transient_timeout_lkst_%' OR option_name LIKE '_transient_zehoro_%' OR option_name LIKE '_transient_timeout_zehoro_%'" );
 		flush_rewrite_rules();
 	}
