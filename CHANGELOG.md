@@ -1,5 +1,27 @@
 # Changelog
 
+## [1.37.0] - 2026-09-06
+
+### Fixed — three things that would have failed a wordpress.org review
+
+- **The self-hosted updater is out of the package.** wordpress.org forbids a plugin that updates
+  itself from outside the directory, and Plugin Check enforces it **statically** — the old
+  `file_exists( vendor/… )` guard was functionally correct (the built package has no `vendor/`, so
+  it never ran) but the scanner flags the reference whether or not it can execute. The wiring moved
+  to `updater.php`, which `.distignore` excludes, and neither the library path nor `PucFactory`
+  appears anywhere in the built ZIP. GitHub and self-hosted installs still auto-update, because
+  that file is present there. Verified: a `.distignore` build is 728 KB / 105 files with zero
+  updater references.
+- **`Requires at least` was a false promise.** Every block declares `apiVersion: 3`, which needs
+  WordPress **6.3**; the header and readme both claimed 6.0. Users on 6.0–6.2 would have installed
+  it and found broken blocks.
+- **`Tested up to`** 7.0 → **7.1**, and the header description trimmed from 157 to 133 characters
+  (Plugin Check caps it at 140).
+
+Note for anyone editing `updater.php`: it is `require`d, so `__FILE__` there is *updater.php*, not
+the plugin's main file. PUC keys updates off the main file's basename, so the caller passes it in
+explicitly — getting that wrong silently breaks updates for every self-hosted install.
+
 All notable changes to the **Zehoro Toolkit** will be documented in this file.
 
 ## [1.36.2] - 2026-07-21

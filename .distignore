@@ -31,3 +31,7 @@
 /HANDOFF.md
 /specs
 /.wordpress-org
+
+# The GitHub self-update wiring — wordpress.org forbids a self-hosted updater, and Plugin
+# Check flags it statically, so the package must not CONTAIN it (a runtime guard is not enough).
+updater.php

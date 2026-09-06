@@ -2,8 +2,8 @@
 /**
  * Plugin Name:  Zehoro Toolkit
  * Plugin URI:   https://leokoo.com
- * Description:  Editorial toolkit for WordPress — Article schema (E-E-A-T), Table of Contents, FAQ, author boxes, and content blocks. The free base for Zehoro Toolkit Pro.
- * Version:      1.36.2
+ * Description:  Editorial toolkit — E-E-A-T Article schema, Table of Contents, FAQ, author boxes and content blocks. Coexists with your SEO plugin.
+ * Version:      1.37.0
  * Author:       Leo Koo
  * Author URI:   https://leokoo.com
  * License:      GPLv2 or later
@@ -11,7 +11,7 @@
  * Text Domain:  zehoro-toolkit
  * Domain Path:  /languages
  * Requires PHP: 7.4
- * Requires at least: 6.0
+ * Requires at least: 6.3
  */
 
 if ( ! defined( 'ABSPATH' ) ) exit;
@@ -21,7 +21,7 @@ if ( ! defined( 'ABSPATH' ) ) exit;
 // zehoro-toolkit/). The second copy returns immediately.
 if ( defined( 'ZEHORO_VERSION' ) ) return;
 
-define( 'ZEHORO_VERSION', '1.36.2' );
+define( 'ZEHORO_VERSION', '1.37.0' );
 define( 'ZEHORO_DIR',     plugin_dir_path( __FILE__ ) );
 define( 'ZEHORO_URL',     plugin_dir_url( __FILE__ ) );
 
@@ -36,49 +36,20 @@ spl_autoload_register( function( $class ) {
     if ( file_exists( $file ) ) require $file;
 } );
 
-// --- Auto-updater (GitHub) ---
-// Guarded by file_exists(): the wordpress.org build ships WITHOUT vendor/
-// (excluded via .distignore), so this whole block is skipped there and
-// wordpress.org serves updates instead. GitHub / self-hosted installs keep
-// auto-updates because vendor/ is present. wp.org forbids a self-hosted
-// updater in the distributed package — excluding vendor/ satisfies that
-// without forking the source.
-if ( file_exists( __DIR__ . '/vendor/yahnis-elsts/plugin-update-checker/plugin-update-checker.php' ) ) {
-    require_once __DIR__ . '/vendor/yahnis-elsts/plugin-update-checker/plugin-update-checker.php';
-
-    $lkst_updater = \YahnisElsts\PluginUpdateChecker\v5\PucFactory::buildUpdateChecker(
-        'https://github.com/leokoo/zehoro-toolkit/',
-        __FILE__,
-        'zehoro-toolkit'
-    );
-    // Use the shared GitHub token if available (avoids API rate-limit / enables
-    // private-repo updates). Read the CANONICAL key first — Pro reads/writes
-    // `zehoro_pro_github_token`, so without this fallback a token set the canonical
-    // way left Free's updater unauthenticated — then the legacy `lkst_*` key.
-    // Authenticate on `plugins_loaded` (mirrors Pro) and NEVER forward an
-    // ENCRYPTED token. Pro stores `zehoro_pro_github_token` encrypted at rest
-    // (ciphertext prefixed `v1:`/`b64:`); Free has no decrypt path, so handing
-    // that ciphertext to GitHub as a bearer token yields a 401 and breaks Free's
-    // update check. Skip auth for a ciphertext value → fall back to anonymous
-    // (rate-limited) public-repo checks. A hand-set plaintext ZEHORO_GITHUB_TOKEN
-    // still authenticates. (See reference_wp_no_crypto_at_plugin_load doctrine.)
-    add_action( 'plugins_loaded', function () use ( $lkst_updater ) {
-        $gh_token = get_option( 'zehoro_pro_github_token', '' );
-        if ( empty( $gh_token ) ) {
-            $gh_token = get_option( 'lkst_pro_github_token', '' );
-        }
-        if ( empty( $gh_token ) && defined( 'ZEHORO_GITHUB_TOKEN' ) ) {
-            $gh_token = ZEHORO_GITHUB_TOKEN;
-        }
-        if ( strncmp( (string) $gh_token, 'v1:', 3 ) === 0 || strncmp( (string) $gh_token, 'b64:', 4 ) === 0 ) {
-            $gh_token = ''; // Pro's encrypted token — never send ciphertext as a credential.
-        }
-        if ( ! empty( $gh_token ) ) {
-            $lkst_updater->setAuthentication( $gh_token );
-        }
-    }, 1 );
-    $lkst_updater->setBranch( 'main' );
-    $lkst_updater->getVcsApi()->enableReleaseAssets();
+// --- Auto-updater (GitHub) — NOT shipped to wordpress.org ---
+// The wiring lives in updater.php, which `.distignore` excludes from the built package.
+// It used to sit inline behind a `file_exists( vendor/… )` guard: functionally correct (the
+// wp.org build has no vendor/, so it never ran) but Plugin Check scans STATICALLY and flags
+// `plugin_updater_detected` on the reference regardless of the guard. Keeping the code in a
+// file the package does not contain is what actually satisfies the rule.
+// The condition names ONLY updater.php — the vendor check lives inside it. Naming the
+// updater library's path here would leave its string in the distributed main file, which is
+// what Plugin Check greps for; the package must mention it nowhere.
+if ( file_exists( __DIR__ . '/updater.php' ) ) {
+    // PUC keys the update off the MAIN plugin file's basename; inside updater.php `__FILE__`
+    // would be updater.php, which silently breaks updates for every self-hosted install.
+    $zehoro_updater_plugin_file = __FILE__;
+    require_once __DIR__ . '/updater.php';
 }
 
 // Rename migrator (lkst_* → zehoro_*) runs idempotently early, so all option
